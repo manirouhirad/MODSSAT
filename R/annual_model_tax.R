@@ -2,8 +2,6 @@
 #' @param tax_amount                     is the amount of tax on the unit of groundwater extracted. Defaults to 1.1.
 #' @param well_soil_file                 is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".
 #' @param well_capacity_files            is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".
-#' @param price_file                     is the file that includes crop prices. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv".
-#' @param fixed_cost_file                is the file tha includes fixed costs (per acre) costs of production. Defaults to "C:/Users/manirad/Downloads/test/fixed_cost_input.csv".
 #' @param econ_output_file               is the name of the output file that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
 #' @param first_year_of_simulation       is the first year that the hydro-economic simulation starts. Defaults to 2000.
@@ -23,8 +21,6 @@
 annual_model_tax = function(tax_amount=1.1,
                                  well_soil_file          = "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv",
                                  well_capacity_files     = "C:/Users/manirad/Downloads/test/Well Capacity",
-                                 price_file              = "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv",
-                                 fixed_cost_file         = "C:/Users/manirad/Downloads/test/fixed_cost_input.csv",
                                  econ_output_file        = "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
                                  well_capacity_file_year = "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
                                  first_year_of_simulation = 2000,
@@ -35,6 +31,7 @@ annual_model_tax = function(tax_amount=1.1,
                                  first_year_of_GW = 1997,
                                  last_year_of_GW  = 2008,
                                  irrigation_season_days = 70){
+
   #----------------
   # 1) Soil type
   #----------------

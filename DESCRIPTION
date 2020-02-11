@@ -2,13 +2,13 @@ Package: MODSSAT
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Mani",
+           family = "Rouhi Rad",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "rrad@clemson.edu",
+           comment = c(ORCID = "https://orcid.org/0000-0003-3572-1601"))
+Description: This package contains the functions for the economic component of the MOD$$AT model. MOD$$AT is a hydro-economic model that is based on MODFLOW as the groundwater component, DSSAT as the crop simulation component and this package. The package has separate functions for different policies. It also has three separate functions for each run. First, the gen_lookup_XX function creates the lookup table (XX reflexts the policy). This lookup table includes all the expected profit-maximizing amounts of groundwater extraction and profits for each well capacity. Second, the annual_model_XX (again, XX is a placeholder for the policy) then based on the year, selects the profit-maximizing amounts of groundwater use and profits and passes the water use argument to MODFLOW. gen_well_capacity function generates a well capacity file at the end of the simulation. 
+License: MIT
 Encoding: UTF-8
 LazyData: true
 Depends:
