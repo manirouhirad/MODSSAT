@@ -9,7 +9,7 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-function (tax_amount = 1.1,
+gen_output_tax = function (tax_amount = 1.1,
           well_capacity_files = "C:/Users/manirad/Downloads/test/Well Capacity",
           well_capacity_for_econ = "C:/Users/manirad/Downloads/test/Econ_output/well_capacity.csv",
           first_year_of_simulation = 2000,
