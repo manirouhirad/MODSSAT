@@ -17,11 +17,11 @@
 #' }
 #' @export
 gen_lookup_tax = function(tax_amount              = 1.1,
-                          DSSAT_files         = "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised",
-                          soil_file           = "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv",
-                          well_capacity_file  = "C:/Users/manirad/Downloads/test/Well_Capacity_ganarator.csv",
-                          price_file          = "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv",
-                          fixed_cost_file     = "C:/Users/manirad/Downloads/test/fixed_cost_input.csv",
+                          DSSAT_files         = "./input_files/DSSAT_files",
+                          soil_file           = "./input_files/Well_Soil Type_generator_07.csv",
+                          well_capacity_file  = "./input_files/Well_Capacity_ganarator.csv",
+                          price_file          = "./input_files/crop_prices.csv",
+                          fixed_cost_file     = "./input_files/fixed_cost_input.csv",
                           pumping_cost = 3.56,
                           default_well_capacity_col_name = "Well_Capacity(gpm)",
                           soil_moisture_targets = c(25, 35, 45, 55, 65, 75),

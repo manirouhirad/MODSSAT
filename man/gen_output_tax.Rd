@@ -6,9 +6,8 @@
 \usage{
 gen_output_tax(
   tax_amount = 1.1,
-  well_capacity_files = "C:/Users/manirad/Downloads/test/Well Capacity",
- 
-    well_capacity_for_econ = "C:/Users/manirad/Downloads/test/Econ_output/well_capacity.csv",
+  well_capacity_files = "./Well Capacity",
+  well_capacity_for_econ = "./Econ_output/well_capacity.csv",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)"
 )

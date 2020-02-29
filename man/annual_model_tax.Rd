@@ -6,11 +6,10 @@
 \usage{
 annual_model_tax(
   tax_amount = 1.1,
- 
-    well_soil_file = "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv",
-  well_capacity_files = "C:/Users/manirad/Downloads/test/Well Capacity",
-  econ_output_file = "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
-  well_capacity_file_year = "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
+  well_soil_file = "./input_files/Well_Soil Type.csv",
+  well_capacity_files = "./Well Capacity",
+  econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
+  well_capacity_file_year = "./KS_DSSAT_output.csv",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
