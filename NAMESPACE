@@ -2,4 +2,5 @@
 
 export(annual_model_tax)
 export(gen_lookup_tax)
+export(gen_lookup_tax_KS)
 export(gen_output_tax)

@@ -1,4 +1,4 @@
-#' This function generates the lookup table with a tax policy.
+#' This function generates the lookup table with a tax policy for KS.
 #' @param tax_amount                     is the amount of tax on the unit of groundwater extracted. Defaults to 1.1.
 #' @param DSSAT_files                    is the directory where DSSAT files are located. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised".
 #' @param soil_file                      is the file that contains base soil file. Defaults to "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv".
@@ -16,7 +16,7 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-gen_lookup_tax = function (tax_amount = 0.1, DSSAT_files = "./input_files/DSSAT_files",
+gen_lookup_tax_KS = function (tax_amount = 0.1, DSSAT_files = "./input_files/DSSAT_files",
           soil_file = "./input_files/Well_Soil Type_generator_07.csv",
           well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
           price_file = "./input_files/crop_prices.csv", fixed_cost_file = "./input_files/fixed_cost_input.csv",
