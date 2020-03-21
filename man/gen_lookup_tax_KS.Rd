@@ -11,7 +11,7 @@ gen_lookup_tax_KS(
   well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
-  pumping_cost = 3.56,
+  pumping_cost = 3,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
   IFREQ_seq = 2,
