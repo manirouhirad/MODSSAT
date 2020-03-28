@@ -5,7 +5,7 @@
 \title{This function produces annual amounts of water use and profits.}
 \usage{
 annual_model_tax(
-  tax_amount = 0.1,
+  tax_amount = 1,
   well_soil_file = "./input_files/Well_Soil Type.csv",
   well_capacity_files = "./Well Capacity",
   econ_output_file = "./Econ_output/KS_DSSAT_output.csv",

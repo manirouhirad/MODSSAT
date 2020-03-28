@@ -9,12 +9,13 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-gen_output_tax = function (tax_amount = 1.1,
+gen_output_tax = function (tax_amount = 1,
           well_capacity_files = "./Well Capacity",
           well_capacity_for_econ = "./Econ_output/well_capacity.csv",
           first_year_of_simulation = 2000,
           default_well_capacity_col_name = "Well_Capacity(gpm)")
 {
+  tax_amount = (tax_amount - 1)/10
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
   ldf <- lapply(filenames, fread, fill = T)

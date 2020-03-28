@@ -16,7 +16,7 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-gen_lookup_tax_KS = function (tax_amount = 0.1,
+gen_lookup_tax_KS = function (tax_amount = 1,
                               DSSAT_files = "./input_files/DSSAT_files",
                               soil_file = "./input_files/Well_Soil Type_generator_07.csv",
                               well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
@@ -30,7 +30,7 @@ gen_lookup_tax_KS = function (tax_amount = 0.1,
                               IFREQ_interpolate = 0.1)
 {
   library(data.table)
-  tax_amount = tax_amount - 0.1
+  tax_amount = (tax_amount - 1)/10
   print(paste("this is the tax:", tax_amount, sep = " "))
   col_new = c("RUNNO", "TRNO", "R_pound", "O_pound", "C_pound",
               "CR", "MODEL", "EXNAME", "FNAM", "WSTA", "SOIL_ID", "SDAT",

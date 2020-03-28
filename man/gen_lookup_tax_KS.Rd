@@ -5,7 +5,7 @@
 \title{This function generates the lookup table with a tax policy for KS.}
 \usage{
 gen_lookup_tax_KS(
-  tax_amount = 0.1,
+  tax_amount = 1,
   DSSAT_files = "./input_files/DSSAT_files",
   soil_file = "./input_files/Well_Soil Type_generator_07.csv",
   well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",

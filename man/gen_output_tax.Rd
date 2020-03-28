@@ -5,7 +5,7 @@
 \title{This function produces annual well capacity for each well in each year.}
 \usage{
 gen_output_tax(
-  tax_amount = 1.1,
+  tax_amount = 1,
   well_capacity_files = "./Well Capacity",
   well_capacity_for_econ = "./Econ_output/well_capacity.csv",
   first_year_of_simulation = 2000,

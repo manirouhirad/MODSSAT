@@ -18,7 +18,7 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-annual_model_tax = function (tax_amount = 0.1,
+annual_model_tax = function (tax_amount = 1,
                              well_soil_file = "./input_files/Well_Soil Type.csv",
                              well_capacity_files = "./Well Capacity",
                              econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
@@ -32,6 +32,7 @@ annual_model_tax = function (tax_amount = 0.1,
                              last_year_of_GW = 2008,
                              irrigation_season_days = 70)
 {
+  tax_amount = (tax_amount - 1)/10
   soil_type = fread(well_soil_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
                                    Soil_Type))]
