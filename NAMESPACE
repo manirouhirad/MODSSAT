@@ -3,6 +3,7 @@
 export(annual_model_CREP)
 export(annual_model_base)
 export(annual_model_tax)
+export(gen_CREP_wells)
 export(gen_lookup_CREP)
 export(gen_lookup_tax)
 export(gen_lookup_tax_KS)
