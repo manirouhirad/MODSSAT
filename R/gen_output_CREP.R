@@ -22,7 +22,8 @@ gen_output_CREP = function (well_capacity_files = "./Well Capacity",
   ldf[, `:=`(file_name, substr(file_name, nchar(file_name) -
                                  16, nchar(file_name) - 13))]
   ldf[, `:=`(file_name, as.integer(file_name))]
-  write.table(ldf, sep = ",", file = well_capacity_for_econ,
-              row.names = F, col.names = !file.exists(well_capacity_for_econ),
-              append = T)
+  # write.table(ldf, sep = ",", file = well_capacity_for_econ,
+  #             row.names = F, col.names = !file.exists(well_capacity_for_econ),
+  #             append = T)
+  write.csv(ldf, well_capacity_for_econ, row.names = F)
 }

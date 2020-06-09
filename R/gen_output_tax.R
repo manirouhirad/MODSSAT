@@ -30,7 +30,9 @@ gen_output_tax = function (tax_amount = 1,
                                  16, nchar(file_name) - 13))]
   ldf[, `:=`(file_name, as.integer(file_name))]
   ldf[, `:=`(tax, tax_amount)]
-  write.table(ldf, sep = ",", file = well_capacity_for_econ,
-              row.names = F, col.names = !file.exists(well_capacity_for_econ),
-              append = T)
+  # write.table(ldf, sep = ",", file = well_capacity_for_econ,
+  #             row.names = F, col.names = !file.exists(well_capacity_for_econ),
+  #             append = T)
+  write.csv(ldf, well_capacity_for_econ, row.names = F)
+
 }
