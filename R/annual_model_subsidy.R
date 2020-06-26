@@ -74,7 +74,6 @@ annual_model_subsidy = function (subsidy_amount = 2,
   well_capacity_data[is.na(Soil_Type), `:=`(Soil_Type, missing_soil_types)]
   well_capacity_data = well_capacity_data[!is.na(Soil_Type)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
-  
   soil_type = fread(well_soil_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
                                    Soil_Type))]
@@ -84,10 +83,8 @@ annual_model_subsidy = function (subsidy_amount = 2,
                      `:=`(Well_capacity, minimum_well_capacity)]
   well_capacity_data[Well_capacity >= maximum_well_capacity,
                      `:=`(Well_capacity, maximum_well_capacity)]
-  
   lookup_table_well_2 = fread("lookup_table_well_2.csv")
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
-  
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
   ldf <- lapply(filenames, fread, fill = T)
@@ -102,36 +99,23 @@ annual_model_subsidy = function (subsidy_amount = 2,
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
-  # year_dt[, `:=`(file_name, ifelse(file_name < last_year_of_GW +
-  #                                    1, file_name, ifelse(file_name > last_year_of_GW & file_name <=
-  #                                                           last_year_of_GW + (last_year_of_GW - first_year_of_GW +
-  #                                                                                1), file_name - (last_year_of_GW - first_year_of_GW +
-  #                                                                                                   1), ifelse(file_name > last_year_of_GW + (last_year_of_GW -
-  #                                                                                                                                               first_year_of_GW + 1) & file_name <= last_year_of_GW +
-  #                                                                                                                2 * (last_year_of_GW - first_year_of_GW + 1), file_name -
-  #                                                                                                                2 * (last_year_of_GW - first_year_of_GW), ifelse(file_name >
-  #                                                                                                                                                                   last_year_of_GW + 2 * (last_year_of_GW - first_year_of_GW +
-  #                                                                                                                                                                                            1) & file_name < last_year_of_GW + 3 * (last_year_of_GW -
-  #                                                                                                                                                                                                                                      first_year_of_GW + 1), file_name - 3 * (last_year_of_GW -
-  #                                                                                                                                                                                                                                                                                first_year_of_GW), file_name - 4 * (last_year_of_GW -
-  #                                                                                                                                                                                                                                                                                                                      first_year_of_GW))))))]
-  
-  year_dt[, `:=`(file_name, ifelse(file_name < 2010, file_name, ifelse(file_name > 2009 & file_name <= 2022, file_name - 13,
-                                                                       ifelse(file_name > 2022 & file_name <= 2035, file_name - 26,
-                                                                              ifelse(file_name > 2035 & file_name < 2049, file_name - 39, file_name - 52)))))]
-  
-  
+  year_dt[, `:=`(file_name, ifelse(file_name < 2010, file_name,
+                                   ifelse(file_name > 2009 & file_name <= 2022, file_name -
+                                            13, ifelse(file_name > 2022 & file_name <= 2035,
+                                                       file_name - 26, ifelse(file_name > 2035 & file_name <
+                                                                                2049, file_name - 39, file_name - 52)))))]
   year_dt = year_dt$file_name
-  lookup_table_all_years_2 = lookup_table_all_years_2[SDAT == year_dt]
-  lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
+  lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
+                                                        year_dt]
+  # lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
   setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity)
   setkey(lookup_table_well_2, SOIL_ID, Well_capacity)
   setkey(well_capacity_data, Soil_Type, Well_capacity)
   lookup_table_all_years_2 = lookup_table_all_years_2[well_capacity_data]
-  lookup_table_well_2 = lookup_table_well_2[well_capacity_data]
-  lookup_table_all_years_2[, `:=`(irr_tot_acres, sum(irrigation)),
+  lookup_table_well_2      = lookup_table_well_2[well_capacity_data]
+  lookup_table_all_years_2[, `:=`(irr_tot_acres, sum(irrigation_quarter)),
                            by = "Well_ID"]
-  lookup_table_all_years_2[, `:=`(profit_Well_ID, sum(profit)),
+  lookup_table_all_years_2[, `:=`(profit_Well_ID, sum(profit_quarter)),
                            by = "Well_ID"]
   lookup_table_all_years_2 = unique(lookup_table_all_years_2,
                                     by = "Well_ID")
@@ -142,7 +126,6 @@ annual_model_subsidy = function (subsidy_amount = 2,
   econ_output[, `:=`(subsidy_amnt, subsidy_amount)]
   econ_output[, `:=`(subsidy_thshld, subsidy_threshold)]
   econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
-  
   econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
