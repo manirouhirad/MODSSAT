@@ -6,8 +6,8 @@
 \usage{
 gen_CREP_wells(
   seed = 1,
-  number_of_CREP_wells = 169,
-  well_id_file = "./input_files/all_well_IDs.csv",
+  number_of_CREP_wells = 12,
+  well_id_file = "all_well_IDs.csv",
   output_file = "CREP_wells.csv"
 )
 }
