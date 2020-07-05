@@ -3,7 +3,6 @@
 #' @return                               returns the output table.
 #' @export
 FN_optim = function(jj){
-  library(data.table)
   foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1,
                     .(Well_ID, Well_capacity, SOIL_ID, tot_acres,
                       SDAT, quarter, CR, PAW, irrigation, profit)]
