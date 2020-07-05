@@ -325,7 +325,7 @@ gen_lookup_subsidy_par = function (subsidy_amount = 2, subsidy_threshold = 200, 
                                   "data.table", "setnames", "setkey",
                                   "subsidy_amount", "subsidy_threshold"),
                   envir = environment())
-    system.time(foo_dt_all <- parLapply(cl, 1:aa, FN_optim))
+    system.time(foo_dt_all <- parLapply(cl, 1:aa, FN_optim2))
     stopCluster(cl)
 
 
