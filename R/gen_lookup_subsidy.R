@@ -1,4 +1,4 @@
-#' This function generates the lookup table with a tax policy for KS.
+#' This function generates the lookup table with a subsidy policy that includes a threshold and a marginal subsidy rate.
 #' @param subsidy_amount                 is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.
 #' @param subsidy_threshold              is the threshold of subsidy, i.e., the amount of groundwater extraction above which subsidy is zero. Defaults to 400.
 #' @param DSSAT_files                    is the directory where DSSAT files are located. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised".
