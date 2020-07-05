@@ -312,7 +312,7 @@ gen_lookup_subsidy_par = function (subsidy_amount = 2,
     print(paste("this is the before", "the parallel", sep = " "))
 
     cl <- makeCluster(num_clusters)
-    clusterExport(cl, varlist=c("foo_irr", ".", "data.table", "setnames", "setkey", "subsidy_amount", "subsidy_threshold"))
+    clusterExport(cl, varlist=c("foo_irr", ".", "data.table", "setnames", "setkey", "subsidy_amount", "subsidy_threshold"), envir=environment())
     system.time(foo_dt_all <- parLapply(cl, 1:max(foo_irr$Well_ID_grp), FN_optim) )  # paralel execution, with time wrapper
     stopCluster(cl)
 
