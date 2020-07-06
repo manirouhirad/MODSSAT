@@ -19,8 +19,8 @@
 #' }
 #' @export
 gen_lookup_subsidy_par = function (subsidy_amount = 2, subsidy_threshold = 200, DSSAT_files = "./input_files/DSSAT_files",
-                                    soil_file = "./input_files/Well_Soil Type_generator_07_5gpm.csv",
-                                    well_capacity_file = "./input_files/Well_Capacity_ganarator_5gpm.csv",
+                                   soil_file = "./input_files/Well_Soil Type_generator_07.csv",
+                                   well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
                                     price_file = "./input_files/crop_prices.csv", fixed_cost_file = "./input_files/fixed_cost_input.csv",
                                     pumping_cost = 3, default_well_capacity_col_name = "Well_Capacity(gpm)",
                                     soil_moisture_targets = c(25, 35, 45, 55, 65, 75), IFREQ_seq = 2,
