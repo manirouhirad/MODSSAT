@@ -19,8 +19,8 @@
 #' gen_lookup_subsidy(subsidy_amount = 2)
 #' }
 #' @export
-annual_model_subsidy = function (subsidy_amount = 2,
-                             subsidy_threshold = 200,
+annual_model_subsidy = function (subsidy_amount = 21,
+                             subsidy_threshold = 1500,
                              well_soil_file = "./input_files/Well_Soil Type.csv",
                              well_capacity_files = "./Well Capacity",
                              econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
@@ -28,8 +28,8 @@ annual_model_subsidy = function (subsidy_amount = 2,
                              first_year_of_simulation = 2000,
                              default_well_capacity_col_name = "Well_Capacity(gpm)",
                              missing_soil_types = "KS00000007",
-                             minimum_well_capacity = 100,
-                             maximum_well_capacity = 3000,
+                             minimum_well_capacity = 0,
+                             maximum_well_capacity = 1000,
                              first_year_of_GW = 1997,
                              last_year_of_GW = 2008,
                              irrigation_season_days = 70)
@@ -79,11 +79,8 @@ annual_model_subsidy = function (subsidy_amount = 2,
                                    Soil_Type))]
   soil_type = soil_type[complete.cases(Well_ID)]
   soil_type = unique(soil_type, by = "Well_ID")
-  well_capacity_data[Well_capacity <= minimum_well_capacity,
-                     `:=`(Well_capacity, minimum_well_capacity)]
-  well_capacity_data[Well_capacity >= maximum_well_capacity,
-                     `:=`(Well_capacity, maximum_well_capacity)]
-  lookup_table_well_2 = fread("lookup_table_well_2.csv")
+  well_capacity_data[, Well_capacity := ifelse(Well_capacity <= minimum_well_capacity, minimum_well_capacity, Well_capacity)]
+  well_capacity_data[, Well_capacity := ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity)]
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
@@ -107,21 +104,12 @@ annual_model_subsidy = function (subsidy_amount = 2,
   year_dt = year_dt$file_name
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
                                                         year_dt]
-  # lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
   setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity)
-  setkey(lookup_table_well_2, SOIL_ID, Well_capacity)
   setkey(well_capacity_data, Soil_Type, Well_capacity)
   lookup_table_all_years_2 = lookup_table_all_years_2[well_capacity_data]
-  lookup_table_well_2      = lookup_table_well_2[well_capacity_data]
-  lookup_table_all_years_2[, `:=`(irr_tot_acres, sum(irrigation_quarter)),
-                           by = "Well_ID"]
-  lookup_table_all_years_2[, `:=`(profit_Well_ID, sum(profit_quarter)),
-                           by = "Well_ID"]
-  lookup_table_all_years_2 = unique(lookup_table_all_years_2,
-                                    by = "Well_ID")
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
   econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,
-                                             tot_acres, irr_tot_acres, profit_Well_ID, output_rate_acin_day)]
+                                             tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, output_rate_acin_day)]
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(subsidy_amnt, subsidy_amount)]
   econ_output[, `:=`(subsidy_thshld, subsidy_threshold)]
@@ -134,3 +122,4 @@ annual_model_subsidy = function (subsidy_amount = 2,
   write.csv(econ_output, econ_output_file, row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
+

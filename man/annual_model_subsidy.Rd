@@ -5,8 +5,8 @@
 \title{This function produces annual amounts of water use and profits.}
 \usage{
 annual_model_subsidy(
-  subsidy_amount = 2,
-  subsidy_threshold = 200,
+  subsidy_amount = 21,
+  subsidy_threshold = 1500,
   well_soil_file = "./input_files/Well_Soil Type.csv",
   well_capacity_files = "./Well Capacity",
   econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
@@ -14,8 +14,8 @@ annual_model_subsidy(
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
-  minimum_well_capacity = 100,
-  maximum_well_capacity = 3000,
+  minimum_well_capacity = 0,
+  maximum_well_capacity = 1000,
   first_year_of_GW = 1997,
   last_year_of_GW = 2008,
   irrigation_season_days = 70

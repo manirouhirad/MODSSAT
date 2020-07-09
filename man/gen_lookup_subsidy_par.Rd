@@ -5,11 +5,11 @@
 \title{This function is the parallelized version of the gen_lookup_subsidy function.}
 \usage{
 gen_lookup_subsidy_par(
-  subsidy_amount = 2,
-  subsidy_threshold = 200,
+  subsidy_amount = 21,
+  subsidy_threshold = 1500,
   DSSAT_files = "./input_files/DSSAT_files",
-  soil_file = "./input_files/Well_Soil Type_generator_07.csv",
-  well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
+  soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
+  well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
   pumping_cost = 3,
