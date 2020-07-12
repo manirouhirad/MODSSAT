@@ -114,10 +114,13 @@ annual_model_tax = function (tax_amount = 1,
   #                                                                                                                                                                                                                                                                                first_year_of_GW), file_name - 4 * (last_year_of_GW -
   #                                                                                                                                                                                                                                                                                                                      first_year_of_GW))))))]
 
-  year_dt[, `:=`(file_name, ifelse(file_name < 2010, file_name, ifelse(file_name > 2009 & file_name <= 2022, file_name - 13,
-                                                                       ifelse(file_name > 2022 & file_name <= 2035, file_name - 26,
-                                                                              ifelse(file_name > 2035 & file_name < 2049, file_name - 39, file_name - 52)))))]
+  # year_dt[, `:=`(file_name, ifelse(file_name < 2010, file_name, ifelse(file_name > 2009 & file_name <= 2022, file_name - 13,
+  #                                                                      ifelse(file_name > 2022 & file_name <= 2035, file_name - 26,
+  #                                                                             ifelse(file_name > 2035 & file_name < 2049, file_name - 39, file_name - 52)))))]
 
+  year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
+                                   ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
+                                                                                                       file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
 
   year_dt = year_dt$file_name
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT == year_dt]

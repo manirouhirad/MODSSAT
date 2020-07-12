@@ -64,7 +64,7 @@ annual_model_base = function (well_soil_file = "./input_files/Well_Soil Type.csv
   well_capacity_data[is.na(Soil_Type), `:=`(Soil_Type, missing_soil_types)]
   well_capacity_data = well_capacity_data[!is.na(Soil_Type)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
-  
+
   soil_type = fread(well_soil_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000", Soil_Type))]
   soil_type = soil_type[complete.cases(Well_ID)]
@@ -73,10 +73,10 @@ annual_model_base = function (well_soil_file = "./input_files/Well_Soil Type.csv
                      `:=`(Well_capacity, minimum_well_capacity)]
   well_capacity_data[Well_capacity >= maximum_well_capacity,
                      `:=`(Well_capacity, maximum_well_capacity)]
-  
+
   lookup_table_well_2 = fread("lookup_table_well_2.csv")
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
-  
+
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
   ldf <- lapply(filenames, fread, fill = T)
@@ -91,11 +91,10 @@ annual_model_base = function (well_soil_file = "./input_files/Well_Soil Type.csv
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
-  year_dt[, `:=`(file_name, ifelse(file_name < 2010, file_name, ifelse(file_name > 2009 & file_name <= 2022, file_name - 13,
-                                                                       ifelse(file_name > 2022 & file_name <= 2035, file_name - 26,
-                                                                              ifelse(file_name > 2035 & file_name < 2049, file_name - 39, file_name - 52)))))]
-  
-  
+  year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
+                                   ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
+                                                                                                       file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
+
   year_dt = year_dt$file_name
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT == year_dt]
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
@@ -115,7 +114,7 @@ annual_model_base = function (well_soil_file = "./input_files/Well_Soil Type.csv
                                              tot_acres, irr_tot_acres, profit_Well_ID, output_rate_acin_day)]
   econ_output[, `:=`(row, 1:.N)]
   econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
-  
+
   econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
