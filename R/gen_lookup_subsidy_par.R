@@ -292,7 +292,6 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
     foo_irr[, `:=`(irrigation, 32.5 * irr_mm * 0.0393701)]
     foo_irr[, `:=`(profit, 32.5 * (yield_kg_ac * price -
                                      f_cost) - irrigation * cost_per_acre_in)]
-    setkey(foo_irr, Well_ID, quarter, SDAT)
     data.table::setkey(foo_irr, Well_ID, tot_acres, quarter,
                        SDAT)
     foo_irr_2 = data.table::copy(foo_irr)
