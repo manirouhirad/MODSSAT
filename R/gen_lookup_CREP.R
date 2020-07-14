@@ -290,7 +290,7 @@ gen_lookup_CREP = function(DSSAT_files = "./input_files/DSSAT_files",
     cl <- makeCluster(num_clusters)
     aa = max(foo_irr$Well_ID_grp)
     clusterExport(cl, varlist = c("foo_irr", "data.table",
-                                  "setnames", "setkey", "subsidy_amount", "subsidy_threshold"),
+                                  "setnames", "setkey"),
                   envir = environment())
     system.time(foo_dt_all <- parLapply(cl, 1:aa, FN_optim_CREP))
     stopCluster(cl)
