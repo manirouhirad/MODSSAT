@@ -31,7 +31,7 @@ annual_model_subsidy = function(subsidy_amount = 21,
                              minimum_well_capacity = 0,
                              maximum_well_capacity = 1000,
                              first_year_of_GW = 1997,
-                             last_year_of_GW = 2008,
+                             last_year_of_GW = 2007,
                              irrigation_season_days = 70)
 {
   subsidy_amount = (subsidy_amount - 1)/10
@@ -96,9 +96,12 @@ annual_model_subsidy = function(subsidy_amount = 21,
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
-  year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
-                                   ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
-                                                                                                       file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
+  year_dt[, `:=`(file_name, ifelse(file_name <= (last_year_of_GW-1), file_name +
+                                     1, ifelse(file_name > (last_year_of_GW-1) & file_name <= (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1), file_name -
+                                                 (-1 + last_year_of_GW - first_year_of_GW+1), ifelse(file_name > (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1) & file_name <= (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                       (-1 + 2*(last_year_of_GW - first_year_of_GW+1)), ifelse(file_name > (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)) & file_name <= (last_year_of_GW-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                                                                                 (-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name - (-1 + 4*(last_year_of_GW - first_year_of_GW+1)))))))]
+
   year_dt = year_dt$file_name
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
                                                         year_dt]

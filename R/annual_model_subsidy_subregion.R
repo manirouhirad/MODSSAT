@@ -33,7 +33,7 @@ annual_model_subsidy_subregion = function(subsidy_amount = 21,
                                 minimum_well_capacity = 0,
                                 maximum_well_capacity = 1000,
                                 first_year_of_GW = 1997,
-                                last_year_of_GW = 2008,
+                                last_year_of_GW = 2007,
                                 irrigation_season_days = 70)
 {
   subsidy_amount = (subsidy_amount - 1)/10
@@ -85,7 +85,7 @@ annual_model_subsidy_subregion = function(subsidy_amount = 21,
   well_capacity_data[, Well_capacity := ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity)]
   lookup_table_all_years_2   = readRDS("lookup_table_all_years_2.rds")
   lookup_table_all_years_2_0 = readRDS("lookup_table_all_years_2_0.rds")
-  
+
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
   ldf <- lapply(filenames, fread, fill = T)
@@ -100,21 +100,23 @@ annual_model_subsidy_subregion = function(subsidy_amount = 21,
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
-  year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
-                                   ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
-                                                                                                       file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
+  year_dt[, `:=`(file_name, ifelse(file_name <= (last_year_of_GW-1), file_name +
+                                     1, ifelse(file_name > (last_year_of_GW-1) & file_name <= (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1), file_name -
+                                                 (-1 + last_year_of_GW - first_year_of_GW+1), ifelse(file_name > (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1) & file_name <= (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                       (-1 + 2*(last_year_of_GW - first_year_of_GW+1)), ifelse(file_name > (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)) & file_name <= (last_year_of_GW-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                                                                                 (-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name - (-1 + 4*(last_year_of_GW - first_year_of_GW+1)))))))]
   year_dt = year_dt$file_name
   lookup_table_all_years_2   = lookup_table_all_years_2[SDAT ==
                                                         year_dt]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[SDAT ==
                                                         year_dt]
-  
+
   setkey(lookup_table_all_years_2,   SOIL_ID, Well_capacity)
   setkey(lookup_table_all_years_2_0, SOIL_ID, Well_capacity)
   setkey(well_capacity_data, Soil_Type, Well_capacity)
   lookup_table_all_years_2   = lookup_table_all_years_2[well_capacity_data]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[well_capacity_data]
-  
+
   wells_subregion = fread(subregion_file)
   wells_subregion[, id := 1]
   setkey(lookup_table_all_years_2, Well_ID)
@@ -123,15 +125,15 @@ annual_model_subsidy_subregion = function(subsidy_amount = 21,
   lookup_table_all_years_2 = lookup_table_all_years_2[wells_subregion]
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
-  
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)], 
+
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)],
     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)])
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
-  
+
   setkey(lookup_table_all_years_2, Well_ID)
   econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,
                                              tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, output_rate_acin_day)]
-  
+
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(subsidy_amnt, subsidy_amount)]
   econ_output[, `:=`(subsidy_thshld, subsidy_threshold)]
