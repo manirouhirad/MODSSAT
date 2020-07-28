@@ -14,7 +14,7 @@
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @export
-annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv",
+annual_model_CREP_0 = function (well_soil_file = "./input_files/Well_Soil Type.csv",
                               well_capacity_files = "./Well Capacity",
                               econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
                               well_capacity_file_year = "./KS_DSSAT_output.csv",
@@ -70,7 +70,7 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
                      `:=`(Well_capacity, minimum_well_capacity)]
   well_capacity_data[Well_capacity >= maximum_well_capacity,
                      `:=`(Well_capacity, maximum_well_capacity)]
-  
+
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
@@ -89,7 +89,7 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
   econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
-  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, 
+  well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
                                                     output_rate_acin_day=1)]
   write.csv(econ_output, econ_output_file, row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)

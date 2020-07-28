@@ -2,7 +2,9 @@
 
 export(FN_optim)
 export(annual_model_CREP)
+export(annual_model_CREP_0)
 export(annual_model_base)
+export(annual_model_base_0)
 export(annual_model_subsidy)
 export(annual_model_subsidy_0)
 export(annual_model_subsidy_subregion)

@@ -13,7 +13,7 @@
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @export
-annual_model_base = function (well_soil_file = "./input_files/Well_Soil Type.csv",
+annual_model_base_0 = function (well_soil_file = "./input_files/Well_Soil Type.csv",
                              well_capacity_files = "./Well Capacity",
                              econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
                              well_capacity_file_year = "./KS_DSSAT_output.csv",
