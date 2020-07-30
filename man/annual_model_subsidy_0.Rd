@@ -17,7 +17,7 @@ annual_model_subsidy_0(
   minimum_well_capacity = 0,
   maximum_well_capacity = 1000,
   first_year_of_GW = 1997,
-  last_year_of_GW = 2007,
+  last_year_of_GW = 2008,
   irrigation_season_days = 70
 )
 }
