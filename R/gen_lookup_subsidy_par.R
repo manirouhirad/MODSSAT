@@ -296,6 +296,11 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
                        SDAT)
     foo_irr_2 = data.table::copy(foo_irr)
     foo_irr[, `:=`(Well_ID_grp, .GRP), by = "Well_ID"]
+
+    setkey(foo_irr, Well_ID, tot_acres, SDAT, quarter, CR, PAW)
+    foo_irr[, group_1 := .GRP, by=c("Well_ID", "tot_acres", "SDAT")] ############################################# NEW
+    foo_irr[, group_2 := 1:.N, by=c("Well_ID", "tot_acres", "SDAT", "quarter")] ############################################# NEW
+
     cl <- makeCluster(num_clusters)
     aa = max(foo_irr$Well_ID_grp)
     clusterExport(cl, varlist = c("foo_irr", "data.table",
@@ -304,6 +309,12 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
     system.time(foo_dt_all <- parLapply(cl, 1:aa, FN_optim2))
     stopCluster(cl)
     foo_dt_all <- do.call(rbind, foo_dt_all)
+
+
+    setkey(foo_dt_all, group_1, quarter, group_2)
+    setkey(foo_irr,    group_1, quarter, group_2)
+    foo_dt_all = foo_irr[a]
+
     setkey(foo_dt_all, Well_ID, tot_acres, SOIL_ID, quarter,
            CR, PAW)
     setkey(foo_irr_2, Well_ID, tot_acres, SOIL_ID, quarter,
@@ -318,13 +329,20 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
                                               SOIL_ID, tot_acres, irr_tot_acres = mean_irrigation_combination,
                                               profit_Well_ID = mean_profit_combination, profit_Well_ID_subsidy = mean_profit_combination_sub)]
     lookup_table_all_years = copy(lookup_table_quarter)
-    lookup_table_all_years[, irr_tot_acres  := sum(irrigation_quarter), by=c("Well_capacity", "SDAT")]
-    lookup_table_all_years[, profit_Well_ID := sum(profit_quarter),     by=c("Well_capacity", "SDAT")]
-    lookup_table_all_years[, irr_below      := ifelse(irr_tot_acres < subsidy_threshold, subsidy_threshold - irr_tot_acres, 0)]
-    lookup_table_all_years = unique(lookup_table_all_years,             by=c("Well_capacity", "SDAT"))
-    lookup_table_all_years[, profit_Well_ID_sub := profit_Well_ID + irr_below * subsidy_amount]
-    lookup_table_all_years = lookup_table_all_years[,.(Well_capacity, SOIL_ID, tot_acres, SDAT, irr_tot_acres, profit_Well_ID, irr_below, profit_Well_ID_sub)]
-
+    lookup_table_all_years[, `:=`(irr_tot_acres, sum(irrigation_quarter)),
+                           by = c("Well_capacity", "SDAT")]
+    lookup_table_all_years[, `:=`(profit_Well_ID, sum(profit_quarter)),
+                           by = c("Well_capacity", "SDAT")]
+    lookup_table_all_years[, `:=`(irr_below, ifelse(irr_tot_acres <
+                                                      subsidy_threshold, subsidy_threshold - irr_tot_acres,
+                                                    0))]
+    lookup_table_all_years = unique(lookup_table_all_years,
+                                    by = c("Well_capacity", "SDAT"))
+    lookup_table_all_years[, `:=`(profit_Well_ID_sub, profit_Well_ID +
+                                    irr_below * subsidy_amount)]
+    lookup_table_all_years = lookup_table_all_years[, .(Well_capacity,
+                                                        SOIL_ID, tot_acres, SDAT, irr_tot_acres, profit_Well_ID,
+                                                        irr_below, profit_Well_ID_sub)]
     lookup_table_all_years_2 = rbind(lookup_table_all_years_2,
                                      lookup_table_all_years)
     lookup_table_quarter_2 = rbind(lookup_table_quarter_2,
@@ -341,4 +359,3 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
   saveRDS(lookup_table_quarter_2, "lookup_table_quarter_2.rds")
   saveRDS(lookup_table_all_years_2, "lookup_table_all_years_2.rds")
 }
-
