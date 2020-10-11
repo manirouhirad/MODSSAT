@@ -306,7 +306,7 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
     clusterExport(cl, varlist = c("foo_irr", "data.table",
                                   "setnames", "setkey", "subsidy_amount", "subsidy_threshold"),
                   envir = environment())
-    system.time(foo_dt_all <- parLapply(cl, 1:aa, FN_optim2))
+    foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
     stopCluster(cl)
     foo_dt_all <- do.call(rbind, foo_dt_all)
 
