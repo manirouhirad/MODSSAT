@@ -313,7 +313,7 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21, subsidy_threshold = 1500
 
     setkey(foo_dt_all, group_1, quarter, group_2)
     setkey(foo_irr,    group_1, quarter, group_2)
-    foo_dt_all = foo_irr[a]
+    foo_dt_all = foo_irr[foo_dt_all]
 
     setkey(foo_dt_all, Well_ID, tot_acres, SOIL_ID, quarter,
            CR, PAW)
