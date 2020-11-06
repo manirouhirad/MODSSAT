@@ -85,6 +85,7 @@ annual_model_CREP_0 = function (well_soil_file = "./input_files/Well_Soil Type.c
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, year := year_2]
   econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
+  econ_output_in[, year := 0]
   econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
