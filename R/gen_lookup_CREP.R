@@ -319,22 +319,16 @@ gen_lookup_CREP = function(DSSAT_files = "./input_files/DSSAT_files",
     data.table::setkey(lookup_table_well, Well_capacity)
     lookup_table_well = lookup_table_well[, .(Well_capacity,
                                               SOIL_ID, tot_acres, irr_tot_acres = mean_irrigation_combination,
-                                              profit_Well_ID = mean_profit_combination, profit_Well_ID_subsidy = mean_profit_combination_sub)]
+                                              profit_Well_ID = mean_profit_combination)]
     lookup_table_all_years = copy(lookup_table_quarter)
     lookup_table_all_years[, `:=`(irr_tot_acres, sum(irrigation_quarter)),
                            by = c("Well_capacity", "SDAT")]
     lookup_table_all_years[, `:=`(profit_Well_ID, sum(profit_quarter)),
                            by = c("Well_capacity", "SDAT")]
-    lookup_table_all_years[, `:=`(irr_below, ifelse(irr_tot_acres <
-                                                      subsidy_threshold, subsidy_threshold - irr_tot_acres,
-                                                    0))]
     lookup_table_all_years = unique(lookup_table_all_years,
                                     by = c("Well_capacity", "SDAT"))
-    lookup_table_all_years[, `:=`(profit_Well_ID_sub, profit_Well_ID +
-                                    irr_below * subsidy_amount)]
     lookup_table_all_years = lookup_table_all_years[, .(Well_capacity,
-                                                        SOIL_ID, tot_acres, SDAT, irr_tot_acres, profit_Well_ID,
-                                                        irr_below, profit_Well_ID_sub)]
+                                                        SOIL_ID, tot_acres, SDAT, irr_tot_acres, profit_Well_ID)]
     lookup_table_all_years_2 = rbind(lookup_table_all_years_2,
                                      lookup_table_all_years)
     lookup_table_quarter_2 = rbind(lookup_table_quarter_2,
