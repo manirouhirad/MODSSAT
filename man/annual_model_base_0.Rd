@@ -7,7 +7,7 @@
 annual_model_base_0(
   well_soil_file = "./input_files/Well_Soil Type.csv",
   well_capacity_files = "./Well Capacity",
-  econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
+  econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
@@ -24,7 +24,7 @@ annual_model_base_0(
 
 \item{well_capacity_files}{is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".}
 
-\item{econ_output_file}{is the name of the output file that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",}
+\item{econ_output_folder}{is the name of the output folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",}
 
 \item{well_capacity_file_year}{is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",}
 
