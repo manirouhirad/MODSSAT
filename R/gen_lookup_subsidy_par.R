@@ -316,7 +316,6 @@ gen_lookup_subsidy_par = function (subsidy_amount = 21,
     stopCluster(cl)
     foo_dt_all <- do.call(rbind, foo_dt_all)
 
-    foo_dt_all = FN_optim2(900)
     setkey(foo_dt_all, group_1, quarter, group_2)
     setkey(foo_irr,    group_1, quarter, group_2)
     foo_dt_all = foo_irr[foo_dt_all]
