@@ -126,12 +126,11 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
   year_2 = year_dt$file_name
-  year_dt[, file_name := ifelse(file_name == first_year_of_simulation, first_year_of_simulation,
-                                ifelse(file_name <= (last_year_of_GW - 1), file_name + 1,
+  year_dt[, file_name := ifelse(file_name <= (last_year_of_GW - 1), file_name + 1,
                                        ifelse(file_name > (last_year_of_GW - 1) & file_name <= (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1), file_name - (-1 + last_year_of_GW - first_year_of_GW + 1),
                                               ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
                                                      ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)),
-                                                            file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1)))))))]
+                                                            file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1))))))]
 
 
 
@@ -192,6 +191,8 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
 
   # APH_ratio<-fread(APH_ratiofile) #read in APH
   # APH_ratio = unique(APH_ratio, by="CR")
+
+  print("Line 196.")
 
   #............................................................................#
   #                            read input files                                #
@@ -280,6 +281,8 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
   KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry", CR, sep = "-"))]
 
+
+  print("Line 290.")
 
 
   # add crop well capacity combinations to existing wells.
@@ -441,6 +444,9 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   setkey(parcel_APH, Well_ID, CR)
   foo_irr = foo_irr[parcel_APH]
 
+  print("Line 463.")
+
+
   #............................................................................#
   #                            calculate premium rate                          #
   #............................................................................#
@@ -515,6 +521,8 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   lookup_table_year[, year := year_2]
 
 
+  print("Line 540.")
+
   #............................................................................#
   #                                     outputs                                #
   #............................................................................#
@@ -538,7 +546,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   econ_output_in = fread("./Econ_output/KS_DSSAT_output_ins.csv") ## <------------- fix the year here
   econ_output    = rbind(econ_output_in, lookup_table_year)
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_",
-                                insurance_subsidy_increase, "_", year_dt, ".csv"), row.names = FALSE)
+                                insurance_subsidy_increase, "_", year_2, ".csv"), row.names = FALSE)
 
   # 3. APH for each well.
   parcel_APH_output = lookup_table_year[,.(Well_ID, quarter, q1=1, CR, yield_kg_ac)]
