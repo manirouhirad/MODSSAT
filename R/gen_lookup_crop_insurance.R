@@ -143,7 +143,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   well_capacity_data[, `:=`(file_name, substr(file_name, nchar(file_name) -
                                                 16, nchar(file_name) - 13))]
   well_capacity_data[, `:=`(file_name, as.integer(file_name))]
-  well_capacity_data = well_capacity_data[file_name == year_2,.(Well_ID, `Well_Capacity(gpm)`)]
+  well_capacity_data = well_capacity_data[file_name == year_2-1,.(Well_ID, `Well_Capacity(gpm)`)]
 
   soil_type          = fread(well_soil_file)
   soil_type[, V1 := NULL]
