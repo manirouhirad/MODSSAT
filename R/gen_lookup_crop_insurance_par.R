@@ -483,7 +483,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   cl <- makeCluster(num_clusters, outfile="")
   aa =  max(foo_irr$Well_ID_grp)
   clusterExport(cl, varlist = c("foo_irr", "data.table",
-                                "setnames", "setkey"),
+                                "setnames", "setkey", "mean_irrigation_practice"),
                 envir = environment())
   foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
   stopCluster(cl)
