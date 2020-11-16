@@ -29,6 +29,7 @@ gen_lookup_crop_insurance(
   irrigation_season_days = 70,
   first_year_of_simulation = 1999,
   insurance_subsidy_increase = 0,
+  no_policy_indicator = 1,
   num_clusters = parallel::detectCores() - 2
 )
 }
@@ -80,6 +81,8 @@ gen_lookup_crop_insurance(
 \item{first_year_of_simulation}{is the first year that the hydro-economic simulation starts. Defaults to 2000.}
 
 \item{insurance_subsidy_increase}{is the change in insurance subsidy. This can be positive or negative.}
+
+\item{no_policy_indicator}{is an indicator that is equal to 0 if the policy is no crop insurance policy. Otherwise it's equal to 1.}
 
 \item{num_clusters}{is the number of cores for parallelization.}
 }

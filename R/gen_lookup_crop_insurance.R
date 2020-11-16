@@ -23,6 +23,7 @@
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @param first_year_of_simulation       is the first year that the hydro-economic simulation starts. Defaults to 2000.
 #' @param insurance_subsidy_increase     is the change in insurance subsidy. This can be positive or negative.
+#' @param no_policy_indicator            is an indicator that is equal to 0 if the policy is no crop insurance policy. Otherwise it's equal to 1.
 #' @param num_clusters                   is the number of cores for parallelization.
 #' @return                               returns the output table.
 #' @examples
@@ -54,6 +55,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
                                      irrigation_season_days         = 70,
                                      first_year_of_simulation       = 1999,
                                      insurance_subsidy_increase     = 0,
+                                     no_policy_indicator            = 1,
                                      num_clusters                   = parallel::detectCores()-2
 )
 {
@@ -462,8 +464,8 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   #                            calculate profit                                #
   #............................................................................#
 
-  foo_irr[, yield_ins := ifelse(yield_kg_ac > cover * APH, yield_kg_ac, cover * APH)]
-  foo_irr[, liabpay := ifelse(yield_kg_ac < cover * APH, cover * APH - yield_kg_ac, 0)]
+  foo_irr[, yield_ins := ifelse(yield_kg_ac > cover * APH * no_policy_indicator, yield_kg_ac, cover * APH)]
+  foo_irr[, liabpay   := ifelse(yield_kg_ac < cover * APH * no_policy_indicator, cover * APH - yield_kg_ac, 0)]
   foo_irr[, `:=`(irrigation, 32.5 * irr_mm * 0.0393701)]
   foo_irr[, `:=`(profit, 32.5 * (price * yield_ins - f_cost - prem) - irrigation * cost_per_acre_in)]
 

@@ -30,31 +30,31 @@
 #' gen_lookup_tax(subsidy_amount = 2)
 #' }
 #' @export
-gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./input_files/DSSAT_files",
-                                     well_soil_file                 = "./input_files/Well_Soil Type.csv",
-                                     well_capacity_files            = "./Well Capacity",
-                                     price_file                     = "./input_files/crop_prices.csv",
-                                     fixed_cost_file                = "./input_files/fixed_cost_input.csv",
-                                     insparamfile                   = "./input_files/insparam.csv",
-                                     parcel_APH_file                = "./parcel_APH.csv",
-                                     county_APH_file                = "./county_ref.csv",
-                                     cover_file                     = "./input_files/coverage_subsidy.csv",
-                                     econ_output_folder             = "./Econ_output/results_with_insurance/",
-                                     hydrology_file_year            = "./KS_DSSAT_output.csv",
-                                     default_well_capacity_col_name = "Well_Capacity(gpm)",
-                                     missing_soil_types             = "KS00000007",
-                                     pumping_cost                   = 3,
-                                     soil_moisture_targets          = c(25, 35, 45, 55, 65, 75),
-                                     IFREQ_seq                      = 2,
-                                     IFREQ_interpolate              = 0.1,
-                                     minimum_well_capacity          = 0,
-                                     maximum_well_capacity          = 1000,
-                                     first_year_of_GW               = 1997,
-                                     last_year_of_GW                = 2008,
-                                     irrigation_season_days         = 70,
-                                     first_year_of_simulation       = 1999,
-                                     insurance_subsidy_increase     = 0,
-                                     num_clusters                   = parallel::detectCores()-8
+gen_lookup_crop_insurance_par = function(DSSAT_files = "./input_files/DSSAT_files",
+                                         well_soil_file                 = "./input_files/Well_Soil Type.csv",
+                                         well_capacity_files            = "./Well Capacity",
+                                         price_file                     = "./input_files/crop_prices.csv",
+                                         fixed_cost_file                = "./input_files/fixed_cost_input.csv",
+                                         insparamfile                   = "./input_files/insparam.csv",
+                                         parcel_APH_file                = "./parcel_APH.csv",
+                                         county_APH_file                = "./county_ref.csv",
+                                         cover_file                     = "./input_files/coverage_subsidy.csv",
+                                         econ_output_folder             = "./Econ_output/results_with_insurance/",
+                                         hydrology_file_year            = "./KS_DSSAT_output.csv",
+                                         default_well_capacity_col_name = "Well_Capacity(gpm)",
+                                         missing_soil_types             = "KS00000007",
+                                         pumping_cost                   = 3,
+                                         soil_moisture_targets          = c(25, 35, 45, 55, 65, 75),
+                                         IFREQ_seq                      = 2,
+                                         IFREQ_interpolate              = 0.1,
+                                         minimum_well_capacity          = 0,
+                                         maximum_well_capacity          = 1000,
+                                         first_year_of_GW               = 1997,
+                                         last_year_of_GW                = 2008,
+                                         irrigation_season_days         = 70,
+                                         first_year_of_simulation       = 1999,
+                                         insurance_subsidy_increase     = 0,
+                                         num_clusters                   = parallel::detectCores()-8
 )
 {
 
@@ -407,20 +407,35 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   foo_irr[, cover := 0]
   foo_irr[, subs  := 0]
 
-  dt = data.table()
-  for(j in 1:nrow(cover)){ #loop over coverage and subsidy
-    fooadd <- copy(foo_irr) #start with the base array
-    qux = as.numeric(cover[j,1])
-    fooadd[, cover := rep(qux, nrow(fooadd))] #add coverage level
-    qux = as.numeric(cover[j,2])
-    fooadd[, subs  := rep(qux, nrow(fooadd))] #add subsidy
-    dt<-rbind(dt,fooadd) #add onto foo_irr
-    print(j)
-  }
+  # dt = data.table()
+  # for(j in 1:nrow(cover)){ #loop over coverage and subsidy
+  #   fooadd <- copy(foo_irr) #start with the base array
+  #   qux = as.numeric(cover[j,1])
+  #   fooadd[, cover := rep(qux, nrow(fooadd))] #add coverage level
+  #   qux = as.numeric(cover[j,2])
+  #   fooadd[, subs  := rep(qux, nrow(fooadd))] #add subsidy
+  #   dt<-rbind(dt,fooadd) #add onto foo_irr
+  #   print(j)
+  # }
+  #
+  # foo_irr = rbind(foo_irr, dt)
+  # rm(fooadd) #clean out fooadd
+  # rm(dt) #clean out fooadd
+  #
 
-  foo_irr = rbind(foo_irr, dt)
-  rm(fooadd) #clean out fooadd
-  rm(dt) #clean out fooadd
+
+  cl <- makeCluster(num_clusters, outfile="")
+  bb=nrow(cover)
+  clusterExport(cl, varlist = c("foo_irr", "cover", "data.table", "rep",
+                                "setkey", "copy"),
+                envir = environment())
+  foo_dt_all <- parLapply(cl, 1:bb, FN_cover)
+  stopCluster(cl)
+  foo_dt_all <- do.call(rbind, foo_dt_all)
+  foo_irr = rbind(foo_irr, foo_dt_all)
+  rm(foo_dt_all)
+  rm(bb)
+  print(foo_irr)
 
   #Generate insurance payout here
   setkey(foo_irr,CR)
@@ -478,18 +493,21 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   #                            expected profit-max                             #
   #............................................................................#
   foo_irr[, row := 1:.N]
-  foo_irr[, Well_ID_grp := .GRP, by="Well_ID"]
+  # foo_irr[, Well_ID_grp := .GRP, by="Well_ID"]
+  foo_irr[, Well_ID_grp := floor(row/(nrow(foo_irr)/4))]
+
+
 
   cl <- makeCluster(num_clusters, outfile="")
   aa =  max(foo_irr$Well_ID_grp)
   clusterExport(cl, varlist = c("foo_irr", "data.table",
-                                "setnames", "setkey", "mean_irrigation_practice"),
+                                "setkey"),
                 envir = environment())
   foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
   stopCluster(cl)
   foo_dt_all <- do.call(rbind, foo_dt_all)
 
-
+  print(foo_dt_all)
 
   setkey(foo_irr, row)
   setkey(foo_dt_all, row)
