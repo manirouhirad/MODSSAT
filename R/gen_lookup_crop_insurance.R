@@ -478,7 +478,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   #                            expected profit-max                             #
   #............................................................................#
 
-  foo_irr = foo_irr[,.(row, Well_ID, Well_capacity, tot_acres, quarter, CR, PAW, cover, irrigation, yield_kg_ac, profit)]
+  foo_irr = foo_irr[,.(row, Well_ID, Well_capacity, tot_acres, quarter, CR, PAW, cover, irrigation, yield_kg_ac, profit, liabpay)]
   foo_irr[, mean_yield               := mean(yield_kg_ac), by=c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
   foo_irr[, mean_profit_practice     := mean(profit), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
   foo_irr[, mean_irrigation_practice := mean(irrigation), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
