@@ -475,11 +475,12 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   rm(well_capacity_data)
 
   foo_irr_2 = foo_irr[SDAT == year_dt]
-
+  foo_irr[, row:= 1:.N]
   #............................................................................#
   #                            expected profit-max                             #
   #............................................................................#
 
+  foo_irr = foo_irr[,.(row, Well_ID, tot_acres, quarter, CR, PAW, cover, irrigation, yield_kg_ac, profit)]
   foo_irr[, mean_yield               := mean(yield_kg_ac), by=c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
   foo_irr[, mean_profit_practice     := mean(profit), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
   foo_irr[, mean_irrigation_practice := mean(irrigation), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW", "cover")]
@@ -491,7 +492,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   foo_irr[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
   foo_irr[, `:=`(irr_tot_acres, sum(mean_irrigation_practice)), by = c("Well_ID", "tot_acres")]
   foo_irr[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
-
   setkey(foo_irr, Well_ID, tot_acres)
   foo_irr = foo_irr[profit_Well_ID == profit_tot_acres]
 
@@ -507,13 +507,11 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
                                      exp_liabpay = liabpay)]
   lookup_table_quarter = unique(lookup_table_quarter)
 
-
   setkey(lookup_table_quarter, Well_ID, tot_acres, quarter, CR, PAW, cover)
   setkey(foo_irr_2, Well_ID, tot_acres, quarter, CR, PAW, cover)
   lookup_table_year = foo_irr_2[lookup_table_quarter]
   setkey(lookup_table_year, Well_capacity, Well_ID, quarter)
   lookup_table_year[, year := year_2]
-
 
   #............................................................................#
   #                                     outputs                                #
