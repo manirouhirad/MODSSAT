@@ -66,8 +66,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   #............................................................................#
 
   library(data.table)
-  library(snow)
-  library(parallel)
 
   #............................................................................#
   #                            read input files                                #
