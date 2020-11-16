@@ -2,7 +2,7 @@
 % Please edit documentation in R/gen_lookup_crop_insurance.R
 \name{gen_lookup_crop_insurance}
 \alias{gen_lookup_crop_insurance}
-\title{This function is the parallelized version of the gen_lookup_subsidy function.}
+\title{This function generates outputs for different crop insurance parameters.}
 \usage{
 gen_lookup_crop_insurance(
   DSSAT_files = "./input_files/DSSAT_files",
@@ -87,7 +87,7 @@ gen_lookup_crop_insurance(
 returns the output table.
 }
 \description{
-This function is the parallelized version of the gen_lookup_subsidy function.
+This function generates outputs for different crop insurance parameters.
 }
 \examples{
 \dontrun{

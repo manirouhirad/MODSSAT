@@ -1,4 +1,4 @@
-#' This function is the parallelized version of the gen_lookup_subsidy function.
+#' This function generates outputs for different crop insurance parameters.
 #' @param DSSAT_files                    is the directory where DSSAT files are located. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised".
 #' @param well_soil_file                 is the file that contains base soil file. Defaults to "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv".
 #' @param well_capacity_files            is the file that contains base well capacity. Defaults to "C:/Users/manirad/Downloads/test/Well_Capacity_ganarator.csv".
@@ -192,8 +192,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   # APH_ratio<-fread(APH_ratiofile) #read in APH
   # APH_ratio = unique(APH_ratio, by="CR")
 
-  print("Line 196.")
-
   #............................................................................#
   #                            read input files                                #
   #............................................................................#
@@ -280,9 +278,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
   KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
   KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry", CR, sep = "-"))]
-
-
-  print("Line 290.")
 
 
   # add crop well capacity combinations to existing wells.
@@ -444,9 +439,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   setkey(parcel_APH, Well_ID, CR)
   foo_irr = foo_irr[parcel_APH]
 
-  print("Line 463.")
-
-
   #............................................................................#
   #                            calculate premium rate                          #
   #............................................................................#
@@ -521,8 +513,6 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   lookup_table_year[, year := year_2]
 
 
-  print("Line 540.")
-
   #............................................................................#
   #                                     outputs                                #
   #............................................................................#
@@ -586,8 +576,5 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   county_APH_output = county_APH_output[,.(CR, APH_cntyref)]
   write.csv(county_APH_output, county_APH_file, row.names = F)
 
-  rm(foo)
-  rm(foo_irr)
-  rm(foo_irr_2)
 }
 
