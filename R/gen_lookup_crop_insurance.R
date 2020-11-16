@@ -52,7 +52,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
                                      first_year_of_GW               = 1997,
                                      last_year_of_GW                = 2008,
                                      irrigation_season_days         = 70,
-                                     first_year_of_simulation       = 2000,
+                                     first_year_of_simulation       = 1999,
                                      insurance_subsidy_increase     = 0,
                                      num_clusters                   = parallel::detectCores()-2
 )
@@ -143,7 +143,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   well_capacity_data[, `:=`(file_name, substr(file_name, nchar(file_name) -
                                                 16, nchar(file_name) - 13))]
   well_capacity_data[, `:=`(file_name, as.integer(file_name))]
-  well_capacity_data = well_capacity_data[file_name == year_2-1,.(Well_ID, `Well_Capacity(gpm)`)]
+  well_capacity_data = well_capacity_data[file_name == year_2,.(Well_ID, `Well_Capacity(gpm)`)]
 
   soil_type          = fread(well_soil_file)
   soil_type[, V1 := NULL]
@@ -546,7 +546,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   econ_output_in = fread("./Econ_output/KS_DSSAT_output_ins.csv") ## <------------- fix the year here
   econ_output    = rbind(econ_output_in, lookup_table_year)
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_",
-                                insurance_subsidy_increase, "_", year_2, ".csv"), row.names = FALSE)
+                                insurance_subsidy_increase, "_", year_2+1, ".csv"), row.names = FALSE)
 
   # 3. APH for each well.
   parcel_APH_output = lookup_table_year[,.(Well_ID, quarter, q1=1, CR, yield_kg_ac)]

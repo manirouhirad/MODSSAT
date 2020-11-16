@@ -27,7 +27,7 @@ gen_lookup_crop_insurance(
   first_year_of_GW = 1997,
   last_year_of_GW = 2008,
   irrigation_season_days = 70,
-  first_year_of_simulation = 2000,
+  first_year_of_simulation = 1999,
   insurance_subsidy_increase = 0,
   num_clusters = parallel::detectCores() - 2
 )
