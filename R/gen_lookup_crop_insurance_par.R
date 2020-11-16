@@ -54,23 +54,23 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
                                      irrigation_season_days         = 70,
                                      first_year_of_simulation       = 1999,
                                      insurance_subsidy_increase     = 0,
-                                     num_clusters                   = parallel::detectCores()-2
+                                     num_clusters                   = parallel::detectCores()-8
 )
 {
-  
-  
+
+
   #............................................................................#
   #                            load necessary packages                         #
   #............................................................................#
-  
+
   library(data.table)
   library(snow)
   library(parallel)
-  
+
   #............................................................................#
   #                            read input files                                #
   #............................................................................#
-  
+
   # DSSAT
   col_new = c("RUNNO", "TRNO", "R_pound", "O_pound", "C_pound",
               "CR", "MODEL", "EXNAME", "FNAM", "WSTA", "SOIL_ID", "SDAT",
@@ -85,7 +85,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
               "YPEM", "YPTM", "YPIM", "DPNAM", "DPNUM", "YPNAM", "YPNUM",
               "NDCH", "TMAXA", "TMINA", "SRADA", "DAYLA", "CO2A", "PRCP",
               "ETCP", "ESCP", "EPCP", "PAW", "IFREQ")
-  
+
   filenames = list.files(path = DSSAT_files, pattern = "*.OSU",
                          full.names = TRUE, recursive = TRUE)
   ldf <- lapply(filenames, read.table, fill = T)
@@ -108,9 +108,9 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   KS_DSSAT[, `:=`(foo, NULL)]
   data.table::setnames(KS_DSSAT, old = colnames(KS_DSSAT),
                        new = col_new)
-  
+
   # wells: soil type and well capacity <--------- read every year. Fine which year it is.
-  
+
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
   ldf <- lapply(filenames, fread, fill = T)
@@ -131,20 +131,20 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
                                        ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
                                               ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)),
                                                      file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1))))))]
-  
-  
-  
+
+
+
   year_dt = year_dt$file_name
   print(paste0("year_dt is equal to ", year_dt))
   print(paste0("year_2 is equal to ",  year_2))
   # year_dt = 2000
-  
+
   well_capacity_data = rbindlist(ldf)
   well_capacity_data[, `:=`(file_name, substr(file_name, nchar(file_name) -
                                                 16, nchar(file_name) - 13))]
   well_capacity_data[, `:=`(file_name, as.integer(file_name))]
   well_capacity_data = well_capacity_data[file_name == year_2,.(Well_ID, `Well_Capacity(gpm)`)]
-  
+
   soil_type          = fread(well_soil_file)
   soil_type[, V1 := NULL]
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000", Soil_Type))]
@@ -155,7 +155,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   well_capacity_data[is.na(Soil_Type), Soil_Type:= missing_soil_types]
   well_capacity_data[Well_capacity>1300, Well_capacity := 1300]
   well_capacity_data[Well_capacity< 5 , Well_capacity := 5]
-  
+
   # parameters: costs, prices
   price_dt = data.table::fread(price_file)
   data.table::setkey(price_dt, CR)
@@ -168,30 +168,30 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   fixed_cost[, `:=`(irr, NULL)]
   fixed_cost = rbind(fixed_cost, data.table::data.table(Crop = "FA", f_cost = 0))
   data.table::setkey(fixed_cost, Crop)
-  
+
   # parameters: insurance
   inpa = fread(insparamfile)
   inpa[, crop := c("MZ", "dry-MZ", "WH", "dry-WH", "SG", "dry-SG")]
   inpa = rbind(inpa, data.table(crop="FA", Irrigation = "N", refrate = 0, exp = 1, fixrate = 0, rdfact = 0, unitfact = 1, refamnt = 0))
-  
+
   # parameters: insurance subsidy rate. This is key here.
   cover = fread(cover_file)
-  
-  
+
+
   #variables: APH for fields and county <------------------------------------------ get back to this one
   # what needs to be done here is to read the APH and county ref in and estimate APH ratio
-  
+
   parcel_APH = fread(parcel_APH_file)
   county_APH = fread(county_APH_file)
-  
+
   setkey(parcel_APH, CR)
   setkey(county_APH, CR)
   parcel_APH = parcel_APH[county_APH]
   parcel_APH[, APH_ratio := APH/APH_cntyref]
-  
+
   # APH_ratio<-fread(APH_ratiofile) #read in APH
   # APH_ratio = unique(APH_ratio, by="CR")
-  
+
   #............................................................................#
   #                            read input files                                #
   #............................................................................#
@@ -249,7 +249,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
                           IRCM, PRCP, PRCM, HWAM)]
   data.table::setkey(KS_DSSAT, SOIL_ID, CR, PAW, SDAT,
                      IFREQ)
-  
+
   KS_DSSAT[, `:=`(lead_yield, dplyr::lead(HWAM, n = 1L)),
            by = c("SOIL_ID", "CR", "PAW", "SDAT")]
   KS_DSSAT[, `:=`(lead_irr_mm, dplyr::lead(IRCM, n = 1L)),
@@ -278,11 +278,11 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
   KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
   KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry", CR, sep = "-"))]
-  
-  
+
+
   # add crop well capacity combinations to existing wells.
   number_of_crops = length(KS_DSSAT[, unique(CR)])
-  
+
   setkey(well_capacity_data, Well_ID, Soil_Type)
   well_capacity_data[, `:=`(quarter_1, 0)]
   well_capacity_data[, `:=`(quarter_2, 0)]
@@ -348,19 +348,19 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
                              tot_acres_65, tot_acres_975, tot_acres_130)
   rm(tot_acres_0, tot_acres_325, tot_acres_65, tot_acres_975, tot_acres_130)
   data.table::setkey(well_capacity_data, Well_ID, tot_acres, quarter)
-  
-  
+
+
   ## Add Fallow
   KS_DSSAT[, `:=`(IFREQ, round(IFREQ, 1))]
   number_of_years = nrow(unique(KS_DSSAT, by = "SDAT"))
-  
+
   foo = data.table(SOIL_ID = data.table(SOIL_ID = c("KS00000001", "KS00000002", "KS00000003", "KS00000004",
                                                     "KS00000005", "KS00000006", "KS00000007"),
                                         CR  = c("FA", "FA", "FA", "FA", "FA", "FA", "FA"), IFREQ = 0,
                                         PAW = c("25", "25", "25", "25", "25", "25", "25"),
                                         SDAT= min(KS_DSSAT$SDAT), irr_mm = 0, PRCP = 200, PRCM = 200, yield_kg_ac = 0
   ))
-  
+
   foo = foo[rep(seq_len(nrow(foo)), each = number_of_years)]
   baz = unique(KS_DSSAT, by = "SDAT")
   foo[, `:=`(SDAT, rep(baz$SDAT, nrow(foo)/nrow(baz)))]
@@ -368,7 +368,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   foo[, `:=`(PRCM, rep(baz$PRCM, nrow(foo)/nrow(baz)))]
   foo = foo[,.(SOIL_ID = SOIL_ID.SOIL_ID, CR = SOIL_ID.CR, IFREQ= SOIL_ID.IFREQ, PAW= SOIL_ID.PAW, SDAT,
                irr_mm = SOIL_ID.irr_mm, PRCP, PRCM, yield_kg_ac= SOIL_ID.yield_kg_ac)]
-  
+
   KS_DSSAT = rbind(KS_DSSAT, foo)
   data.table::setkey(KS_DSSAT, SOIL_ID, CR, IFREQ)
   well_capacity_data[data.table::like(CR, "dry"), `:=`(ifreq,
@@ -378,7 +378,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   well_capacity_data = unique(well_capacity_data, by = cols)
   data.table::setkey(well_capacity_data, Soil_Type, CR,
                      ifreq)
-  
+
   # merge DSSAT and well data
   foo_irr = merge(well_capacity_data, KS_DSSAT, by.x = c("Soil_Type", "CR", "ifreq"), by.y = c("SOIL_ID", "CR", "IFREQ"),
                   allow.cartesian = T)
@@ -386,9 +386,9 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
                         tot_acres, IFREQ = ifreq, CR, quarter, PAW, SDAT,
                         irr_mm, PRCP, PRCM, yield_kg_ac)]
   data.table::setkey(foo_irr, Well_capacity)
-  
+
   setkey(well_capacity_data, Well_capacity)
-  
+
   # then merge it with other parameters like prices
   data.table::setkey(foo_irr, CR)
   foo_irr = foo_irr[price_dt]
@@ -402,11 +402,11 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   data.table::setkey(fixed_cost, Crop)
   foo_irr = foo_irr[fixed_cost]
   foo_irr = foo_irr[complete.cases(Well_ID)]
-  
+
   # add different coverage levels
   foo_irr[, cover := 0]
   foo_irr[, subs  := 0]
-  
+
   dt = data.table()
   for(j in 1:nrow(cover)){ #loop over coverage and subsidy
     fooadd <- copy(foo_irr) #start with the base array
@@ -417,32 +417,32 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
     dt<-rbind(dt,fooadd) #add onto foo_irr
     print(j)
   }
-  
+
   foo_irr = rbind(foo_irr, dt)
   rm(fooadd) #clean out fooadd
   rm(dt) #clean out fooadd
-  
+
   #Generate insurance payout here
   setkey(foo_irr,CR)
   setkey(inpa, crop)
   foo_irr=foo_irr[inpa]
   foo_irr=foo_irr[complete.cases(Well_ID)]                                                                                                    # remove NA's
-  
+
   foo = unique(parcel_APH, by="Well_ID")
   foo[, CR        := "FA"]
   foo[, APH       := 0]
   foo[, APH_cntyref   := 0]
   foo[, APH_ratio := 1]
   parcel_APH = rbind(parcel_APH, foo)
-  
+
   setkey(foo_irr,    Well_ID, CR)
   setkey(parcel_APH, Well_ID, CR)
   foo_irr = foo_irr[parcel_APH]
-  
+
   #............................................................................#
   #                            calculate premium rate                          #
   #............................................................................#
-  
+
   foo_irr[, pr := APH_cntyref^exp]
   foo_irr[, pr := pr * refrate + fixrate]
   foo_irr[, pr := pr * unitfact * rdfact]
@@ -451,36 +451,36 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   foo_irr[, pr := ifelse(pr < prevpr*1.2, pr, prevpr)]
   foo_irr[  pr > .999,   pr := .999]
   foo_irr[, prem := pr * cover * APH * (1-subs)]
-  
+
   foo_irr = foo_irr[, .(Well_ID, SOIL_ID, Well_capacity,
                         SDAT, PRCP, PRCM, price, cost_per_acre_in, f_cost,
                         tot_acres, IFREQ, quarter, CR, PAW,
                         irr_mm, yield_kg_ac,
                         cover, subs, refrate, exp, fixrate, rdfact, unitfact, refamnt, APH, APH_cntyref, APH_ratio, prem)]
-  
+
   #............................................................................#
   #                            calculate profit                                #
   #............................................................................#
-  
+
   foo_irr[, yield_ins := ifelse(yield_kg_ac > cover * APH, yield_kg_ac, cover * APH)]
   foo_irr[, liabpay := ifelse(yield_kg_ac < cover * APH, cover * APH - yield_kg_ac, 0)]
   foo_irr[, `:=`(irrigation, 32.5 * irr_mm * 0.0393701)]
   foo_irr[, `:=`(profit, 32.5 * (price * yield_ins - f_cost - prem) - irrigation * cost_per_acre_in)]
-  
+
   rm(df_foo)
   rm(KS_DSSAT)
   rm(KS_DSSAT_0)
   rm(well_capacity_data)
-  
+
   foo_irr_2 = foo_irr[SDAT == year_dt]
-  
+
   #............................................................................#
   #                            expected profit-max                             #
   #............................................................................#
   foo_irr[, row := 1:.N]
   foo_irr[, Well_ID_grp := .GRP, by="Well_ID"]
-  
-  cl <- makeCluster(num_clusters)
+
+  cl <- makeCluster(num_clusters, outfile="")
   aa =  max(foo_irr$Well_ID_grp)
   clusterExport(cl, varlist = c("foo_irr", "data.table",
                                 "setnames", "setkey"),
@@ -488,37 +488,37 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
   stopCluster(cl)
   foo_dt_all <- do.call(rbind, foo_dt_all)
-  
-  
-  
+
+
+
   setkey(foo_irr, row)
   setkey(foo_dt_all, row)
   foo_irr = foo_irr[foo_dt_all]
-  
-  
+
+
   # so here you want to see what each producer will do at the beginning of the season
   # and then see what year it is and then see the outcome
-  
+
   ### add year of the simulation and well capacity here:
   ### also create a separate output that includes crop yield (APH) and county mean
-  
+
   lookup_table_quarter = foo_irr[, .(Well_ID, tot_acres, quarter, CR, PAW, cover,
                                      exp_irrigation_quarter = mean_irrigation_practice, exp_profit_quarter= profit_quarter,
                                      exp_liabpay = liabpay)]
   lookup_table_quarter = unique(lookup_table_quarter)
-  
-  
+
+
   setkey(lookup_table_quarter, Well_ID, tot_acres, quarter, CR, PAW, cover)
   setkey(foo_irr_2, Well_ID, tot_acres, quarter, CR, PAW, cover)
   lookup_table_year = foo_irr_2[lookup_table_quarter]
   setkey(lookup_table_year, Well_capacity, Well_ID, quarter)
   lookup_table_year[, year := year_2]
-  
-  
+
+
   #............................................................................#
   #                                     outputs                                #
   #............................................................................#
-  
+
   # 1. output for the hydrology model:
   dt = lookup_table_year[,.(Well_ID, irrigation)]
   dt[, irrigation := sum(irrigation), by="Well_ID"]
@@ -526,20 +526,20 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   dt[, `:=`(output_rate_acin_day, irrigation/irrigation_season_days)]
   output_hydrology = dt[,.(Well_ID, output_rate_acin_day)]
   write.csv(output_hydrology, hydrology_file_year, row.names = FALSE)
-  
+
   # 2. output of the econ model:
   # econ_output_in = lookup_table_year[1]
   # econ_output_in[, year := 0]
   # econ_output_in[, Well_ID := 0]
   # write.csv(econ_output_in, "./Econ_output/KS_DSSAT_output_ins.csv", row.names = F)
   # write.csv(econ_output_in, "./input_files/KS_DSSAT_output_ins.csv", row.names = F)
-  
-  
+
+
   econ_output_in = fread("./Econ_output/KS_DSSAT_output_ins.csv") ## <------------- fix the year here
   econ_output    = rbind(econ_output_in, lookup_table_year)
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_",
                                 insurance_subsidy_increase, "_", year_2+1, ".csv"), row.names = FALSE)
-  
+
   # 3. APH for each well.
   parcel_APH_output = lookup_table_year[,.(Well_ID, quarter, q1=1, CR, yield_kg_ac)]
   parcel_APH_output[, yield_kg_q  := yield_kg_ac * 32.5]
@@ -548,19 +548,19 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   parcel_APH_output = unique(parcel_APH_output, by =c("Well_ID", "CR"))
   parcel_APH_output[, yield_kg_ac := yield_kg_q/(q1*32.5)]
   parcel_APH_output = parcel_APH_output[,.(Well_ID, CR, yield_kg_ac)]
-  
+
   parcel_APH = parcel_APH[,.(Well_ID, CR, APH)]
-  
+
   setkey(parcel_APH,        Well_ID, CR)
   setkey(parcel_APH_output, Well_ID, CR)
-  
+
   parcel_APH_output = parcel_APH_output[parcel_APH]
   parcel_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH]
   parcel_APH_output[, APH := .9*APH + .1*yield_kg_ac]
   parcel_APH_output = parcel_APH_output[,.(Well_ID, CR, APH)]
   write.csv(parcel_APH_output, parcel_APH_file, row.names = F)
-  
-  
+
+
   # 4. APH for the county.
   county_APH_output = lookup_table_year[,.(Well_ID, quarter, q1=1, CR, yield_kg_ac)]
   county_APH_output[, yield_kg_q  := yield_kg_ac * 32.5]
@@ -569,7 +569,7 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   county_APH_output = unique(county_APH_output, by ="CR")
   county_APH_output[, yield_kg_ac := yield_kg_q/(q1*32.5)]
   county_APH_output = county_APH_output[,.(CR, yield_kg_ac)] # <~~~~~~~~~~~~~~~~ call it cntyref
-  
+
   setkey(county_APH,        CR)
   setkey(county_APH_output, CR)
   county_APH_output = county_APH_output[county_APH]
@@ -577,6 +577,6 @@ gen_lookup_crop_insurance_par = function(DSSAT_files                    = "./inp
   county_APH_output[, APH := .9*APH_cntyref + .1*yield_kg_ac]
   county_APH_output = county_APH_output[,.(CR, APH_cntyref)]
   write.csv(county_APH_output, county_APH_file, row.names = F)
-  
+
 }
 

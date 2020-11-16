@@ -29,7 +29,7 @@ gen_lookup_crop_insurance_par(
   irrigation_season_days = 70,
   first_year_of_simulation = 1999,
   insurance_subsidy_increase = 0,
-  num_clusters = parallel::detectCores() - 2
+  num_clusters = parallel::detectCores() - 8
 )
 }
 \arguments{
