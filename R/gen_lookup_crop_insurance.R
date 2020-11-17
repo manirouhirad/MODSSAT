@@ -570,7 +570,7 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   setkey(county_APH_output, CR)
   county_APH_output = county_APH_output[county_APH]
   county_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH_cntyref]
-  county_APH_output[, APH := .9*APH_cntyref + .1*yield_kg_ac]
+  county_APH_output[, APH_cntyref := .9*APH_cntyref + .1*yield_kg_ac]
   county_APH_output = county_APH_output[,.(CR, APH_cntyref)]
   write.csv(county_APH_output, county_APH_file, row.names = F)
 
