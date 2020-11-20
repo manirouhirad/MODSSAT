@@ -11,8 +11,10 @@ gen_lookup_crop_insurance(
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
   insparamfile = "./input_files/insparam.csv",
-  parcel_APH_file = "./parcel_APH.csv",
-  county_APH_file = "./county_ref.csv",
+  parcel_input_APH_file = "./parcel_APH.csv",
+  county_input_APH_file = "./county_ref.csv",
+  parcel_output_APH_folder = "./Econ_output/APH_history/APH_parcel/",
+  county_output_APH_folder = "./Econ_output/APH_history/APH_county/",
   cover_file = "./input_files/coverage_subsidy.csv",
   econ_output_folder = "./Econ_output/results_with_insurance/",
   hydrology_file_year = "./KS_DSSAT_output.csv",
@@ -25,11 +27,11 @@ gen_lookup_crop_insurance(
   minimum_well_capacity = 0,
   maximum_well_capacity = 1000,
   first_year_of_GW = 1997,
-  last_year_of_GW = 2008,
+  last_year_of_GW = 2007,
   irrigation_season_days = 70,
   first_year_of_simulation = 1999,
   insurance_subsidy_increase = 0,
-  no_policy_indicator = 1,
+  no_policy_indicator = 0,
   num_clusters = parallel::detectCores() - 2
 )
 }
@@ -46,9 +48,13 @@ gen_lookup_crop_insurance(
 
 \item{insparamfile}{is the value of insurance parameters that are used to estimate the premium rate.}
 
-\item{parcel_APH_file}{is the file that keeps track of the APH at the parcel-level.}
+\item{parcel_input_APH_file}{is the input APH file at the parcel-level.}
 
-\item{county_APH_file}{is the file that keeps tracl of the APH at the county-level.}
+\item{county_input_APH_file}{is the input APH file at the county-level.}
+
+\item{parcel_output_APH_folder}{is the output APH file at the parcel-level.}
+
+\item{county_output_APH_folder}{is the output APH file at the county-level.}
 
 \item{cover_file}{is the file that includes different coverage levels and their respective subsidies.}
 

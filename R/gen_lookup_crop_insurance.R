@@ -5,8 +5,10 @@
 #' @param price_file                     is the file that includes crop prices. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv".
 #' @param fixed_cost_file                is the file tha includes fixed costs (per acre) costs of production. Defaults to "C:/Users/manirad/Downloads/test/fixed_cost_input.csv".
 #' @param insparamfile                   is the value of insurance parameters that are used to estimate the premium rate.
-#' @param parcel_APH_file                is the file that keeps track of the APH at the parcel-level.
-#' @param county_APH_file                is the file that keeps tracl of the APH at the county-level.
+#' @param parcel_input_APH_file          is the input APH file at the parcel-level.
+#' @param county_input_APH_file          is the input APH file at the county-level.
+#' @param parcel_output_APH_folder       is the output APH file at the parcel-level.
+#' @param county_output_APH_folder       is the output APH file at the county-level.
 #' @param cover_file                     is the file that includes different coverage levels and their respective subsidies.
 #' @param econ_output_folder             is the folder where outputs will be written in.
 #' @param hydrology_file_year            is the file that communicates daily groundwater use for each well. This file is read by the MODFLOW model.
@@ -37,8 +39,10 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
                                      price_file                     = "./input_files/crop_prices.csv",
                                      fixed_cost_file                = "./input_files/fixed_cost_input.csv",
                                      insparamfile                   = "./input_files/insparam.csv",
-                                     parcel_APH_file                = "./parcel_APH.csv",
-                                     county_APH_file                = "./county_ref.csv",
+                                     parcel_input_APH_file          = "./parcel_APH.csv",
+                                     county_input_APH_file          = "./county_ref.csv",
+                                     parcel_output_APH_folder       = "./Econ_output/APH_history/APH_parcel/",
+                                     county_output_APH_folder       = "./Econ_output/APH_history/APH_county/",
                                      cover_file                     = "./input_files/coverage_subsidy.csv",
                                      econ_output_folder             = "./Econ_output/results_with_insurance/",
                                      hydrology_file_year            = "./KS_DSSAT_output.csv",
@@ -51,11 +55,11 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
                                      minimum_well_capacity          = 0,
                                      maximum_well_capacity          = 1000,
                                      first_year_of_GW               = 1997,
-                                     last_year_of_GW                = 2008,
+                                     last_year_of_GW                = 2007,
                                      irrigation_season_days         = 70,
                                      first_year_of_simulation       = 1999,
                                      insurance_subsidy_increase     = 0,
-                                     no_policy_indicator            = 1,
+                                     no_policy_indicator            = 0,
                                      num_clusters                   = parallel::detectCores()-2
 )
 {
@@ -127,10 +131,10 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   year_dt = year_dt[nrow(year_dt)]
   year_2 = year_dt$file_name
   year_dt[, file_name := ifelse(file_name <= (last_year_of_GW - 1), file_name + 1,
-                                       ifelse(file_name > (last_year_of_GW - 1) & file_name <= (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1), file_name - (-1 + last_year_of_GW - first_year_of_GW + 1),
-                                              ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
-                                                     ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)),
-                                                            file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1))))))]
+                                ifelse(file_name > (last_year_of_GW - 1) & file_name <= (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1), file_name - (-1 + last_year_of_GW - first_year_of_GW + 1),
+                                       ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
+                                              ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)),
+                                                     file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1))))))]
 
 
 
@@ -181,8 +185,8 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   #variables: APH for fields and county <------------------------------------------ get back to this one
   # what needs to be done here is to read the APH and county ref in and estimate APH ratio
 
-  parcel_APH = fread(parcel_APH_file)
-  county_APH = fread(county_APH_file)
+  parcel_APH = fread(parcel_input_APH_file)
+  county_APH = fread(county_input_APH_file)
 
   setkey(parcel_APH, CR)
   setkey(county_APH, CR)
@@ -543,18 +547,18 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   parcel_APH_output[, q1 := sum(q1), by=c("Well_ID", "CR")]
   parcel_APH_output = unique(parcel_APH_output, by =c("Well_ID", "CR"))
   parcel_APH_output[, yield_kg_ac := yield_kg_q/(q1*32.5)]
-  parcel_APH_output = parcel_APH_output[,.(Well_ID, CR, yield_kg_ac)]
+  parcel_APH_output = parcel_APH_output[,.(Well_ID, year = year_2+1, CR, yield_kg_ac)]
 
-  parcel_APH = parcel_APH[,.(Well_ID, CR, APH)]
-
-  setkey(parcel_APH,        Well_ID, CR)
-  setkey(parcel_APH_output, Well_ID, CR)
-
-  parcel_APH_output = parcel_APH_output[parcel_APH]
-  parcel_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH]
-  parcel_APH_output[, APH := .9*APH + .1*yield_kg_ac]
-  parcel_APH_output = parcel_APH_output[,.(Well_ID, CR, APH)]
-  write.csv(parcel_APH_output, parcel_APH_file, row.names = F)
+  # parcel_APH = parcel_APH[,.(Well_ID, CR, APH)]
+  #
+  # setkey(parcel_APH,        Well_ID, CR)
+  # setkey(parcel_APH_output, Well_ID, CR)
+  #
+  # parcel_APH_output = parcel_APH_output[parcel_APH]
+  # parcel_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH]
+  # parcel_APH_output[, APH := .9*APH + .1*yield_kg_ac]
+  # parcel_APH_output = parcel_APH_output[,.(Well_ID, year = year_2+1, CR, APH)]
+  write.csv(parcel_APH_output, paste0(parcel_output_APH_folder, "parcel_APH_", year_2+1, ".csv"), row.names = F)
 
 
   # 4. APH for the county.
@@ -564,15 +568,14 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   county_APH_output[, q1 := sum(q1), by="CR"]
   county_APH_output = unique(county_APH_output, by ="CR")
   county_APH_output[, yield_kg_ac := yield_kg_q/(q1*32.5)]
-  county_APH_output = county_APH_output[,.(CR, yield_kg_ac)] # <~~~~~~~~~~~~~~~~ call it cntyref
+  county_APH_output = county_APH_output[,.(year = year_2+1, CR, yield_kg_ac)] # <~~~~~~~~~~~~~~~~ call it cntyref
 
-  setkey(county_APH,        CR)
-  setkey(county_APH_output, CR)
-  county_APH_output = county_APH_output[county_APH]
-  county_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH_cntyref]
-  county_APH_output[, APH_cntyref := .9*APH_cntyref + .1*yield_kg_ac]
-  county_APH_output = county_APH_output[,.(CR, APH_cntyref)]
-  write.csv(county_APH_output, county_APH_file, row.names = F)
+  # setkey(county_APH,        CR)
+  # setkey(county_APH_output, CR)
+  # county_APH_output = county_APH_output[county_APH]
+  # county_APH_output[is.na(yield_kg_ac), yield_kg_ac := APH_cntyref]
+  # county_APH_output[, APH_cntyref := .9*APH_cntyref + .1*yield_kg_ac]
+  # county_APH_output = county_APH_output[,.(year = year_2+1, CR, APH_cntyref)]
+  write.csv(county_APH_output, paste0(county_output_APH_folder, "county_ref_", year_2+1, ".csv"), row.names = F)
 
 }
-
