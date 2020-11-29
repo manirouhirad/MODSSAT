@@ -505,7 +505,9 @@ gen_lookup_crop_insurance = function(DSSAT_files                    = "./input_f
   ### also create a separate output that includes crop yield (APH) and county mean
 
   lookup_table_quarter = foo_irr[, .(Well_ID, tot_acres, quarter, CR, PAW, cover,
-                                     exp_irrigation_quarter = mean_irrigation_practice, exp_profit_quarter= profit_quarter,
+                                     exp_irrigation_quarter = mean_irrigation_practice,
+                                     exp_yield_quarter = mean_yield,
+                                     exp_profit_quarter= profit_quarter,
                                      exp_liabpay = liabpay)]
   lookup_table_quarter = unique(lookup_table_quarter)
 
