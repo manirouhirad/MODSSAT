@@ -316,15 +316,15 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
 
 
     FN_optim2 = function(jj) {
-      foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
-                                                            quarter, group_2, irrigation, profit)]
-      foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
-                                                            quarter, group_2, irrigation, profit)]
-      foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
-                                                            quarter, group_2, irrigation, profit)]
-      foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
-                                                            quarter, group_2, irrigation, profit)]
-      # foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
+      # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
+      #                                                       quarter, group_2, irrigation, profit)]
+      # foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
+      #                                                       quarter, group_2, irrigation, profit)]
+      # foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
+      #                                                       quarter, group_2, irrigation, profit)]
+      # foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
+      #                                                       quarter, group_2, irrigation, profit)]
+      # # foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
       #                 allow.cartesian = T)
       # foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
       #                 allow.cartesian = T)
@@ -370,8 +370,9 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       # foo_dt1 = foo_dt1[, .(group_1, quarter = quarter.x, group_2 = group_2.x,
       #                       mean_irrigation_combination, mean_profit_combination,
       #                       mean_profit_combination_sub)]
-      foo_dt1 = rbind(foo_dt1, foo_dt2, foo_dt3, foo_dt4)
-      return(foo_dt1)
+      # foo_dt1 = rbind(foo_dt1, foo_dt2, foo_dt3, foo_dt4)
+      # return(foo_dt1)
+      print(jj)
     }
 
 
