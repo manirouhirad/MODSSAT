@@ -18,19 +18,20 @@
 #' gen_lookup_tax(subsidy_amount = 2)
 #' }
 #' @export
-gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
-                                           subsidy_threshold = 1500,
-                                           DSSAT_files = "./input_files/DSSAT_files",
-                                           soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-                                           well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
-                                           price_file = "./input_files/crop_prices.csv",
-                                           fixed_cost_file = "./input_files/fixed_cost_input.csv",
-                                           pumping_cost = 3,
-                                           default_well_capacity_col_name = "Well_Capacity(gpm)",
-                                           soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
-                                           IFREQ_seq = 2,
-                                           IFREQ_interpolate = 0.1,
-                                           num_clusters = detectCores() - 2)
+gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
+                                          subsidy_threshold = 1500,
+                                          DSSAT_files = "./input_files/DSSAT_files",
+                                          soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
+                                          well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
+                                          price_file = "./input_files/crop_prices.csv",
+                                          fixed_cost_file = "./input_files/fixed_cost_input.csv",
+                                          pumping_cost = 3,
+                                          default_well_capacity_col_name = "Well_Capacity(gpm)",
+                                          soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
+                                          IFREQ_seq = 2,
+                                          IFREQ_interpolate = 0.1,
+                                          num_clusters = 12
+)
 {
   library(data.table)
   library(parallel)
@@ -39,19 +40,28 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
               "per acre-inch", sep = " "))
   print(paste("this is the subsidy threshold:", subsidy_threshold,
               "acre-inch", sep = " "))
-  col_new = c("RUNNO", "TRNO", "R_pound", "O_pound", "C_pound",
-              "CR", "MODEL", "EXNAME", "FNAM", "WSTA", "SOIL_ID", "SDAT",
-              "PDAT", "EDAT", "ADAT", "MDAT", "HDAT", "DWAP", "CWAM",
-              "HWAM", "HWAH", "BWAH", "PWAM", "HWUM", "H_AM", "H_UM",
-              "HIAM", "LAIX", "IR_M", "IRCM", "PRCM", "ETCM", "EPCM",
-              "ESCM", "ROCM", "DRCM", "SWXM", "NI_M", "NICM", "NFXM",
-              "NUCM", "NLCM", "NIAM", "CNAM", "GNAM", "N2OEC", "PI_M",
-              "PICM", "PUPC", "SPAM", "KI_M", "KICM", "KUPC", "SKAM",
-              "RECM", "ONTAM", "ONAM", "OPTAM", "OPAM", "OCTAM", "OCAM",
-              "CO2EC", "DMPPM", "DMPEM", "DMPTM", "DMPIM", "YPPM",
-              "YPEM", "YPTM", "YPIM", "DPNAM", "DPNUM", "YPNAM", "YPNUM",
-              "NDCH", "TMAXA", "TMINA", "SRADA", "DAYLA", "CO2A", "PRCP",
-              "ETCP", "ESCP", "EPCP", "PAW", "IFREQ")
+  col_new = c("RUNNO", "TRNO", "R_pound",
+              "O_pound", "C_pound", "CR", "MODEL",
+              "EXNAME", "FNAM", "WSTA", "SOIL_ID",
+              "SDAT", "PDAT", "EDAT", "ADAT",
+              "MDAT", "HDAT", "DWAP", "CWAM",
+              "HWAM", "HWAH", "BWAH", "PWAM",
+              "HWUM", "H_AM", "H_UM", "HIAM",
+              "LAIX", "IR_M", "IRCM", "PRCM",
+              "ETCM", "EPCM", "ESCM", "ROCM",
+              "DRCM", "SWXM", "NI_M", "NICM",
+              "NFXM", "NUCM", "NLCM", "NIAM",
+              "CNAM", "GNAM", "N2OEC", "PI_M",
+              "PICM", "PUPC", "SPAM", "KI_M",
+              "KICM", "KUPC", "SKAM", "RECM",
+              "ONTAM", "ONAM", "OPTAM", "OPAM",
+              "OCTAM", "OCAM", "CO2EC", "DMPPM",
+              "DMPEM", "DMPTM", "DMPIM", "YPPM",
+              "YPEM", "YPTM", "YPIM", "DPNAM",
+              "DPNUM", "YPNAM", "YPNUM", "NDCH",
+              "TMAXA", "TMINA", "SRADA", "DAYLA",
+              "CO2A", "PRCP", "ETCP", "ESCP",
+              "EPCP", "PAW", "IFREQ")
   filenames = list.files(path = DSSAT_files, pattern = "*.OSU",
                          full.names = TRUE, recursive = TRUE)
   ldf <- lapply(filenames, read.table, fill = T)
@@ -69,16 +79,18 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
   KS_DSSAT = KS_DSSAT[, !sapply(KS_DSSAT, function(x) all(is.na(x))),
                       with = FALSE]
   KS_DSSAT[, `:=`(V9, as.character(V9))]
-  KS_DSSAT[, `:=`(PAW, substr(V9, 1, regexpr("_", V9) - 2))]
-  KS_DSSAT[, `:=`(IFREQ, substr(V9, regexpr("Q", V9) + 2, nchar(V9)))]
+  KS_DSSAT[, `:=`(PAW, substr(V9, 1, regexpr("_",
+                                             V9) - 2))]
+  KS_DSSAT[, `:=`(IFREQ, substr(V9, regexpr("Q",
+                                            V9) + 2, nchar(V9)))]
   KS_DSSAT[, `:=`(V9, NULL)]
   KS_DSSAT[, `:=`(foo, NULL)]
   data.table::setnames(KS_DSSAT, old = colnames(KS_DSSAT),
                        new = col_new)
   KS_DSSAT[, `:=`(WSTA, substr(WSTA, 1, 4))]
-  KS_DSSAT[, `:=`(group, .GRP), by = c("WSTA", "SOIL_ID")]
+  KS_DSSAT[, `:=`(group, .GRP), by = c("WSTA",
+                                       "SOIL_ID")]
   KS_DSSAT_2 = data.table::copy(KS_DSSAT)
-
   lookup_table_all_years_2 = data.table::data.table()
   lookup_table_quarter_2 = data.table::data.table()
   lookup_table_well_2 = data.table::data.table()
@@ -95,16 +107,16 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
                     allow.cartesian = T)
     foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
                     allow.cartesian = T)
-    setnames(foo_dt2, old = c("quarter.x", "group_2.x", "irrigation.x",
-                              "profit.x"), new = c("quarter.xx", "group_2.xx",
-                                                   "irrigation.xx", "profit.xx"))
-    setnames(foo_dt2, old = c("quarter.y", "group_2.y", "irrigation.y",
-                              "profit.y"), new = c("quarter.yy", "group_2.yy",
-                                                   "irrigation.yy", "profit.yy"))
+    setnames(foo_dt2, old = c("quarter.x", "group_2.x",
+                              "irrigation.x", "profit.x"), new = c("quarter.xx",
+                                                                   "group_2.xx", "irrigation.xx", "profit.xx"))
+    setnames(foo_dt2, old = c("quarter.y", "group_2.y",
+                              "irrigation.y", "profit.y"), new = c("quarter.yy",
+                                                                   "group_2.yy", "irrigation.yy", "profit.yy"))
     foo_dt1 = merge(foo_dt1, foo_dt2, by = c("group_1"),
                     allow.cartesian = T)
-    foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x", "group_2.y",
-                                          "group_2.xx", "group_2.yy")]
+    foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x",
+                                          "group_2.y", "group_2.xx", "group_2.yy")]
     setkey(foo_dt1, group_3)
     rm(foo_dt2, foo_dt3, foo_dt4)
     foo_dt1[, `:=`(irrigation_sum, irrigation.x + irrigation.y +
@@ -112,8 +124,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     foo_dt1[, `:=`(irrigation_below, ifelse(irrigation_sum <
                                               subsidy_threshold, subsidy_threshold - irrigation_sum,
                                             0))]
-    foo_dt1[, `:=`(profit_sum, profit.x + profit.y + profit.xx +
-                     profit.yy)]
+    foo_dt1[, `:=`(profit_sum, profit.x + profit.y +
+                     profit.xx + profit.yy)]
     foo_dt1[, `:=`(profit_sum_sub, profit_sum + irrigation_below *
                      subsidy_amount)]
     foo_dt1[, `:=`(mean_profit_combination, mean(profit_sum)),
@@ -140,11 +152,15 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     foo_dt1 = rbind(foo_dt1, foo_dt2, foo_dt3, foo_dt4)
     return(foo_dt1)
   }
+
+
+  i=5
   for (i in 1:max(KS_DSSAT_2$group)) {
     soil_type = data.table::fread(soil_file)
-    soil_type[, `:=`(Soil_Type, KS_DSSAT_2[group == i, unique(SOIL_ID)])]
-    soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
-                                     Soil_Type))]
+    soil_type[, `:=`(Soil_Type, KS_DSSAT_2[group ==
+                                             i, unique(SOIL_ID)])]
+    soil_type[, `:=`(Soil_Type, gsub("KSFC00000",
+                                     "KS0000000", Soil_Type))]
     well_capacity = data.table::fread(well_capacity_file)
     data.table::setkey(soil_type, Well_ID)
     data.table::setkey(well_capacity, Well_ID)
@@ -164,7 +180,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     data.table::setkey(cost_dt, Well_ID)
     cost_dt[, `:=`(cost_per_acre_in, (pumping_cost)/1)]
     fixed_cost = data.table::fread(fixed_cost_file)
-    fixed_cost[irr == 0, `:=`(Crop, paste("dry", Crop, sep = "-"))]
+    fixed_cost[irr == 0, `:=`(Crop, paste("dry",
+                                          Crop, sep = "-"))]
     fixed_cost[, `:=`(irr, NULL)]
     fixed_cost = rbind(fixed_cost, data.table::data.table(Crop = "FA",
                                                           f_cost = 0))
@@ -174,8 +191,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     KS_DSSAT[, `:=`(IRCM, as.numeric(as.character(IRCM)))]
     KS_DSSAT = KS_DSSAT[complete.cases(IRCM)]
     KS_DSSAT[, `:=`(SDAT, substr(SDAT, 1, 4))]
-    cols_change = c("IFREQ", "PAW", "SDAT", "IRCM", "PRCP",
-                    "PRCM", "HWAM")
+    cols_change = c("IFREQ", "PAW", "SDAT",
+                    "IRCM", "PRCP", "PRCM", "HWAM")
     KS_DSSAT[, `:=`((cols_change), lapply(.SD, function(x) as.numeric(as.character(x)))),
              .SDcols = cols_change]
     cols_change = c("SOIL_ID", "WSTA", "CR")
@@ -185,7 +202,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     KS_DSSAT = KS_DSSAT[IFREQ != 0]
     KS_DSSAT_0 <- KS_DSSAT_0[rep(seq_len(nrow(KS_DSSAT_0)),
                                  each = length(soil_moisture_targets))]
-    KS_DSSAT_0[, `:=`(PAW, rep(soil_moisture_targets, nrow(KS_DSSAT_0)/length(soil_moisture_targets)))]
+    KS_DSSAT_0[, `:=`(PAW, rep(soil_moisture_targets,
+                               nrow(KS_DSSAT_0)/length(soil_moisture_targets)))]
     KS_DSSAT = rbind(KS_DSSAT, KS_DSSAT_0)
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
                        PAW, SDAT)
@@ -195,9 +213,11 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, PAW,
                        SDAT, IFREQ)
     KS_DSSAT[, `:=`(lead_yield, dplyr::lead(HWAM, n = 1L)),
-             by = c("SOIL_ID", "WSTA", "CR", "PAW", "SDAT")]
-    KS_DSSAT[, `:=`(lead_irr_mm, dplyr::lead(IRCM, n = 1L)),
-             by = c("SOIL_ID", "WSTA", "CR", "PAW", "SDAT")]
+             by = c("SOIL_ID", "WSTA", "CR",
+                    "PAW", "SDAT")]
+    KS_DSSAT[, `:=`(lead_irr_mm, dplyr::lead(IRCM,
+                                             n = 1L)), by = c("SOIL_ID", "WSTA", "CR",
+                                                              "PAW", "SDAT")]
     KS_DSSAT <- KS_DSSAT[rep(seq_len(nrow(KS_DSSAT)), each = IFREQ_seq *
                                10)]
     df_foo = data.table::data.table(x = seq(0, IFREQ_seq -
@@ -205,16 +225,16 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     df_foo = do.call(rbind, replicate(nrow(KS_DSSAT)/nrow(df_foo),
                                       df_foo, simplify = F))
     KS_DSSAT = data.table::data.table(KS_DSSAT, IFREQ_int = df_foo$x)
-    KS_DSSAT[, `:=`(foo, max(IFREQ)), by = c("SOIL_ID", "WSTA",
-                                             "CR")]
+    KS_DSSAT[, `:=`(foo, max(IFREQ)), by = c("SOIL_ID",
+                                             "WSTA", "CR")]
     KS_DSSAT[, `:=`(IFREQ, IFREQ + IFREQ_int)]
     KS_DSSAT = KS_DSSAT[IFREQ <= foo]
     KS_DSSAT[, `:=`(foo, NULL)]
     KS_DSSAT = KS_DSSAT[complete.cases(lead_yield)]
-    KS_DSSAT[, `:=`(yield_int, HWAM + (lead_yield - HWAM)/IFREQ_seq *
-                      IFREQ_int)]
-    KS_DSSAT[, `:=`(irr_int, IRCM + (lead_irr_mm - IRCM)/IFREQ_seq *
-                      IFREQ_int)]
+    KS_DSSAT[, `:=`(yield_int, HWAM + (lead_yield -
+                                         HWAM)/IFREQ_seq * IFREQ_int)]
+    KS_DSSAT[, `:=`(irr_int, IRCM + (lead_irr_mm -
+                                       IRCM)/IFREQ_seq * IFREQ_int)]
     KS_DSSAT = KS_DSSAT[, .(SOIL_ID, WSTA, CR, IFREQ, PAW,
                             SDAT, irr_mm = irr_int, PRCP, PRCM, yield_kg_ac = yield_int)]
     KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
@@ -223,8 +243,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
     KS_DSSAT = KS_DSSAT[SDAT < 2016]
-
-    KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry", CR, sep = "-"))]
+    KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
+                                        CR, sep = "-"))]
     number_of_crops = length(KS_DSSAT[, unique(CR)])
     well_capacity_data = rbind(data.table::data.table(Well_ID = 1,
                                                       Soil_Type = unique(well_capacity_data$Soil_Type),
@@ -236,8 +256,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     well_capacity_data[, `:=`(quarter_4, 0)]
     well_capacity_data <- well_capacity_data[rep(seq_len(nrow(well_capacity_data)),
                                                  each = 5)]
-    well_capacity_data[, `:=`(tot_acres, rep(c(0, 32.5, 65,
-                                               97.5, 130), nrow(well_capacity_data)/5))]
+    well_capacity_data[, `:=`(tot_acres, rep(c(0, 32.5,
+                                               65, 97.5, 130), nrow(well_capacity_data)/5))]
     well_capacity_data <- well_capacity_data[rep(seq_len(nrow(well_capacity_data)),
                                                  each = (number_of_crops + 1))]
     well_capacity_data[, `:=`(quarter_4, rep(0:number_of_crops,
@@ -248,8 +268,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
                                              nrow(well_capacity_data)/(number_of_crops + 1)))]
     well_capacity_data[, `:=`(quarter_1, rep(0:number_of_crops,
                                              nrow(well_capacity_data)/(number_of_crops + 1)))]
-    well_capacity_data[, `:=`(ifreq, round((tot_acres * 1)/(Well_capacity *
-                                                              0.053030303149011), 1))]
+    well_capacity_data[, `:=`(ifreq, round((tot_acres *
+                                              1)/(Well_capacity * 0.053030303149011), 1))]
     well_capacity_data[!(complete.cases(ifreq) & ifreq <
                            100), `:=`(ifreq, 0)]
     well_capacity_data[ifreq < 2 & ifreq > 0, `:=`(ifreq,
@@ -268,27 +288,27 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     well_capacity_data = well_capacity_data[foo]
     well_capacity_data[, `:=`(value, NULL)]
     well_capacity_data[, `:=`(quarter, ifelse(variable ==
-                                                "quarter_1", 1, ifelse(variable == "quarter_2", 2,
-                                                                       ifelse(variable == "quarter_3", 3, 4))))]
+                                                "quarter_1", 1, ifelse(variable == "quarter_2",
+                                                                       2, ifelse(variable == "quarter_3", 3, 4))))]
     well_capacity_data[, `:=`(variable, NULL)]
     tot_acres_0 = well_capacity_data[tot_acres == 0]
     tot_acres_0 = tot_acres_0[data.table::like(CR, "FA") |
                                 data.table::like(CR, "dry")]
     tot_acres_325 = well_capacity_data[tot_acres == 32.5]
     tot_acres_325 = tot_acres_325[(quarter == 1 & !(data.table::like(CR,
-                                                                     "FA") | data.table::like(CR, "dry"))) | (quarter !=
-                                                                                                                1 & (data.table::like(CR, "FA") | data.table::like(CR,
-                                                                                                                                                                   "dry")))]
+                                                                     "FA") | data.table::like(CR, "dry"))) |
+                                    (quarter != 1 & (data.table::like(CR, "FA") |
+                                                       data.table::like(CR, "dry")))]
     tot_acres_65 = well_capacity_data[tot_acres == 65]
     tot_acres_65 = tot_acres_65[(quarter < 3 & !(data.table::like(CR,
-                                                                  "FA") | data.table::like(CR, "dry"))) | (quarter >
-                                                                                                             2 & (data.table::like(CR, "FA") | data.table::like(CR,
-                                                                                                                                                                "dry")))]
+                                                                  "FA") | data.table::like(CR, "dry"))) |
+                                  (quarter > 2 & (data.table::like(CR, "FA") |
+                                                    data.table::like(CR, "dry")))]
     tot_acres_975 = well_capacity_data[tot_acres == 97.5]
     tot_acres_975 = tot_acres_975[(quarter < 4 & !(data.table::like(CR,
-                                                                    "FA") | data.table::like(CR, "dry"))) | (quarter >
-                                                                                                               3 & (data.table::like(CR, "FA") | data.table::like(CR,
-                                                                                                                                                                  "dry")))]
+                                                                    "FA") | data.table::like(CR, "dry"))) |
+                                    (quarter > 3 & (data.table::like(CR, "FA") |
+                                                      data.table::like(CR, "dry")))]
     tot_acres_130 = well_capacity_data[tot_acres == 130]
     tot_acres_130 = tot_acres_130[!(data.table::like(CR,
                                                      "FA") | data.table::like(CR, "dry"))]
@@ -311,16 +331,18 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     foo[, `:=`(PRCP, rep(baz$PRCP, nrow(foo)/nrow(baz)))]
     KS_DSSAT = rbind(KS_DSSAT, foo)
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ)
-    well_capacity_data[data.table::like(CR, "dry"), `:=`(ifreq,
-                                                         0)]
-    well_capacity_data[CR == "FA", `:=`(ifreq, 0)]
+    well_capacity_data[data.table::like(CR, "dry"),
+                       `:=`(ifreq, 0)]
+    well_capacity_data[CR == "FA", `:=`(ifreq,
+                                        0)]
     cols = colnames(well_capacity_data)
     well_capacity_data = unique(well_capacity_data, by = cols)
     data.table::setkey(well_capacity_data, Well_ID, tot_acres,
                        quarter)
     foo_irr = merge(well_capacity_data, KS_DSSAT, by.x = c("Soil_Type",
-                                                           "weather_station", "CR", "ifreq"), by.y = c("SOIL_ID",
-                                                                                                       "WSTA", "CR", "IFREQ"), allow.cartesian = T)
+                                                           "weather_station", "CR", "ifreq"),
+                    by.y = c("SOIL_ID", "WSTA", "CR",
+                             "IFREQ"), allow.cartesian = T)
     foo_irr = foo_irr[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                           Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                           PAW, SDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
@@ -345,18 +367,18 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
     foo_irr[, `:=`(Well_ID_grp, .GRP), by = "Well_ID"]
     setkey(foo_irr, Well_ID, tot_acres, SDAT, quarter, CR,
            PAW)
-    foo_irr[, `:=`(group_1, .GRP), by = c("Well_ID", "tot_acres",
-                                          "SDAT")]
-    foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID", "tot_acres",
-                                          "SDAT", "quarter")]
+    foo_irr[, `:=`(group_1, .GRP), by = c("Well_ID",
+                                          "tot_acres", "SDAT")]
+    foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID",
+                                          "tot_acres", "SDAT", "quarter")]
     aa = max(foo_irr$Well_ID_grp)
     if (Sys.info()[1] == "Windows") {
       library(snow)
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
-      clusterExport(cl, varlist = c("foo_irr", "data.table", "FN_optim2", ".",
-                                    "setnames", "setkey", "subsidy_amount", "subsidy_threshold"),
-                    envir = environment())
+      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", "FN_optim2",
+                                              "setnames", "setkey", "subsidy_amount",
+                                              "subsidy_threshold"), envir = environment())
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
       stopCluster(cl)
     }
@@ -393,8 +415,8 @@ gen_lookup_subsidy_par_win_mac = function (subsidy_amount = 21,
                                                     0))]
     lookup_table_all_years = unique(lookup_table_all_years,
                                     by = c("Well_capacity", "SDAT"))
-    lookup_table_all_years[, `:=`(profit_Well_ID_sub, profit_Well_ID +
-                                    irr_below * subsidy_amount)]
+    lookup_table_all_years[, `:=`(profit_Well_ID_sub,
+                                  profit_Well_ID + irr_below * subsidy_amount)]
     lookup_table_all_years = lookup_table_all_years[, .(Well_capacity,
                                                         SOIL_ID, WSTA, tot_acres, SDAT, irr_tot_acres, profit_Well_ID,
                                                         irr_below, profit_Well_ID_sub)]
