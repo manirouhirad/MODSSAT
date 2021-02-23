@@ -388,7 +388,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim2",
                                               "setnames", "setkey", "subsidy_amount",
                                               "subsidy_threshold"), envir = environment())
-      print("hi")
+      head(foo_irr)
 
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
       print("bye")
