@@ -318,7 +318,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       library(snow)
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
-      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".",
+      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa",
                                               "setnames", "setkey", "subsidy_amount",
                                               "subsidy_threshold"), envir = environment())
       print("hi")
