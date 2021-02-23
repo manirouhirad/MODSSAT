@@ -380,8 +380,11 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
         foo_dt1 = rbind(foo_dt1, foo_dt2, foo_dt3, foo_dt4)
         return(foo_dt1)
       }
+      print("ok")
 
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
+      print("bye")
+
       stopCluster(cl)
     }
     else {
