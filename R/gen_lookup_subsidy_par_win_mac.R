@@ -317,8 +317,8 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
 
     FN_optim2 = function(jj) {
       library(data.table)
-      foo_irr = data.table::data.table(foo_irr)
-      foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1,]
+      foo_parallel = data.table::data.table(foo_parallel)
+      foo_dt1 = foo_parallel[Well_ID_grp == jj & quarter == 1,]
 
       # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
@@ -390,6 +390,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
                                               "subsidy_threshold"), envir = environment())
       print("hi")
       print(foo_irr)
+      foo_parallel = copy(foo_irr)
 
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
       print("bye")
