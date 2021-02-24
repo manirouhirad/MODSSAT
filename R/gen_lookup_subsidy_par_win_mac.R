@@ -320,18 +320,28 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       foo_dt1 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 1,]
       foo_dt1 = foo_dt1[c("group_1", "quarter", "group_2", "irrigation", "profit")]
 
+      foo_dt2 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 2,]
+      foo_dt2 = foo_dt2[c("group_1", "quarter", "group_2", "irrigation", "profit")]
+
+      foo_dt3 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 3,]
+      foo_dt3 = foo_dt3[c("group_1", "quarter", "group_2", "irrigation", "profit")]
+
+      foo_dt4 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 4,]
+      foo_dt4 = foo_dt4[c("group_1", "quarter", "group_2", "irrigation", "profit")]
+
+
       # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
-      foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
-                                                            quarter, group_2, irrigation, profit)]
+      # foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
+      #                                                       quarter, group_2, irrigation, profit)]
       # foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
       # foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
-      # # foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
-      #                 allow.cartesian = T)
-      # foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
-      #                 allow.cartesian = T)
+      foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
+                      allow.cartesian = T)
+      foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
+                      allow.cartesian = T)
       # setnames(foo_dt2, old = c("quarter.x", "group_2.x",
       #                           "irrigation.x", "profit.x"), new = c("quarter.xx",
       #                                                                "group_2.xx", "irrigation.xx", "profit.xx"))
