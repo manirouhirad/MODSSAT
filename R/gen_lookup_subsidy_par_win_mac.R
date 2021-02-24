@@ -314,84 +314,6 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
     foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID",
                                           "tot_acres", "SDAT", "quarter")]
 
-
-    FN_optim2 = function(jj) {
-      foo_parallel = data.frame(foo_parallel)
-      foo_dt1 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 1,]
-      foo_dt1 = foo_dt1[c("group_1", "quarter", "group_2", "irrigation", "profit")]
-
-      foo_dt2 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 2,]
-      foo_dt2 = foo_dt2[c("group_1", "quarter", "group_2", "irrigation", "profit")]
-
-      foo_dt3 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 3,]
-      foo_dt3 = foo_dt3[c("group_1", "quarter", "group_2", "irrigation", "profit")]
-
-      foo_dt4 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 4,]
-      foo_dt4 = foo_dt4[c("group_1", "quarter", "group_2", "irrigation", "profit")]
-
-
-      # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
-      #                                                       quarter, group_2, irrigation, profit)]
-      # foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
-      #                                                       quarter, group_2, irrigation, profit)]
-      # foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
-      #                                                       quarter, group_2, irrigation, profit)]
-      # foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
-      #                                                       quarter, group_2, irrigation, profit)]
-      foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
-                      allow.cartesian = T)
-      foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
-                      allow.cartesian = T)
-      colnames(foo_dt2) = c("group_1", "quarter", "group_2", "irrigation", "profit", "quarter.xx", "group_2.xx",
-      "irrigation.xx", "profit.xx", "quarter.yy", "group_2.yy", "irrigation.yy", "profit.yy")
-      # data.table::setnames(foo_dt2, old = c("quarter.x", "group_2.x",
-      #                           "irrigation.x", "profit.x"), new = c("quarter.xx",
-      #                                                                "group_2.xx", "irrigation.xx", "profit.xx"))
-      # data.table::setnames(foo_dt2, old = c("quarter.y", "group_2.y",
-      #                           "irrigation.y", "profit.y"), new = c("quarter.yy",
-      #                                                                "group_2.yy", "irrigation.yy", "profit.yy"))
-      foo_dt1 = merge(foo_dt1, foo_dt2, by = c("group_1"),
-                      allow.cartesian = T)
-      foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x",
-                                            "group_2.y", "group_2.xx", "group_2.yy")]
-      # data.table::setkey(foo_dt1, group_3)
-      rm(foo_dt2, foo_dt3, foo_dt4)
-      # foo_dt1[, `:=`(irrigation_sum, irrigation.x + irrigation.y +
-      #                  irrigation.xx + irrigation.yy)]
-      # foo_dt1[, `:=`(irrigation_below, ifelse(irrigation_sum <
-      #                                           subsidy_threshold, subsidy_threshold - irrigation_sum,
-      #                                         0))]
-      # foo_dt1[, `:=`(profit_sum, profit.x + profit.y +
-      #                  profit.xx + profit.yy)]
-      # foo_dt1[, `:=`(profit_sum_sub, profit_sum + irrigation_below *
-      #                  subsidy_amount)]
-      # foo_dt1[, `:=`(mean_profit_combination, mean(profit_sum)),
-      #         by = c("group_3")]
-      # foo_dt1[, `:=`(mean_profit_combination_sub, mean(profit_sum_sub)),
-      #         by = c("group_3")]
-      # foo_dt1[, `:=`(mean_irrigation_combination, mean(irrigation_sum)),
-      #         by = c("group_3")]
-      # foo_dt1 = unique(foo_dt1, by = "group_3")
-      # foo_dt1[, `:=`(max_p, max(mean_profit_combination_sub))]
-      # foo_dt1 = foo_dt1[mean_profit_combination_sub == max_p]
-      # foo_dt4 = foo_dt1[, .(group_1, quarter = quarter.yy,
-      #                       group_2 = group_2.yy, mean_irrigation_combination,
-      #                       mean_profit_combination, mean_profit_combination_sub)]
-      # foo_dt3 = foo_dt1[, .(group_1, quarter = quarter.xx,
-      #                       group_2 = group_2.xx, mean_irrigation_combination,
-      #                       mean_profit_combination, mean_profit_combination_sub)]
-      # foo_dt2 = foo_dt1[, .(group_1, quarter = quarter.y, group_2 = group_2.y,
-      #                       mean_irrigation_combination, mean_profit_combination,
-      #                       mean_profit_combination_sub)]
-      # foo_dt1 = foo_dt1[, .(group_1, quarter = quarter.x, group_2 = group_2.x,
-      #                       mean_irrigation_combination, mean_profit_combination,
-      #                       mean_profit_combination_sub)]
-      # foo_dt1 = rbind(foo_dt1, foo_dt2, foo_dt3, foo_dt4)
-      # return(foo_dt1)
-      print(jj)
-    }
-
-
     aa = max(foo_irr$Well_ID_grp)
     if (Sys.info()[1] == "Windows") {
       library(snow)
@@ -403,7 +325,6 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       library(data.table)
       print("hi")
       print(foo_irr)
-      foo_parallel = copy(foo_irr)
 
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim2)
       print("bye")
