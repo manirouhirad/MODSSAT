@@ -316,15 +316,14 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
 
 
     FN_optim2 = function(jj) {
-      library(data.table)
       foo_parallel = data.table::data.table(foo_parallel)
       foo_dt1 = foo_parallel[foo_parallel$Well_ID_grp == jj & foo_parallel$quarter == 1,]
       foo_dt1 = foo_dt1[c("group_1", "quarter", "group_2", "irrigation", "profit")]
 
       # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
-      # foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
-      #                                                       quarter, group_2, irrigation, profit)]
+      foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
+                                                            quarter, group_2, irrigation, profit)]
       # foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
       # foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
@@ -389,6 +388,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
       parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim2",
                                               "setnames", "setkey", "subsidy_amount",
                                               "subsidy_threshold"), envir = environment())
+      library(data.table)
       print("hi")
       print(foo_irr)
       foo_parallel = copy(foo_irr)
