@@ -342,18 +342,18 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
                       allow.cartesian = T)
       foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
                       allow.cartesian = T)
-      data.table::setnames(foo_dt2, old = c("quarter.x", "group_2.x",
-                                "irrigation.x", "profit.x"), new = c("quarter.xx",
-                                                                     "group_2.xx", "irrigation.xx", "profit.xx"))
-      data.table::setnames(foo_dt2, old = c("quarter.y", "group_2.y",
-                                "irrigation.y", "profit.y"), new = c("quarter.yy",
-                                                                     "group_2.yy", "irrigation.yy", "profit.yy"))
-      foo_dt1 = merge(foo_dt1, foo_dt2, by = c("group_1"),
-                      allow.cartesian = T)
-      foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x",
-                                            "group_2.y", "group_2.xx", "group_2.yy")]
-      data.table::setkey(foo_dt1, group_3)
-      rm(foo_dt2, foo_dt3, foo_dt4)
+      # data.table::setnames(foo_dt2, old = c("quarter.x", "group_2.x",
+      #                           "irrigation.x", "profit.x"), new = c("quarter.xx",
+      #                                                                "group_2.xx", "irrigation.xx", "profit.xx"))
+      # data.table::setnames(foo_dt2, old = c("quarter.y", "group_2.y",
+      #                           "irrigation.y", "profit.y"), new = c("quarter.yy",
+      #                                                                "group_2.yy", "irrigation.yy", "profit.yy"))
+      # foo_dt1 = merge(foo_dt1, foo_dt2, by = c("group_1"),
+      #                 allow.cartesian = T)
+      # foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x",
+      #                                       "group_2.y", "group_2.xx", "group_2.yy")]
+      # data.table::setkey(foo_dt1, group_3)
+      # rm(foo_dt2, foo_dt3, foo_dt4)
       # foo_dt1[, `:=`(irrigation_sum, irrigation.x + irrigation.y +
       #                  irrigation.xx + irrigation.yy)]
       # foo_dt1[, `:=`(irrigation_below, ifelse(irrigation_sum <
