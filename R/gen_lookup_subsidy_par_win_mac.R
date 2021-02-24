@@ -318,7 +318,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
     FN_optim2 = function(jj) {
       library(data.table)
       foo_irr = data.table::data.table(foo_irr)
-      foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1]
+      foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1,]
 
       # foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
       #                                                       quarter, group_2, irrigation, profit)]
