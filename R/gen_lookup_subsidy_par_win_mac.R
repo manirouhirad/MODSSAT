@@ -141,7 +141,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
     KS_DSSAT[, `:=`((cols_change), lapply(.SD, as.character)),
              .SDcols = cols_change]
     KS_DSSAT = KS_DSSAT[IFREQ < 17]
-    KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets]
+    KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets | IFREQ == 0]
 
     KS_DSSAT_0 = KS_DSSAT[IFREQ == 0]
     KS_DSSAT   = KS_DSSAT[IFREQ != 0]
