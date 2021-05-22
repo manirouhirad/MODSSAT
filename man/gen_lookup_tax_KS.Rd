@@ -7,8 +7,8 @@
 gen_lookup_tax_KS(
   tax_amount = 1,
   DSSAT_files = "./input_files/DSSAT_files",
-  soil_file = "./input_files/Well_Soil Type_generator_07.csv",
-  well_capacity_file = "./input_files/Well_Capacity_ganarator.csv",
+  soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
+  well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
   pumping_cost = 3,
