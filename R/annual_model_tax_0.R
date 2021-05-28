@@ -148,8 +148,8 @@ annual_model_tax = function (tax_amount = 1,
   # well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day)]
 
   econ_output[, `:=`(output_rate_acin_day, 0)]
-  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day=10)]
-
+  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day=0)]
+  print(well_capacity_data)
   write.csv(econ_output, econ_output_file, row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
