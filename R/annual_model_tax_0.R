@@ -18,7 +18,7 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-annual_model_tax = function (tax_amount = 1,
+annual_model_tax_0 = function (tax_amount = 1,
                              well_soil_file = "./input_files/Well_Soil Type.csv",
                              well_capacity_files = "./Well Capacity",
                              econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
