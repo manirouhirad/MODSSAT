@@ -144,11 +144,11 @@ annual_model_tax_0 = function (tax_amount = 1,
   econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
 
   econ_output = rbind(econ_output_in, econ_output)
-  # econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day, 0)]
-  # well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day)]
+  econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day, 0)]
+  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day)]
 
-  econ_output[, `:=`(output_rate_acin_day, 0)]
-  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day=0)]
+  # econ_output[, `:=`(output_rate_acin_day, 0)]
+  # well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day=0)]
   print(well_capacity_data)
   write.csv(econ_output, econ_output_file, row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
