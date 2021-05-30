@@ -18,20 +18,22 @@
 #' gen_lookup_tax(tax_amount = 2)
 #' }
 #' @export
-annual_model_tax_0 = function (tax_amount = 1,
-                             well_soil_file = "./input_files/Well_Soil Type.csv",
+annual_model_tax_0 = function(tax_amount = 1,
+                             # well_soil_file = "./input_files/Well_Soil Type.csv",
+                             well_soil_file = "./input_files/Well_SoilType_WeatherStation.csv",
                              well_capacity_files = "./Well Capacity",
                              econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
                              well_capacity_file_year = "./KS_DSSAT_output.csv",
                              first_year_of_simulation = 2000,
                              default_well_capacity_col_name = "Well_Capacity(gpm)",
                              missing_soil_types = "KS00000007",
-                             minimum_well_capacity = 100,
-                             maximum_well_capacity = 3000,
+                             minimum_well_capacity = 1,
+                             maximum_well_capacity = 1000,
                              first_year_of_GW = 1997,
-                             last_year_of_GW = 2008,
+                             last_year_of_GW = 2007,
                              irrigation_season_days = 70)
 {
+
   tax_amount = (tax_amount - 1)/10
   soil_type = fread(well_soil_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
@@ -52,6 +54,8 @@ annual_model_tax_0 = function (tax_amount = 1,
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
   year_dt = year_dt$file_name
+  year_2  = year_dt
+
   well_capacity = data.table(Well_ID = NA, V1 = NA)
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
   well_capacity = ifelse(year_dt == first_year_of_simulation,
@@ -71,19 +75,23 @@ annual_model_tax_0 = function (tax_amount = 1,
   setkey(well_capacity_data, Well_ID)
   well_capacity_data[is.na(Soil_Type), `:=`(Soil_Type, missing_soil_types)]
   well_capacity_data = well_capacity_data[!is.na(Soil_Type)]
+  # well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
+  well_capacity_data[is.na(weather_station), `:=`(weather_station, well_capacity_data[1,weather_station])]
+  well_capacity_data = well_capacity_data[!is.na(weather_station)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
 
-  soil_type = fread(well_soil_file)
-  soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
-                                   Soil_Type))]
-  soil_type = soil_type[complete.cases(Well_ID)]
-  soil_type = unique(soil_type, by = "Well_ID")
+
+  # soil_type = fread(well_soil_file)
+  # soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
+  #                                  Soil_Type))]
+  # soil_type = soil_type[complete.cases(Well_ID)]
+  # soil_type = unique(soil_type, by = "Well_ID")
   well_capacity_data[Well_capacity <= minimum_well_capacity,
                      `:=`(Well_capacity, minimum_well_capacity)]
   well_capacity_data[Well_capacity >= maximum_well_capacity,
                      `:=`(Well_capacity, maximum_well_capacity)]
 
-  lookup_table_well_2 = fread("lookup_table_well_2.csv")
+  lookup_table_well_2      = fread("lookup_table_well_2.csv")
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
 
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
@@ -118,16 +126,27 @@ annual_model_tax_0 = function (tax_amount = 1,
   #                                                                      ifelse(file_name > 2022 & file_name <= 2035, file_name - 26,
   #                                                                             ifelse(file_name > 2035 & file_name < 2049, file_name - 39, file_name - 52)))))]
 
-  year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
-                                   ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
-                                                                                                       file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
+  # year_dt[, `:=`(file_name, ifelse(file_name <= 2006, file_name+1,
+  #                                  ifelse(file_name > 2006 & file_name <= 2017, file_name - 10, ifelse(file_name > 2017 & file_name <= 2028,
+  #                                                                                                      file_name - 21, ifelse(file_name > 2028 & file_name <= 2039, file_name - 32, file_name - 43)))))]
+  #
+  # year_dt = year_dt$file_name
 
+
+  year_dt[, `:=`(file_name, ifelse(file_name <= (last_year_of_GW-1), file_name +
+                                     1, ifelse(file_name > (last_year_of_GW-1) & file_name <= (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1), file_name -
+                                                 (-1 + last_year_of_GW - first_year_of_GW+1), ifelse(file_name > (last_year_of_GW-1 + last_year_of_GW - first_year_of_GW+1) & file_name <= (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                       (-1 + 2*(last_year_of_GW - first_year_of_GW+1)), ifelse(file_name > (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)) & file_name <= (last_year_of_GW-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name -
+                                                                                                                                                                 (-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name - (-1 + 4*(last_year_of_GW - first_year_of_GW+1)))))))]
   year_dt = year_dt$file_name
+
+
+
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT == year_dt]
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
-  setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity)
-  setkey(lookup_table_well_2, SOIL_ID, Well_capacity)
-  setkey(well_capacity_data, Soil_Type, Well_capacity)
+  setkey(lookup_table_all_years_2,   WSTA, SOIL_ID, Well_capacity)
+  setkey(lookup_table_well_2,        WSTA, SOIL_ID, Well_capacity)
+  setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
   lookup_table_all_years_2 = lookup_table_all_years_2[well_capacity_data]
   lookup_table_well_2 = lookup_table_well_2[well_capacity_data]
   lookup_table_all_years_2[, `:=`(irr_tot_acres, sum(irrigation)),
