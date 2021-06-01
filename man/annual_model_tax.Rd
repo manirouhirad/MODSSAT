@@ -6,17 +6,17 @@
 \usage{
 annual_model_tax(
   tax_amount = 1,
-  well_soil_file = "./input_files/Well_Soil Type.csv",
+  well_soil_file = "./input_files/Well_SoilType_WeatherStation.csv",
   well_capacity_files = "./Well Capacity",
   econ_output_file = "./Econ_output/KS_DSSAT_output.csv",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
-  minimum_well_capacity = 100,
-  maximum_well_capacity = 3000,
+  minimum_well_capacity = 1,
+  maximum_well_capacity = 1000,
   first_year_of_GW = 1997,
-  last_year_of_GW = 2008,
+  last_year_of_GW = 2007,
   irrigation_season_days = 70
 )
 }
