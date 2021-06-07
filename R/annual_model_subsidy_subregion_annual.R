@@ -63,9 +63,12 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 21,
   year_2  = year_dt
   well_capacity = data.table(Well_ID = NA, V1 = NA)
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
+  # well_capacity = ifelse(year_dt == first_year_of_simulation,
+  #                        list(rbind(well_capacity, fread(paste0(first_year_of_simulation,
+  #                                                               "_Well_Capacity.csv")))), list(rbind(well_capacity,
+  #                                                                                                    fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread(paste0(first_year_of_simulation,
-                                                                "_Well_Capacity.csv")))), list(rbind(well_capacity,
+                         list(rbind(well_capacity, fread("Well_Capacity.csv"))), list(rbind(well_capacity,
                                                                                                      fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
