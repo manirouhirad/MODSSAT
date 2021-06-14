@@ -1,5 +1,5 @@
 #' This function produces annual amounts of water use and profits.
-#' @param well_soil_file                 is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".
+#' @param soil_weather_file                 is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".
 #' @param well_capacity_files            is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".
 #' @param econ_output_folder             is the name of the output folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
@@ -14,9 +14,10 @@
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @export
-annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv",
+annual_model_CREP = function (soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
                               well_capacity_files = "./Well Capacity",
-                              econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
+                              # econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
+                              econ_output_folder = "./Econ_output/results with CREP/annual_results/",
                               well_capacity_file_year = "./KS_DSSAT_output.csv",
                               CREP_wells_data = "./CREP_wells.csv",
                               first_year_of_simulation = 2000,
@@ -28,7 +29,7 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
                               last_year_of_GW = 2007,
                               irrigation_season_days = 70)
 {
-  soil_type = fread(well_soil_file)
+  soil_type = fread(soil_weather_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
                                    Soil_Type))]
   soil_type = soil_type[complete.cases(Well_ID)]
@@ -50,10 +51,13 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
   year_2  = year_dt
   well_capacity = data.table(Well_ID = NA, V1 = NA)
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
+  # well_capacity = ifelse(year_dt == first_year_of_simulation,
+  #                        list(rbind(well_capacity, fread(paste0(first_year_of_simulation,
+  #                                                               "_Well_Capacity.csv")))), list(rbind(well_capacity,
+  #                                                                                                    fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread(paste0(first_year_of_simulation,
-                                                                "_Well_Capacity.csv")))), list(rbind(well_capacity,
-                                                                                                     fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
+                         list(rbind(well_capacity, fread("Well_Capacity.csv"))), list(rbind(well_capacity,
+                                                                                            fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
   setkey(soil_type, Well_ID)
@@ -68,6 +72,11 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
   well_capacity_data[is.na(Soil_Type), `:=`(Soil_Type, missing_soil_types)]
   well_capacity_data = well_capacity_data[!is.na(Soil_Type)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
+  well_capacity_data[is.na(weather_station), `:=`(weather_station, well_capacity_data[1,weather_station])]
+  well_capacity_data = well_capacity_data[!is.na(weather_station)]
+  well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
+
+
   CREP_wells = fread(CREP_wells_data)
   CREP_wells[, `:=`(id, 1)]
   setkey(CREP_wells, V1)
@@ -76,15 +85,15 @@ annual_model_CREP = function (well_soil_file = "./input_files/Well_Soil Type.csv
   well_capacity_data = well_capacity_data[is.na(id)]
   well_capacity_data[, `:=`(id, NULL)]
   setnames(well_capacity_data, old = "V1", new = "Well_ID")
-  soil_type = fread(well_soil_file)
+  soil_type = fread(soil_weather_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
                                    Soil_Type))]
   soil_type = soil_type[complete.cases(Well_ID)]
   soil_type = unique(soil_type, by = "Well_ID")
-  well_capacity_data[, `:=`(Well_capacity, ifelse(Well_capacity <=
-                                                    minimum_well_capacity, minimum_well_capacity, Well_capacity))]
-  well_capacity_data[, `:=`(Well_capacity, ifelse(Well_capacity >=
-                                                    maximum_well_capacity, maximum_well_capacity, Well_capacity))]
+
+
+  well_capacity_data[, `:=`(Well_capacity, ifelse(Well_capacity <= minimum_well_capacity, minimum_well_capacity, Well_capacity))]
+  well_capacity_data[, `:=`(Well_capacity, ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity))]
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
