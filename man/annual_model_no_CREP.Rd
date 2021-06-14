@@ -5,9 +5,9 @@
 \title{This function produces annual amounts of water use and profits.}
 \usage{
 annual_model_no_CREP(
-  well_soil_file = "./input_files/Well_Soil Type.csv",
+  soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
   well_capacity_files = "./Well Capacity",
-  econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
+  econ_output_folder = "./Econ_output/results with CREP/annual_results/",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
   CREP_wells_data = "./CREP_wells.csv",
   first_year_of_simulation = 2000,
@@ -21,7 +21,7 @@ annual_model_no_CREP(
 )
 }
 \arguments{
-\item{well_soil_file}{is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".}
+\item{soil_weather_file}{is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".}
 
 \item{well_capacity_files}{is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".}
 
