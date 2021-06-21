@@ -18,7 +18,7 @@
 #' gen_lookup_tax(subsidy_amount = 2)
 #' }
 #' @export
-gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 21,
+gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
                                           subsidy_threshold = 1500,
                                           DSSAT_files = "./input_files/DSSAT_files",
                                           soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
