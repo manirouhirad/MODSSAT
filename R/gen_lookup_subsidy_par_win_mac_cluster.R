@@ -330,7 +330,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
     foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID",
                                           "tot_acres", "SDAT", "quarter")]
 
-
+    print(foo_irr)
     aa = max(foo_irr$Well_ID_grp)
     if (Sys.info()[1] == "Windows") {
       library(snow)
