@@ -43,28 +43,21 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
 
 
   FN_optim2 = function(jj) {
-    foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(group_1,
-                                                          quarter, group_2, irrigation, profit)]
-    foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(group_1,
-                                                          quarter, group_2, irrigation, profit)]
-    foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(group_1,
-                                                          quarter, group_2, irrigation, profit)]
-    foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(group_1,
-                                                          quarter, group_2, irrigation, profit)]
+    foo_dt1 = foo_irr[Well_ID_grp == jj & quarter == 1, .(Well_ID, group_1, quarter, group_2, tot_acres, irrigation, profit)]
+    foo_dt2 = foo_irr[Well_ID_grp == jj & quarter == 2, .(         group_1, quarter, group_2, tot_acres, irrigation, profit)]
+    foo_dt3 = foo_irr[Well_ID_grp == jj & quarter == 3, .(         group_1, quarter, group_2, tot_acres, irrigation, profit)]
+    foo_dt4 = foo_irr[Well_ID_grp == jj & quarter == 4, .(         group_1, quarter, group_2, tot_acres, irrigation, profit)]
     foo_dt3 = merge(foo_dt3, foo_dt4, by = c("group_1"),
                     allow.cartesian = T)
     foo_dt2 = merge(foo_dt2, foo_dt3, by = c("group_1"),
                     allow.cartesian = T)
-    setnames(foo_dt2, old = c("quarter.x", "group_2.x",
-                              "irrigation.x", "profit.x"), new = c("quarter.xx",
-                                                                   "group_2.xx", "irrigation.xx", "profit.xx"))
-    setnames(foo_dt2, old = c("quarter.y", "group_2.y",
-                              "irrigation.y", "profit.y"), new = c("quarter.yy",
-                                                                   "group_2.yy", "irrigation.yy", "profit.yy"))
+    setnames(foo_dt2, old = c("quarter.x",  "group_2.x",  "tot_acres.x",  "irrigation.x",  "profit.x"),
+             new = c("quarter.xx", "group_2.xx", "tot_acres.xx", "irrigation.xx", "profit.xx"))
+    setnames(foo_dt2, old = c("quarter.y",  "group_2.y",  "tot_acres.y",  "irrigation.y",  "profit.y"),
+             new = c("quarter.yy", "group_2.yy", "tot_acres.yy", "irrigation.yy", "profit.yy"))
     foo_dt1 = merge(foo_dt1, foo_dt2, by = c("group_1"),
                     allow.cartesian = T)
-    foo_dt1[, `:=`(group_3, .GRP), by = c("group_2.x",
-                                          "group_2.y", "group_2.xx", "group_2.yy")]
+    foo_dt1[, `:=`(group_3, .GRP), by = c("Well_ID", "tot_acres.x", "group_2.x", "group_2.y", "group_2.xx", "group_2.yy")]
     setkey(foo_dt1, group_3)
     rm(foo_dt2, foo_dt3, foo_dt4)
     foo_dt1[, `:=`(irrigation_sum, irrigation.x + irrigation.y +
@@ -72,8 +65,8 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
     foo_dt1[, `:=`(irrigation_below, ifelse(irrigation_sum <
                                               subsidy_threshold, subsidy_threshold - irrigation_sum,
                                             0))]
-    foo_dt1[, `:=`(profit_sum, profit.x + profit.y +
-                     profit.xx + profit.yy)]
+    foo_dt1[, `:=`(profit_sum, profit.x + profit.y + profit.xx +
+                     profit.yy)]
     foo_dt1[, `:=`(profit_sum_sub, profit_sum + irrigation_below *
                      subsidy_amount)]
     foo_dt1[, `:=`(mean_profit_combination, mean(profit_sum)),
@@ -259,6 +252,11 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
     KS_DSSAT = KS_DSSAT[SDAT < 2016]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
                                         CR, sep = "-"))]
+    KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "SG", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "WH", yield_kg_ac := yield_kg_ac * 1.156]
+
+
     number_of_crops = length(KS_DSSAT[, unique(CR)])
     well_capacity_data = rbind(data.table::data.table(Well_ID = 1,
                                                       Soil_Type = unique(well_capacity_data$Soil_Type),

@@ -186,6 +186,10 @@ gen_lookup_tax_KS = function (tax_amount = 1,
     KS_DSSAT = KS_DSSAT[SDAT < 2016]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
                                         CR, sep = "-"))]
+    KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "SG", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "WH", yield_kg_ac := yield_kg_ac * 1.156]
+
     number_of_crops = length(KS_DSSAT[, unique(CR)])
     well_capacity_data = rbind(data.table::data.table(Well_ID = 1,
                                                       Soil_Type = unique(well_capacity_data$Soil_Type),

@@ -63,9 +63,9 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
   KS_DSSAT = KS_DSSAT[complete.cases(V85)]
   KS_DSSAT[, `:=`(file_name, NULL)]
   rm(ldf)
-  
-  
-  
+
+
+
   KS_DSSAT[, `:=`(foo, nchar(as.character(V9)))]
   KS_DSSAT[foo < 4, `:=`(V9, paste(V9, V11, V10, sep = "_"))]
   KS_DSSAT[foo < 4, `:=`(V10, NA)]
@@ -88,8 +88,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
   lookup_table_all_years_2 = data.table::data.table()
   lookup_table_quarter_2 = data.table::data.table()
   lookup_table_well_2 = data.table::data.table()
-  
-  
+
+
   i=5
   for (i in 1:max(KS_DSSAT_2$group)) {
     soil_type = data.table::fread(soil_file)
@@ -136,7 +136,7 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
              .SDcols = cols_change]
     KS_DSSAT = KS_DSSAT[IFREQ < 17]
     KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets | IFREQ == 0]
-    
+
     KS_DSSAT_0 = KS_DSSAT[IFREQ == 0]
     KS_DSSAT   = KS_DSSAT[IFREQ != 0]
     KS_DSSAT_0 <- KS_DSSAT_0[rep(seq_len(nrow(KS_DSSAT_0)),
@@ -169,8 +169,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
     KS_DSSAT[, `:=`(IFREQ, IFREQ + IFREQ_int)]
     KS_DSSAT = KS_DSSAT[IFREQ <= foo]
     KS_DSSAT[, `:=`(foo, NULL)]
-    
-    
+
+
     KS_DSSAT = KS_DSSAT[complete.cases(lead_yield)]
     KS_DSSAT[, `:=`(yield_int, HWAM + (lead_yield -
                                          HWAM)/IFREQ_seq * IFREQ_int)]
@@ -181,18 +181,23 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
     KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
                        PAW, SDAT)
-    
+
     KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
     KS_DSSAT = KS_DSSAT[SDAT < 2016]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
                                         CR, sep = "-"))]
+    KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "SG", yield_kg_ac := yield_kg_ac * 1.183]
+    KS_DSSAT[CR %like% "WH", yield_kg_ac := yield_kg_ac * 1.156]
+
+
     number_of_crops = length(KS_DSSAT[, unique(CR)])
     well_capacity_data = rbind(data.table::data.table(Well_ID = 1,
                                                       Soil_Type = unique(well_capacity_data$Soil_Type),
                                                       weather_station = unique(well_capacity_data$weather_station),
                                                       Well_capacity = 0), well_capacity_data)
-    
+
     well_capacity_data[, `:=`(quarter_1, 0)]
     well_capacity_data[, `:=`(quarter_2, 0)]
     well_capacity_data[, `:=`(quarter_3, 0)]
@@ -221,8 +226,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
                                         id = c("Well_ID", "Soil_Type", "weather_station",
                                                "Well_capacity", "tot_acres", "ifreq"))
     well_capacity_data = data.table::data.table(well_capacity_data)
-    
-    
+
+
     data.table::setkey(well_capacity_data, Well_ID, Soil_Type,
                        weather_station, tot_acres)
     quz = data.table(CR = KS_DSSAT[, unique(CR)])
@@ -263,8 +268,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
        tot_acres_130)
     data.table::setkey(well_capacity_data, Well_ID, tot_acres,
                        quarter)
-    
-    
+
+
     KS_DSSAT[, `:=`(IFREQ, round(IFREQ, 1))]
     number_of_years = nrow(unique(KS_DSSAT, by = "SDAT"))
     foo = data.table::data.table(SOIL_ID = KS_DSSAT_2[group ==
@@ -294,8 +299,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
                           Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                           PAW, SDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
     data.table::setkey(foo_irr, CR)
-    
-    
+
+
     foo_irr = foo_irr[price_dt]
     foo_irr = foo_irr[complete.cases(Well_ID)]
     data.table::setkey(foo_irr, Well_ID)
@@ -320,8 +325,8 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
                                           "tot_acres", "SDAT")]
     foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID",
                                           "tot_acres", "SDAT", "quarter")]
-    
-    
+
+
     aa = max(foo_irr$Well_ID_grp)
     if (Sys.info()[1] == "Windows") {
       library(snow)
