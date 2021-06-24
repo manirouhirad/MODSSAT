@@ -135,6 +135,16 @@ gen_lookup_CREP_par_win_mac = function(DSSAT_files = "./input_files/DSSAT_files"
     KS_DSSAT[, `:=`((cols_change), lapply(.SD, as.character)),
              .SDcols = cols_change]
     KS_DSSAT = KS_DSSAT[IFREQ < 17]
+
+    qux1 = KS_DSSAT[IFREQ == 6 & PAW == 75]
+    qux2 = KS_DSSAT[IFREQ == 8 & PAW == 75]
+    qux1[, `:=`(IFREQ, 8)]
+    qux2[, `:=`(IFREQ, 6)]
+    KS_DSSAT = KS_DSSAT[!((IFREQ == 6 | IFREQ == 8) & PAW ==
+                            75)]
+    KS_DSSAT = rbind(KS_DSSAT, qux1)
+    KS_DSSAT = rbind(KS_DSSAT, qux2)
+
     KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets | IFREQ == 0]
 
     KS_DSSAT_0 = KS_DSSAT[IFREQ == 0]
