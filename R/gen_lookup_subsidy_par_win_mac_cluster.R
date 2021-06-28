@@ -400,7 +400,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
     foo_irr[, `:=`(group_2, 1:.N), by = c("Well_ID",
                                           "tot_acres", "SDAT", "quarter")]
 
-    print(foo_irr)
+    # print(foo_irr)
     aa = max(foo_irr$Well_ID_grp)
     if (Sys.info()[1] == "Windows") {
       library(snow)
@@ -419,7 +419,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 21,
     }
     foo_dt_all <- do.call(rbind, foo_dt_all)
     foo_dt_all = data.table(foo_dt_all)
-    print(foo_dt_all)
+    # print(foo_dt_all)
     setkey(foo_dt_all, group_1, quarter, group_2)
     setkey(foo_irr, group_1, quarter, group_2)
     foo_dt_all = foo_irr[foo_dt_all]
