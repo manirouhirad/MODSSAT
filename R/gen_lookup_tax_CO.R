@@ -188,7 +188,6 @@ gen_lookup_tax_CO = function (tax_amount = 1,
 
     KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
-    KS_DSSAT = KS_DSSAT[SDAT < 2016]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
                                         CR, sep = "-"))]
     KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
