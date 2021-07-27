@@ -13,7 +13,6 @@
 #' @param first_year_of_GW               is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.
 #' @param last_year_of_GW                is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.
 #' @param well_capacity_intervals        is the intervals in well capacities. Defaults to 20.
-#' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @examples
 #' \dontrun{
@@ -33,8 +32,7 @@ annual_model_tax_CO = function (tax_amount = 1,
                                 maximum_well_capacity = 1000,
                                 first_year_of_GW = 2000,
                                 last_year_of_GW = 2018,
-                                well_capacity_intervals = 20,
-                                irrigation_season_days = 70)
+                                well_capacity_intervals = 20)
 {
   tax_amount = (tax_amount - 1)/10
   soil_type = fread(soil_weather_file)
@@ -47,11 +45,15 @@ annual_model_tax_CO = function (tax_amount = 1,
   ldf <- mapply(cbind, ldf, file_name = filenames, SIMPLIFY = F)
   year_dt = rbindlist(ldf)
   foo = data.table::data.table(Well_ID = 1, V1 = 1, file_name = paste0(well_capacity_files,
-                                                                       "/", first_year_of_simulation, "_Capacity.csv"))
+                                                                       "/", "Well_Capacity_",
+                                                                       first_year_of_simulation, ".csv"))
   setnames(foo, old = "V1", new = default_well_capacity_col_name)
   year_dt = rbind(year_dt, foo)
-  year_dt[, `:=`(file_name, substr(file_name, nchar(file_name) -
-                                     16, nchar(file_name) - 13))]
+
+  year_dt[, file_name := substring(file_name, regexpr("Capacity_", file_name) + 1, nchar(file_name))]
+  year_dt[, file_name := substring(file_name, regexpr("_", file_name) + 1, nchar(file_name))]
+  year_dt[, file_name := gsub(".csv", "", file_name)]
+
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
@@ -60,8 +62,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   well_capacity = data.table(Well_ID = NA, V1 = NA)
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread(paste0(first_year_of_simulation,
-                                                                "_Well_Capacity.csv")))), list(rbind(well_capacity,
+                         list(rbind(well_capacity, fread(paste0("Well_Capacity.csv")))), list(rbind(well_capacity,
                                                                                                      fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
@@ -81,6 +82,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   well_capacity_data = well_capacity_data[!is.na(weather_station)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
   maximum_pump_rate_dt = fread(maximum_pump_rate)
+  maximum_pump_rate_dt[max_pump_rate == -999, max_pump_rate := maximum_pump_rate_dt[,max(max_pump_rate)]]
   setkey(well_capacity_data, Well_ID)
   setkey(maximum_pump_rate_dt, Well_ID)
   well_capacity_data = well_capacity_data[maximum_pump_rate_dt]
@@ -103,28 +105,22 @@ annual_model_tax_CO = function (tax_amount = 1,
   ldf <- mapply(cbind, ldf, file_name = filenames, SIMPLIFY = F)
   year_dt = rbindlist(ldf)
   foo = data.table(Well_ID = 1, V1 = 1, file_name = paste0(well_capacity_files,
-                                                           "/", first_year_of_simulation, "_Capacity.csv"))
+                                                           "/", "Well_Capacity_",
+                                                           first_year_of_simulation, ".csv"))
   setnames(foo, old = "V1", new = default_well_capacity_col_name)
   year_dt = rbind(year_dt, foo)
-  year_dt[, `:=`(file_name, substr(file_name, nchar(file_name) -
-                                     16, nchar(file_name) - 13))]
+
+  year_dt[, file_name := substring(file_name, regexpr("Capacity_", file_name) + 1, nchar(file_name))]
+  year_dt[, file_name := substring(file_name, regexpr("_", file_name) + 1, nchar(file_name))]
+  year_dt[, file_name := gsub(".csv", "", file_name)]
+
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
-  year_dt[, `:=`(file_name, ifelse(file_name <= (last_year_of_GW -
-                                                   1), file_name + 1, ifelse(file_name > (last_year_of_GW -
-                                                                                            1) & file_name <= (last_year_of_GW - 1 + last_year_of_GW -
-                                                                                                                 first_year_of_GW + 1), file_name - (-1 + last_year_of_GW -
-                                                                                                                                                       first_year_of_GW + 1), ifelse(file_name > (last_year_of_GW -
-                                                                                                                                                                                                    1 + last_year_of_GW - first_year_of_GW + 1) & file_name <=
-                                                                                                                                                                                       (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW +
-                                                                                                                                                                                                                     1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW +
-                                                                                                                                                                                                                                                   1)), ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW -
-                                                                                                                                                                                                                                                                                                         first_year_of_GW + 1)) & file_name <= (last_year_of_GW -
-                                                                                                                                                                                                                                                                                                                                                  1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name -
-                                                                                                                                                                                                                                                                 (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)),
-                                                                                                                                                                                                                                                               file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW +
-                                                                                                                                                                                                                                                                                        1)))))))]
+  # year_dt[, `:=`(file_name, ifelse(file_name <= (last_year_of_GW - 1), file_name + 1,
+  #                                  ifelse(file_name > (last_year_of_GW - 1) & file_name <= (last_year_of_GW - 1 + last_year_of_GW -first_year_of_GW + 1), file_name - (-1 + last_year_of_GW - first_year_of_GW + 1),
+  #                                         ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
+  #                                                ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1)))))))]
   year_dt = year_dt$file_name
   lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
                                                         year_dt]

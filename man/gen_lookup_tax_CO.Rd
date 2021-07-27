@@ -7,8 +7,6 @@
 gen_lookup_tax_CO(
   tax_amount = 1,
   DSSAT_files = "./input_files/DSSAT_files",
-  soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-  well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
   pumping_cost = 3.21,
@@ -16,17 +14,16 @@ gen_lookup_tax_CO(
   soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
   IFREQ_seq = 2,
   IFREQ_interpolate = 0.1,
-  number_of_quarters = 6
+  maximum_well_capacity = 1000,
+  well_capacity_intervals = 20,
+  number_of_quarters = 6,
+  num_clusters = 12
 )
 }
 \arguments{
 \item{tax_amount}{is the amount of tax on the unit of groundwater extracted. Defaults to 1.1.}
 
 \item{DSSAT_files}{is the directory where DSSAT files are located. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised".}
-
-\item{soil_file}{is the file that contains base soil file. Defaults to "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv".}
-
-\item{well_capacity_file}{is the file that contains base well capacity. Defaults to "C:/Users/manirad/Downloads/test/Well_Capacity_ganarator.csv".}
 
 \item{price_file}{is the file that includes crop prices. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv".}
 
@@ -42,7 +39,13 @@ gen_lookup_tax_CO(
 
 \item{IFREQ_interpolate}{is the size of interpolation interval. Defaults to 0.1 so that IFREQ_seq of 2 adds 0, 0.1, 0.2, ..., 1.9.}
 
-\item{number_of_quarters}{is the maximum nnumber of quarters that need to be considered in the lookup table generation.}
+\item{maximum_well_capacity}{is the maximum well capacity that needs to be included in the lookup table. Defaults to 1000gpm.}
+
+\item{well_capacity_intervals}{is the size of interpolation interval for well capacity. Defaults to 20gpm.}
+
+\item{number_of_quarters}{is the maximum number of quarters that need to be considered in the lookup table generation.}
+
+\item{num_clusters}{is the number of cores for parallelization.}
 }
 \value{
 returns the output table.
