@@ -38,25 +38,25 @@ gen_lookup_tax_CO = function (tax_amount = 1,
   tax_amount = (tax_amount - 1)/10
   print(paste("this is the tax:", tax_amount, sep = " "))
 
-  FN_optim_tax = function(jj) {
-    foo_dt1 = foo_irr[Well_ID_grp == jj]
-    foo_dt1[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_dt1[, `:=`(sd_profit_PAW, sd(profit)),      by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_dt1[, `:=`(mean_irr_PAW, mean(irrigation)), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_dt1 = unique(foo_dt1,                       by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW"))
-
-    foo_dt1[, `:=`(profit_quarter, max(mean_profit_PAW)), by = c("Well_ID", "tot_acres", "quarter")]
-    foo_dt1 = foo_dt1[profit_quarter == mean_profit_PAW]
-    foo_dt1[, `:=`(count, .N), by = c("Well_ID", "tot_acres", "quarter")]
-    foo_dt1 = unique(foo_dt1,  by = c("Well_ID", "tot_acres", "quarter"))
-    foo_dt1 = foo_dt1[Well_capacity > 0 | tot_acres == 0]
-
-    foo_dt1[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
-    foo_dt1[, `:=`(irr_tot_acres, sum(mean_irr_PAW)),      by = c("Well_ID", "tot_acres")]
-    foo_dt1[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
-    foo_dt1 = foo_dt1[profit_Well_ID == profit_tot_acres]
-    return(foo_dt1)
-  }
+  # FN_optim_tax = function(jj) {
+  #   foo_dt1 = foo_irr[Well_ID_grp == jj]
+  #   foo_dt1[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+  #   foo_dt1[, `:=`(sd_profit_PAW, sd(profit)),      by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+  #   foo_dt1[, `:=`(mean_irr_PAW, mean(irrigation)), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+  #   foo_dt1 = unique(foo_dt1,                       by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW"))
+  #
+  #   foo_dt1[, `:=`(profit_quarter, max(mean_profit_PAW)), by = c("Well_ID", "tot_acres", "quarter")]
+  #   foo_dt1 = foo_dt1[profit_quarter == mean_profit_PAW]
+  #   foo_dt1[, `:=`(count, .N), by = c("Well_ID", "tot_acres", "quarter")]
+  #   foo_dt1 = unique(foo_dt1,  by = c("Well_ID", "tot_acres", "quarter"))
+  #   foo_dt1 = foo_dt1[Well_capacity > 0 | tot_acres == 0]
+  #
+  #   foo_dt1[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
+  #   foo_dt1[, `:=`(irr_tot_acres, sum(mean_irr_PAW)),      by = c("Well_ID", "tot_acres")]
+  #   foo_dt1[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
+  #   foo_dt1 = foo_dt1[profit_Well_ID == profit_tot_acres]
+  #   return(foo_dt1)
+  # }
 
   col_new = c("RUNNO", "TRNO", "R_pound", "O_pound", "C_pound",
               "CR", "MODEL", "EXNAME", "FNAM", "WSTA", "SOIL_ID", "SDAT",
@@ -308,7 +308,7 @@ gen_lookup_tax_CO = function (tax_amount = 1,
       library(snow)
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
-      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim_tax", "Well_ID_grp",
+      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim_tax", #"Well_ID_grp",
                                               "setnames", "setkey", "tax_amount"), envir = environment())
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim_tax)
       stopCluster(cl)
