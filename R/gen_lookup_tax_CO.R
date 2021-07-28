@@ -309,8 +309,7 @@ gen_lookup_tax_CO = function (tax_amount = 1,
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
       parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim_tax",
-                                              "setnames", "setkey", "subsidy_amount",
-                                              "subsidy_threshold"), envir = environment())
+                                              "setnames", "setkey", "tax_amount"), envir = environment())
       foo_dt_all <- parLapply(cl, 1:aa, FN_optim_tax)
       stopCluster(cl)
     }
