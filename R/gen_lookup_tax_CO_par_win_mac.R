@@ -19,7 +19,7 @@
 #' }
 #' @export
 #'
-gen_lookup_tax_CO = function (tax_amount = 1,
+gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
                               DSSAT_files = "./input_files/DSSAT_files",
                               price_file = "./input_files/crop_prices.csv",
                               fixed_cost_file = "./input_files/fixed_cost_input.csv",
@@ -300,44 +300,44 @@ gen_lookup_tax_CO = function (tax_amount = 1,
     data.table::setkey(foo_irr, Well_ID, tot_acres, quarter,
                        SDAT)
     foo_irr_2 = data.table::copy(foo_irr)
-    # foo_irr[, `:=`(Well_ID_grp, .GRP), by = "Well_ID"]
+    foo_irr[, `:=`(Well_ID_grp, .GRP), by = "Well_ID"]
+
+    aa = max(foo_irr$Well_ID_grp)
+
+    if (Sys.info()[1] == "Windows") {
+      library(snow)
+      cl <- makeCluster(num_clusters)
+      print(Sys.info()[1])
+      parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim_tax", #"Well_ID_grp",
+                                              "setnames", "setkey", "tax_amount"), envir = environment())
+      foo_dt_all <- parLapply(cl, 1:aa, FN_optim_tax)
+      stopCluster(cl)
+    }
+    else {
+      print(Sys.info()[1])
+      foo_dt_all <- mclapply(X = 1:aa, FUN = FN_optim_tax,
+                             mc.cores = num_clusters)
+    }
+
+    foo_dt_all <- do.call(rbind, foo_dt_all)
+    foo_dt_all = data.table(foo_dt_all)
+
+
+    # foo_irr[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+    # foo_irr[, `:=`(sd_profit_PAW, sd(profit)),      by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+    # foo_irr[, `:=`(mean_irr_PAW, mean(irrigation)), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
+    # foo_irr = unique(foo_irr,                       by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW"))
     #
-    # aa = max(foo_irr$Well_ID_grp)
+    # foo_irr[, `:=`(profit_quarter, max(mean_profit_PAW)), by = c("Well_ID", "tot_acres", "quarter")]
+    # foo_irr = foo_irr[profit_quarter == mean_profit_PAW]
+    # foo_irr[, `:=`(count, .N), by = c("Well_ID", "tot_acres", "quarter")]
+    # foo_irr = unique(foo_irr,  by = c("Well_ID", "tot_acres", "quarter"))
+    # foo_irr = foo_irr[Well_capacity > 0 | tot_acres == 0]
     #
-    # if (Sys.info()[1] == "Windows") {
-    #   library(snow)
-    #   cl <- makeCluster(num_clusters)
-    #   print(Sys.info()[1])
-    #   parallel::clusterExport(cl, varlist = c("foo_irr", "data.table", ".", "aa", "FN_optim_tax", #"Well_ID_grp",
-    #                                           "setnames", "setkey", "tax_amount"), envir = environment())
-    #   foo_dt_all <- parLapply(cl, 1:aa, FN_optim_tax)
-    #   stopCluster(cl)
-    # }
-    # else {
-    #   print(Sys.info()[1])
-    #   foo_dt_all <- mclapply(X = 1:aa, FUN = FN_optim_tax,
-    #                          mc.cores = num_clusters)
-    # }
-    #
-    # foo_dt_all <- do.call(rbind, foo_dt_all)
-    # foo_dt_all = data.table(foo_dt_all)
-
-
-    foo_irr[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_irr[, `:=`(sd_profit_PAW, sd(profit)),      by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_irr[, `:=`(mean_irr_PAW, mean(irrigation)), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
-    foo_irr = unique(foo_irr,                       by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW"))
-
-    foo_irr[, `:=`(profit_quarter, max(mean_profit_PAW)), by = c("Well_ID", "tot_acres", "quarter")]
-    foo_irr = foo_irr[profit_quarter == mean_profit_PAW]
-    foo_irr[, `:=`(count, .N), by = c("Well_ID", "tot_acres", "quarter")]
-    foo_irr = unique(foo_irr,  by = c("Well_ID", "tot_acres", "quarter"))
-    foo_irr = foo_irr[Well_capacity > 0 | tot_acres == 0]
-
-    foo_irr[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
-    foo_irr[, `:=`(irr_tot_acres, sum(mean_irr_PAW)),      by = c("Well_ID", "tot_acres")]
-    foo_irr[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
-    foo_dt_all = foo_irr[profit_Well_ID == profit_tot_acres]
+    # foo_irr[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
+    # foo_irr[, `:=`(irr_tot_acres, sum(mean_irr_PAW)),      by = c("Well_ID", "tot_acres")]
+    # foo_irr[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
+    # foo_irr = foo_irr[profit_Well_ID == profit_tot_acres]
 
 
     lookup_table_quarter = foo_dt_all[, .(Well_capacity, SOIL_ID, WSTA, tot_acres, quarter, CR, PAW, mean_irr_PAW, profit_quarter)]
