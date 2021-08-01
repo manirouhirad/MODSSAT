@@ -86,16 +86,16 @@ annual_model_tax_CO = function (tax_amount = 1,
   setkey(well_capacity_data, Well_ID)
   setkey(maximum_pump_rate_dt, Well_ID)
   well_capacity_data = well_capacity_data[maximum_pump_rate_dt]
-  well_capacity_data[, `:=`(`Well_Capacity(gpm)`, round(`Well_Capacity(gpm)`))]
-  well_capacity_data[Well_capacity > `Well_Capacity(gpm)`,
-                     `:=`(Well_capacity, `Well_Capacity(gpm)`)]
-  well_capacity_data[, `:=`(`Well_Capacity(gpm)`, NULL)]
+  well_capacity_data[, `:=`(max_pump_rate, round(max_pump_rate))]
+  well_capacity_data[Well_capacity > max_pump_rate,
+                     `:=`(max_pump_rate, Well_capacity)]
   well_capacity_data[, `:=`(well_capacity_org, Well_capacity)]
   well_capacity_data[Well_capacity <= minimum_well_capacity,
                      `:=`(Well_capacity, minimum_well_capacity)]
   well_capacity_data[Well_capacity >= maximum_well_capacity,
                      `:=`(Well_capacity, maximum_well_capacity)]
   well_capacity_data[, Well_capacity := floor(Well_capacity/well_capacity_intervals)*well_capacity_intervals]
+  well_capacity_data[Well_capacity !=0, Well_capacity := Well_capacity + 1]
 
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
   lookup_table_all_years_2 = unique(lookup_table_all_years_2, by=colnames(lookup_table_all_years_2))
@@ -142,6 +142,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   econ_output[, `:=`(tax, tax_amount)]
   write.csv(econ_output, well_capacity_file_year, row.names = FALSE)
 
+  econ_output = econ_output[,.(Well_ID, well_capacity, tot_acres, quarter, CR, PAW, irrigation = irrigation_ac_in, profit, row, tax)]
   econ_output_in = fread(econ_output_file)
   econ_output = rbind(econ_output_in, econ_output)
   write.csv(econ_output, econ_output_file, row.names = FALSE)
