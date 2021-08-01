@@ -135,11 +135,11 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
                                                           f_cost = 0))
     data.table::setkey(fixed_cost, Crop)
     KS_DSSAT = KS_DSSAT_2[group == i, .(SOIL_ID, WSTA, CR,
-                                        IFREQ, PAW, SDAT, IRCM, PRCP, PRCM, HWAM)]
+                                        IFREQ, PAW, HDAT, IRCM, PRCP, PRCM, HWAM)]
     KS_DSSAT[, `:=`(IRCM, as.numeric(as.character(IRCM)))]
     KS_DSSAT = KS_DSSAT[complete.cases(IRCM)]
-    KS_DSSAT[, `:=`(SDAT, substr(SDAT, 1, 4))]
-    cols_change = c("IFREQ", "PAW", "SDAT",
+    KS_DSSAT[, `:=`(HDAT, substr(HDAT, 1, 4))]
+    cols_change = c("IFREQ", "PAW", "HDAT",
                     "IRCM", "PRCP", "PRCM", "HWAM")
     KS_DSSAT[, `:=`((cols_change), lapply(.SD, function(x) as.numeric(as.character(x)))),
              .SDcols = cols_change]
@@ -158,20 +158,20 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
                                nrow(KS_DSSAT_0)/length(soil_moisture_targets)))]
     KS_DSSAT = rbind(KS_DSSAT, KS_DSSAT_0)
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
-                       PAW, SDAT)
+                       PAW, HDAT)
     KS_DSSAT = KS_DSSAT[PRCP > -10 & HWAM > -10]
-    KS_DSSAT = KS_DSSAT[, .(SOIL_ID, WSTA, CR, PAW, SDAT,
+    KS_DSSAT = KS_DSSAT[, .(SOIL_ID, WSTA, CR, PAW, HDAT,
                             IFREQ, IRCM, PRCP, PRCM, HWAM)]
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, PAW,
-                       SDAT, IFREQ)
+                       HDAT, IFREQ)
 
 
     KS_DSSAT[, `:=`(lead_yield, dplyr::lead(HWAM, n = 1L)),
              by = c("SOIL_ID", "WSTA", "CR",
-                    "PAW", "SDAT")]
+                    "PAW", "HDAT")]
     KS_DSSAT[, `:=`(lead_irr_mm, dplyr::lead(IRCM,n = 1L)),
              by = c("SOIL_ID", "WSTA", "CR",
-                    "PAW", "SDAT")]
+                    "PAW", "HDAT")]
     KS_DSSAT <- KS_DSSAT[rep(seq_len(nrow(KS_DSSAT)), each = IFREQ_seq *
                                10)]
 
@@ -189,10 +189,10 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
     KS_DSSAT[, `:=`(irr_int, IRCM + (lead_irr_mm -
                                        IRCM)/IFREQ_seq * IFREQ_int)]
     KS_DSSAT = KS_DSSAT[, .(SOIL_ID, WSTA, CR, IFREQ, PAW,
-                            SDAT, irr_mm = irr_int, PRCP, PRCM, yield_kg_ac = yield_int)]
+                            HDAT, irr_mm = irr_int, PRCP, PRCM, yield_kg_ac = yield_int)]
     KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
-                       PAW, SDAT)
+                       PAW, HDAT)
 
     KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
@@ -251,15 +251,15 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
 
     KS_DSSAT[, `:=`(IFREQ, round(IFREQ, 1))]
 
-    number_of_years = nrow(unique(KS_DSSAT, by = "SDAT"))
+    number_of_years = nrow(unique(KS_DSSAT, by = "HDAT"))
     foo = data.table::data.table(SOIL_ID = KS_DSSAT_2[group ==
                                                         i, unique(SOIL_ID)], WSTA = KS_DSSAT_2[group == i,
                                                                                                unique(WSTA)], CR = "FA", IFREQ = 0, PAW = soil_moisture_targets[1],
-                                 SDAT = min(KS_DSSAT$SDAT), irr_mm = 0, PRCP = 200,
+                                 HDAT = min(KS_DSSAT$HDAT), irr_mm = 0, PRCP = 200,
                                  PRCM = 200, yield_kg_ac = 0)
     foo = foo[rep(seq_len(nrow(foo)), each = number_of_years)]
-    baz = unique(KS_DSSAT, by = "SDAT")
-    foo[, `:=`(SDAT, rep(baz$SDAT, nrow(foo)/nrow(baz)))]
+    baz = unique(KS_DSSAT, by = "HDAT")
+    foo[, `:=`(HDAT, rep(baz$HDAT, nrow(foo)/nrow(baz)))]
     foo[, `:=`(PRCP, rep(baz$PRCP, nrow(foo)/nrow(baz)))]
     KS_DSSAT = rbind(KS_DSSAT, foo)
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ)
@@ -277,7 +277,7 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
                              "IFREQ"), allow.cartesian = T)
     foo_irr = foo_irr[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                           Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
-                          PAW, SDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
+                          PAW, HDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
     data.table::setkey(foo_irr, CR)
 
 
@@ -298,7 +298,7 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
     foo_irr[, `:=`(profit, 32.5 * (yield_kg_ac * price - f_cost) - irrigation * cost_per_acre_in)]
 
     data.table::setkey(foo_irr, Well_ID, tot_acres, quarter,
-                       SDAT)
+                       HDAT)
     foo_irr_2 = data.table::copy(foo_irr)
     foo_irr[, `:=`(Well_ID_grp, .GRP), by = "Well_ID"]
 
@@ -356,7 +356,7 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
                        quarter, CR, PAW)
     baz = foo_irr_2[baz]
     lookup_table_all_years = baz[, .(Well_ID, Well_capacity,
-                                     SOIL_ID, WSTA, tot_acres, IFREQ, CR, quarter, PAW, SDAT,
+                                     SOIL_ID, WSTA, tot_acres, IFREQ, CR, quarter, PAW, HDAT,
                                      PRCP, PRCM, yield_kg_ac, irrigation, profit)]
     lookup_table_all_years_2 = rbind(lookup_table_all_years_2,
                                      lookup_table_all_years)
@@ -367,7 +367,7 @@ gen_lookup_tax_CO_par_win_mac = function (tax_amount = 1,
     print(i)
   }
   data.table::setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity,
-                     SDAT)
+                     HDAT)
   data.table::setkey(lookup_table_quarter_2, SOIL_ID, Well_capacity,
                      quarter)
   data.table::setkey(lookup_table_well_2, SOIL_ID, Well_capacity)

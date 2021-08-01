@@ -8,7 +8,7 @@ annual_model_tax_CO(
   tax_amount = 1,
   soil_weather_file = "./input_files/Well_SoilType_WeatherStation_CO.csv",
   well_capacity_files = "./Well Capacity",
-  maximum_pump_rate = "./2000_Well_Capacity.csv",
+  authorized_gpm = "./2000_Well_Capacity.csv",
   econ_output_file = "./Econ_output/CO_DSSAT_output.csv",
   well_capacity_file_year = "./CO_DSSAT_output.csv",
   first_year_of_simulation = 2000,
@@ -28,7 +28,7 @@ annual_model_tax_CO(
 
 \item{well_capacity_files}{is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".}
 
-\item{maximum_pump_rate}{is the the maximum pump rate that each well can pump. It defaults to initial well capacity. However, a separate maximum pump rate can be provided. Column name should be Well_Capacity(gpm).}
+\item{authorized_gpm}{is the the maximum pump rate that each well can pump. It defaults to initial well capacity. However, a separate maximum pump rate can be provided. Column name should be Well_Capacity(gpm).}
 
 \item{econ_output_file}{is the name of the output file that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",}
 

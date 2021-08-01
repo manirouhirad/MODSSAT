@@ -2,7 +2,7 @@
 #' @param tax_amount                     is the amount of tax on the unit of groundwater extracted. Defaults to 1.1.
 #' @param soil_weather_file              is the file that contains the soil types for each well in the region. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/Well_Soil Type.csv".
 #' @param well_capacity_files            is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".
-#' @param maximum_pump_rate              is the the maximum pump rate that each well can pump. It defaults to initial well capacity. However, a separate maximum pump rate can be provided. Column name should be Well_Capacity(gpm).
+#' @param authorized_gpm              is the the maximum pump rate that each well can pump. It defaults to initial well capacity. However, a separate maximum pump rate can be provided. Column name should be Well_Capacity(gpm).
 #' @param econ_output_file               is the name of the output file that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
 #' @param first_year_of_simulation       is the first year that the hydro-economic simulation starts. Defaults to 2000.
@@ -22,7 +22,7 @@
 annual_model_tax_CO = function (tax_amount = 1,
                                 soil_weather_file   = "./input_files/Well_SoilType_WeatherStation_CO.csv",
                                 well_capacity_files = "./Well Capacity",
-                                maximum_pump_rate =   "./2000_Well_Capacity.csv",
+                                authorized_gpm =   "./2000_Well_Capacity.csv",
                                 econ_output_file =    "./Econ_output/CO_DSSAT_output.csv",
                                 well_capacity_file_year = "./CO_DSSAT_output.csv",
                                 first_year_of_simulation = 2000,
@@ -81,14 +81,14 @@ annual_model_tax_CO = function (tax_amount = 1,
                                                   well_capacity_data[1, weather_station])]
   well_capacity_data = well_capacity_data[!is.na(weather_station)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
-  maximum_pump_rate_dt = fread(maximum_pump_rate)
-  maximum_pump_rate_dt[max_pump_rate == -999, max_pump_rate := maximum_pump_rate_dt[,max(max_pump_rate)]]
+  authorized_gpm_dt = fread(authorized_gpm)
+  authorized_gpm_dt[authorized_rate == -999, authorized_rate := authorized_gpm_dt[,max(authorized_rate)]]
   setkey(well_capacity_data, Well_ID)
-  setkey(maximum_pump_rate_dt, Well_ID)
-  well_capacity_data = well_capacity_data[maximum_pump_rate_dt]
-  well_capacity_data[, `:=`(max_pump_rate, round(max_pump_rate))]
-  well_capacity_data[Well_capacity > max_pump_rate,
-                     `:=`(max_pump_rate, Well_capacity)]
+  setkey(authorized_gpm_dt, Well_ID)
+  well_capacity_data = well_capacity_data[authorized_gpm_dt]
+  well_capacity_data[, `:=`(authorized_rate, round(authorized_rate))]
+  well_capacity_data[Well_capacity > authorized_rate,
+                     `:=`(authorized_rate, Well_capacity)]
   well_capacity_data[, `:=`(well_capacity_org, Well_capacity)]
   well_capacity_data[Well_capacity <= minimum_well_capacity,
                      `:=`(Well_capacity, minimum_well_capacity)]
@@ -122,7 +122,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   #                                         ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
   #                                                ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1)))))))]
   year_dt = year_dt$file_name
-  lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
+  lookup_table_all_years_2 = lookup_table_all_years_2[HDAT ==
                                                         year_dt]
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
 
