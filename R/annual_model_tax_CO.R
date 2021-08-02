@@ -63,7 +63,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
   well_capacity = ifelse(year_dt == first_year_of_simulation,
                          list(rbind(well_capacity, fread(paste0("Well_Capacity.csv")))), list(rbind(well_capacity,
-                                                                                                     fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
+                                                                                                     fread(paste0("./Well Capacity/", "Well_Capacity_", year_dt, ".csv")))))
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
   setkey(soil_type, Well_ID)
@@ -107,6 +107,8 @@ annual_model_tax_CO = function (tax_amount = 1,
   foo = data.table(Well_ID = 1, V1 = 1, file_name = paste0(well_capacity_files,
                                                            "/", "Well_Capacity_",
                                                            first_year_of_simulation, ".csv"))
+
+
   setnames(foo, old = "V1", new = default_well_capacity_col_name)
   year_dt = rbind(year_dt, foo)
 
@@ -122,6 +124,7 @@ annual_model_tax_CO = function (tax_amount = 1,
   #                                         ifelse(file_name > (last_year_of_GW - 1 + last_year_of_GW - first_year_of_GW + 1) & file_name <= (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 2 * (last_year_of_GW - first_year_of_GW + 1)),
   #                                                ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1)))))))]
   year_dt = year_dt$file_name
+  print(year_dt)
   lookup_table_all_years_2 = lookup_table_all_years_2[HDAT ==
                                                         year_dt]
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
