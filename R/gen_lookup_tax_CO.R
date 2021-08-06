@@ -131,8 +131,6 @@ gen_lookup_tax_CO = function (tax_amount = 1,
     # fixed_cost[Crop=="MZ", f_cost := 700]
     fixed_cost[irr == 0, `:=`(Crop, paste("dry", Crop, sep = "-"))]
     fixed_cost[, `:=`(irr, NULL)]
-    fixed_cost = rbind(fixed_cost, data.table::data.table(Crop = "FA",
-                                                          f_cost = 0))
     data.table::setkey(fixed_cost, Crop)
     KS_DSSAT = KS_DSSAT_2[group == i, .(SOIL_ID, WSTA, CR,
                                         IFREQ, PAW, HDAT, IRCM, PRCP, PRCM, HWAM)]
