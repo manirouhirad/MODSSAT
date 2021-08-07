@@ -140,12 +140,12 @@ annual_model_tax_CO = function (tax_amount = 1,
   lookup_table_all_years_2[, tot_acres:= sum(foo), by="Well_ID"]
 
   econ_output = lookup_table_all_years_2[, .(Well_ID, well_capacity = well_capacity_org,
-                                             tot_acres, quarter, CR, PAW, irrigation_ac_in = irrigation, irrigation_depth_mm = round(irrigation/32.5 * 25.4), profit)]
+                                             tot_acres, quarter, CR, PAW, irrigation_ac_in = irrigation, irrigation_depth_mm = round(irrigation/32.5 * 25.4), profit, yield_kg_ac)]
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(tax, tax_amount)]
   write.csv(econ_output, well_capacity_file_year, row.names = FALSE)
 
-  econ_output = econ_output[,.(Well_ID, year = year_dt, well_capacity, tot_acres, quarter, CR, PAW, irrigation = irrigation_ac_in, profit, row, tax)]
+  econ_output = econ_output[,.(Well_ID, year = year_dt, well_capacity, tot_acres, quarter, CR, PAW, irrigation = irrigation_ac_in, profit, yield_kg_ac, row, tax)]
   econ_output_in = fread(econ_output_file)
   econ_output = rbind(econ_output_in, econ_output)
   write.csv(econ_output, econ_output_file, row.names = FALSE)
