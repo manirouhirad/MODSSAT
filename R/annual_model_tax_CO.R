@@ -129,6 +129,9 @@ annual_model_tax_CO = function (tax_amount = 1,
                                                         year_dt]
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
 
+  setkey(lookup_table_all_years_2, WSTA, SOIL_ID, Well_capacity, quarter)
+  lookup_table_all_years_2[, quarter := 1:.N, by=c("WSTA", "SOIL_ID", "Well_capacity")]
+
   setkey(lookup_table_all_years_2, WSTA, SOIL_ID, Well_capacity)
   setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
 
