@@ -228,7 +228,8 @@ gen_lookup_tax_CO = function (tax_amount = 1,
     #                                           1)/(Well_capacity * 0.053030303149011), 1))]
 
 
-    well_capacity_data[!(complete.cases(ifreq) & ifreq < 100), `:=`(ifreq, 0)]
+    well_capacity_data[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
+    well_capacity_data[Well_capacity == 0, ifreq := 0]
     well_capacity_data[ifreq < 2 & ifreq > 0, `:=`(ifreq, 2)]
 
 
