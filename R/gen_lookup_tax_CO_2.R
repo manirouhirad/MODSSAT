@@ -20,24 +20,24 @@
 #' @export
 #'
 gen_lookup_tax_CO_2 = function(tax_amount = 1,
-                              DSSAT_files = "/Users/manirouhirad/Dropbox/with_mani",
-                              price_file = "/Users/manirouhirad/Dropbox/with_mani/crop_prices.csv",
-                              fixed_cost_file = "/Users/manirouhirad/Dropbox/with_mani/fixed_cost_input.csv",
-                              pumping_cost = 3.21,
-                              default_well_capacity_col_name = "Well_Capacity(gpm)",
-                              soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
-                              IFREQ_seq = 1,
-                              IFREQ_interpolate = 0.1,
-                              maximum_well_capacity = 3000,
-                              well_capacity_intervals = 20,
-                              number_of_quarters = 30,
-                              num_clusters = 12
+                               DSSAT_files = "./input_files/DSSAT_files",
+                               price_file = "./input_files/crop_prices.csv",
+                               fixed_cost_file = "./input_files/fixed_cost_input.csv",
+                               pumping_cost = 3.21,
+                               default_well_capacity_col_name = "Well_Capacity(gpm)",
+                               soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
+                               IFREQ_seq = 2,
+                               IFREQ_interpolate = 0.1,
+                               maximum_well_capacity = 1000,
+                               well_capacity_intervals = 20,
+                               number_of_quarters = 6,
+                               num_clusters = 12
 )
 {
   library(data.table)
   tax_amount = (tax_amount - 1)/10
   print(paste("this is the tax:", tax_amount, sep = " "))
-  
+
   # FN_optim_tax = function(jj) {
   #   foo_dt1 = foo_irr[Well_ID_grp == jj]
   #   foo_dt1[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
@@ -57,7 +57,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
   #   foo_dt1 = foo_dt1[profit_Well_ID == profit_tot_acres]
   #   return(foo_dt1)
   # }
-  
+
   col_new = c("RUNNO", "TRNO", "R_pound", "O_pound", "C_pound",
               "CR", "MODEL", "EXNAME", "FNAM", "WSTA", "SOIL_ID", "SDAT",
               "PDAT", "EDAT", "ADAT", "MDAT", "HDAT", "DWAP", "CWAM",
@@ -81,7 +81,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
   KS_DSSAT = KS_DSSAT[complete.cases(V85)]
   KS_DSSAT[, `:=`(file_name, NULL)]
   rm(ldf)
-  
+
   KS_DSSAT[, `:=`(foo, nchar(as.character(V9)))]
   KS_DSSAT[foo < 4, `:=`(V9, paste(V9, V11, V10, sep = "_"))]
   KS_DSSAT[foo < 4, `:=`(V10, NA)]
@@ -95,24 +95,24 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
   KS_DSSAT[, `:=`(foo, NULL)]
   data.table::setnames(KS_DSSAT, old = colnames(KS_DSSAT),
                        new = col_new)
-  
+
   KS_DSSAT[, `:=`(WSTA, substr(WSTA, 1, 4))]
   KS_DSSAT[, `:=`(group, .GRP), by = c("WSTA", "SOIL_ID")]
   unique_soil = unique(KS_DSSAT[,.(SOIL_ID, WSTA)])
-  
+
   KS_DSSAT_2 = data.table::copy(KS_DSSAT)
   lookup_table_all_years_2 = data.table::data.table()
   lookup_table_quarter_2 = data.table::data.table()
   lookup_table_well_2 = data.table::data.table()
-  
+
   i = 5
   for (i in 1:max(KS_DSSAT_2$group)) {
-    
+
     soil_type = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
                            Soil_Type = unique_soil[i, SOIL_ID], weather_station = unique_soil[i, WSTA])
     well_capacity = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
                                `Well_Capacity(gpm)` = seq(1, (maximum_well_capacity), by=well_capacity_intervals))
-    
+
     data.table::setkey(soil_type, Well_ID)
     data.table::setkey(well_capacity, Well_ID)
     well_capacity_data = soil_type[well_capacity]
@@ -121,7 +121,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     well_capacity_data = well_capacity_data[, .(Well_ID,
                                                 Soil_Type, weather_station, Well_capacity)]
     price_dt = data.table::fread(price_file)
-    
+
     data.table::setkey(price_dt, CR)
     cost_dt = well_capacity_data[, .(Well_ID)]
     data.table::setkey(cost_dt, Well_ID)
@@ -147,7 +147,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     # KS_DSSAT = KS_DSSAT[SOIL_ID == unique_soil[i]]
     KS_DSSAT = KS_DSSAT[IFREQ < 12]
     KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets | IFREQ == 0]
-    
+
     KS_DSSAT_0 = KS_DSSAT[IFREQ == 0]
     KS_DSSAT   = KS_DSSAT[IFREQ != 0]
     KS_DSSAT_0 <- KS_DSSAT_0[rep(seq_len(nrow(KS_DSSAT_0)),
@@ -162,8 +162,8 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
                             IFREQ, IRCM, PRCP, PRCM, HWAM)]
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, PAW,
                        HDAT, IFREQ)
-    
-    
+
+
     KS_DSSAT[, `:=`(lead_yield, dplyr::lead(HWAM, n = 1L)),
              by = c("SOIL_ID", "WSTA", "CR",
                     "PAW", "HDAT")]
@@ -172,7 +172,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
                     "PAW", "HDAT")]
     KS_DSSAT <- KS_DSSAT[rep(seq_len(nrow(KS_DSSAT)), each = IFREQ_seq *
                                10)]
-    
+
     df_foo = data.table::data.table(x = seq(0, IFREQ_seq - 0.1, IFREQ_interpolate))
     df_foo = do.call(rbind, replicate(nrow(KS_DSSAT)/nrow(df_foo), df_foo, simplify = F))
     KS_DSSAT = data.table::data.table(KS_DSSAT, IFREQ_int = df_foo$x)
@@ -180,7 +180,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT[, `:=`(IFREQ, IFREQ + IFREQ_int)]
     KS_DSSAT = KS_DSSAT[IFREQ <= foo]
     KS_DSSAT[, `:=`(foo, NULL)]
-    
+
     KS_DSSAT = KS_DSSAT[complete.cases(lead_yield)]
     KS_DSSAT[, `:=`(yield_int, HWAM + (lead_yield -
                                          HWAM)/IFREQ_seq * IFREQ_int)]
@@ -191,7 +191,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
                        PAW, HDAT)
-    
+
     KS_DSSAT = KS_DSSAT[IFREQ == 0 | IFREQ >= IFREQ_seq]
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
@@ -199,57 +199,57 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
     KS_DSSAT[CR %like% "SG", yield_kg_ac := yield_kg_ac * 1.183]
     KS_DSSAT[CR %like% "WH", yield_kg_ac := yield_kg_ac * 1.156]
-    
-    
-    
+
+
+
     number_of_crops = length(KS_DSSAT[, unique(CR)])
     crop_names = c(KS_DSSAT[, unique(CR)], "FA")
-    
+
     well_capacity_data = rbind(data.table::data.table(Well_ID = 1,
                                                       Soil_Type = unique(well_capacity_data$Soil_Type),
                                                       weather_station = unique(well_capacity_data$weather_station),
                                                       Well_capacity = 0), well_capacity_data)
     max_tot_acres  =     number_of_quarters *32.5
     tot_acres_list = c(0:number_of_quarters)*32.5
-    
+
     well_capacity_data <- well_capacity_data[rep(seq_len(nrow(well_capacity_data)),
                                                  each = length(tot_acres_list))]
     well_capacity_data[, `:=`(tot_acres, rep(tot_acres_list, nrow(well_capacity_data)/length(tot_acres_list)))]
-    
+
     well_capacity_data <- well_capacity_data[rep(seq_len(nrow(well_capacity_data)),
                                                  each = (number_of_quarters))]
     well_capacity_data[, `:=`(quarter, rep(1:number_of_quarters, nrow(well_capacity_data)/number_of_quarters))]
-    
+
     well_capacity_data <- well_capacity_data[rep(seq_len(nrow(well_capacity_data)), each = (number_of_crops + 1))]
     well_capacity_data[, `:=`(CR, rep(crop_names, nrow(well_capacity_data)/(number_of_crops + 1)))]
-    
+
     well_capacity_data[, `:=`(ifreq, ceiling(((tot_acres * 1)/(Well_capacity * 0.053030303149011))*10)/10)]
     # well_capacity_data[, `:=`(ifreq, round((tot_acres *
     #                                           1)/(Well_capacity * 0.053030303149011), 1))]
-    
-    
+
+
     well_capacity_data[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
     well_capacity_data[Well_capacity == 0, ifreq := 0]
     well_capacity_data[ifreq < 2 & ifreq > 0, `:=`(ifreq, 2)]
-    
-    
+
+
     # well_capacity_data[ifreq > 10] # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HERE: checking whether we can assign ifreq > 10 to ifreq = 10
-    
+
     # well_capacity_data = reshape2::melt(well_capacity_data,
     #                                     id = c("Well_ID", "Soil_Type", "weather_station",
     #                                            "Well_capacity", "tot_acres", "ifreq"))
     # well_capacity_data = data.table::data.table(well_capacity_data)
     data.table::setkey(well_capacity_data, Well_ID, Soil_Type, weather_station, tot_acres, quarter, CR, ifreq)
-    
+
     well_capacity_data[, aux := tot_acres/32.5]
     well_capacity_data[, CR_aux := ifelse(quarter <= aux,  1, 0)]
     well_capacity_data = well_capacity_data[CR_aux == 0 | (CR != "FA" & !(CR %like% "dry"))]
     well_capacity_data = well_capacity_data[CR_aux != 0 | (CR == "FA" |  (CR %like% "dry"))]
-    
+
     data.table::setkey(well_capacity_data, Well_ID, tot_acres, quarter)
-    
+
     KS_DSSAT[, `:=`(IFREQ, round(IFREQ, 1))]
-    
+
     number_of_years = nrow(unique(KS_DSSAT, by = "HDAT"))
     foo = data.table::data.table(SOIL_ID = KS_DSSAT_2[group ==
                                                         i, unique(SOIL_ID)], WSTA = KS_DSSAT_2[group == i,
@@ -269,8 +269,8 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     cols = colnames(well_capacity_data)
     well_capacity_data = unique(well_capacity_data, by = cols)
     data.table::setkey(well_capacity_data, Well_ID, tot_acres, quarter)
-    
-    
+
+
     foo_irr = merge(well_capacity_data, KS_DSSAT, by.x = c("Soil_Type",
                                                            "weather_station", "CR", "ifreq"),
                     by.y = c("SOIL_ID", "WSTA", "CR",
@@ -279,8 +279,8 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
                           Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                           PAW, HDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
     data.table::setkey(foo_irr, CR)
-    
-    
+
+
     foo_irr = foo_irr[price_dt]
     foo_irr = foo_irr[complete.cases(Well_ID)]
     data.table::setkey(foo_irr, Well_ID)
@@ -296,7 +296,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     foo_irr = foo_irr[complete.cases(Well_ID)]
     foo_irr[, `:=`(irrigation, 32.5 * irr_mm * 0.0393701)]
     foo_irr[, `:=`(profit, 32.5 * (yield_kg_ac * price - f_cost) - irrigation * cost_per_acre_in)]
-    
+
     data.table::setkey(foo_irr, Well_ID, tot_acres, quarter,
                        HDAT)
     foo_irr_2 = data.table::copy(foo_irr)
@@ -322,36 +322,36 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     #
     # foo_dt_all <- do.call(rbind, foo_dt_all)
     # foo_dt_all = data.table(foo_dt_all)
-    
-    
+
+
     foo_irr[, `:=`(mean_profit_PAW, mean(profit)),  by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
     # foo_irr[, `:=`(sd_profit_PAW, sd(profit)),      by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
     foo_irr[, `:=`(mean_irr_PAW, mean(irrigation)), by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW")]
     foo_irr = unique(foo_irr,                       by = c("Well_ID", "tot_acres", "quarter", "CR", "PAW"))
-    
+
     foo_irr[, `:=`(profit_quarter, max(mean_profit_PAW)), by = c("Well_ID", "tot_acres", "quarter")]
     foo_irr = foo_irr[profit_quarter == mean_profit_PAW]
     foo_irr[, `:=`(count, .N), by = c("Well_ID", "tot_acres", "quarter")]
     foo_irr = unique(foo_irr,  by = c("Well_ID", "tot_acres", "quarter"))
     foo_irr = foo_irr[Well_capacity > 0 | tot_acres == 0]
-    
+
     foo_irr[, `:=`(profit_tot_acres, sum(profit_quarter)), by = c("Well_ID", "tot_acres")]
     foo_irr[, `:=`(irr_tot_acres, sum(mean_irr_PAW)),      by = c("Well_ID", "tot_acres")]
     # foo_irr[, `:=`(profit_Well_ID, max(profit_tot_acres)), by = c("Well_ID")]
     # foo_dt_all = foo_irr[profit_Well_ID == profit_tot_acres]
-    
+
     foo_irr[, tot_quarters := tot_acres/32.5]
     # lookup_table_quarter = foo_irr[, .(Well_capacity, SOIL_ID, WSTA, tot_quarters, tot_acres, quarter, CR, PAW, mean_irr_PAW, profit_quarter)]
     # data.table::setkey(lookup_table_quarter, Well_capacity, tot_quarters, quarter)
-    
+
     # lookup_table_well = unique(foo_irr, by = c("Well_ID", "tot_acres"))
     # data.table::setkey(lookup_table_well, Well_capacity)
     # lookup_table_well = lookup_table_well[, .(Well_capacity, SOIL_ID, WSTA, tot_acres, irr_tot_acres, profit_Well_ID)]
     # # lookup_table_well = lookup_table_well[Well_capacity > 0, .(Well_capacity, SOIL_ID, WSTA, tot_acres, irr_tot_acres, profit_Well_ID)]
-    
+
     foo_irr = foo_irr[, .(Well_capacity, tot_quarters, tot_acres,
                                    quarter, CR, PAW, id = 1)]
-    
+
     # baz = lookup_table_quarter[, .(Well_capacity, tot_acres,
     #                                quarter, CR, PAW, id = 1)]
     data.table::setkey(foo_irr, Well_capacity, tot_acres, quarter,
@@ -367,7 +367,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     # lookup_table_quarter_2 = rbind(lookup_table_quarter_2,
     #                                lookup_table_quarter)
     # lookup_table_well_2 = rbind(lookup_table_well_2, lookup_table_well)
-    
+
     print(i)
   }
   data.table::setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity,

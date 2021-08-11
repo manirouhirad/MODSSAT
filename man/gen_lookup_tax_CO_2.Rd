@@ -6,17 +6,17 @@
 \usage{
 gen_lookup_tax_CO_2(
   tax_amount = 1,
-  DSSAT_files = "/Users/manirouhirad/Dropbox/with_mani",
-  price_file = "/Users/manirouhirad/Dropbox/with_mani/crop_prices.csv",
-  fixed_cost_file = "/Users/manirouhirad/Dropbox/with_mani/fixed_cost_input.csv",
+  DSSAT_files = "./input_files/DSSAT_files",
+  price_file = "./input_files/crop_prices.csv",
+  fixed_cost_file = "./input_files/fixed_cost_input.csv",
   pumping_cost = 3.21,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
-  IFREQ_seq = 1,
+  IFREQ_seq = 2,
   IFREQ_interpolate = 0.1,
-  maximum_well_capacity = 3000,
+  maximum_well_capacity = 1000,
   well_capacity_intervals = 20,
-  number_of_quarters = 30,
+  number_of_quarters = 6,
   num_clusters = 12
 )
 }
