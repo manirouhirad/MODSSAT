@@ -145,7 +145,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT[, `:=`((cols_change), lapply(.SD, as.character)),
              .SDcols = cols_change]
     # KS_DSSAT = KS_DSSAT[SOIL_ID == unique_soil[i]]
-    KS_DSSAT = KS_DSSAT[IFREQ < 12]
+    # KS_DSSAT = KS_DSSAT[IFREQ < 12]
     KS_DSSAT = KS_DSSAT[PAW %in% soil_moisture_targets | IFREQ == 0]
 
     KS_DSSAT_0 = KS_DSSAT[IFREQ == 0]
