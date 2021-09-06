@@ -49,11 +49,11 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
                                                                        first_year_of_simulation, ".csv"))
   setnames(foo, old = "V1", new = default_well_capacity_col_name)
   year_dt = rbind(year_dt, foo)
-  
+
   year_dt[, file_name := substring(file_name, regexpr("Capacity_", file_name) + 1, nchar(file_name))]
   year_dt[, file_name := substring(file_name, regexpr("_", file_name) + 1, nchar(file_name))]
   year_dt[, file_name := gsub(".csv", "", file_name)]
-  
+
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
@@ -62,9 +62,9 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
   well_capacity = data.table(Well_ID = NA, V1 = NA)
   setnames(well_capacity, old = "V1", new = default_well_capacity_col_name)
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread(paste0("Well_Capacity.csv")))), 
+                         list(rbind(well_capacity, fread(paste0("Well_Capacity.csv")))),
                          list(rbind(well_capacity, fread(paste0("./Well Capacity/", "Well_Capacity_", year_dt, ".csv")))))
-  
+
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
   setkey(soil_type, Well_ID)
@@ -97,7 +97,7 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
                      `:=`(Well_capacity, maximum_well_capacity)]
   well_capacity_data[, Well_capacity := floor(Well_capacity/well_capacity_intervals)*well_capacity_intervals]
   well_capacity_data[Well_capacity !=0, Well_capacity := Well_capacity + 1]
-  
+
   lookup_table_all_years_2 = readRDS("lookup_table_all_years_2.rds")
   lookup_table_all_years_2 = unique(lookup_table_all_years_2, by=colnames(lookup_table_all_years_2))
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
@@ -108,15 +108,15 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
   foo = data.table(Well_ID = 1, V1 = 1, file_name = paste0(well_capacity_files,
                                                            "/", "Well_Capacity_",
                                                            first_year_of_simulation, ".csv"))
-  
-  
+
+
   setnames(foo, old = "V1", new = default_well_capacity_col_name)
   year_dt = rbind(year_dt, foo)
-  
+
   year_dt[, file_name := substring(file_name, regexpr("Capacity_", file_name) + 1, nchar(file_name))]
   year_dt[, file_name := substring(file_name, regexpr("_", file_name) + 1, nchar(file_name))]
   year_dt[, file_name := gsub(".csv", "", file_name)]
-  
+
   year_dt[, `:=`(file_name, as.integer(file_name))]
   setkey(year_dt, file_name)
   year_dt = year_dt[nrow(year_dt)]
@@ -126,54 +126,54 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
   #                                                ifelse(file_name > (last_year_of_GW - 1 + 2 * (last_year_of_GW - first_year_of_GW + 1)) & file_name <= (last_year_of_GW - 1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 3 * (last_year_of_GW - first_year_of_GW + 1)), file_name - (-1 + 4 * (last_year_of_GW - first_year_of_GW + 1)))))))]
   year_dt = year_dt$file_name
   print(year_dt)
-  
+
   lookup_table_all_years_2[, `:=`(Well_ID, NULL)]
-  
-  lookup_table_all_years_2 = merge(lookup_table_all_years_2, well_capacity_data, 
-                                   by.x= c("WSTA", "SOIL_ID", "Well_capacity"), 
-                                   by.y= c("weather_station", "Soil_Type", "Well_capacity"), 
+
+  lookup_table_all_years_2 = merge(lookup_table_all_years_2, well_capacity_data,
+                                   by.x= c("WSTA", "SOIL_ID", "Well_capacity"),
+                                   by.y= c("weather_station", "Soil_Type", "Well_capacity"),
                                    allow.cartesian = T)
   lookup_table_all_years_2 = lookup_table_all_years_2[tot_quarters <= QCircle_Count]
   lookup_table_all_years_2 = lookup_table_all_years_2[quarter      <= QCircle_Count]
   lookup_table_all_years_2[, mean_profit_quarter := mean(profit), by=c("Well_ID", "tot_acres", "quarter")]
-  
+
   setkey(lookup_table_all_years_2, Well_ID, tot_acres, quarter)
-  
+
   foo = unique(lookup_table_all_years_2, by=c("Well_ID", "tot_acres", "quarter"))
   foo[, profit_tot_acres := sum(mean_profit_quarter), by=c("Well_ID", "tot_acres")]
   foo = unique(foo, by=c("Well_ID", "tot_acres"))
   foo[, max_profit_tot_acres := max(profit_tot_acres), by="Well_ID"]
   foo = foo[max_profit_tot_acres   ==     profit_tot_acres,.(Well_ID, tot_acres, id=1)]
-  
+
   setkey(foo,                      Well_ID, tot_acres)
   setkey(lookup_table_all_years_2, Well_ID, tot_acres)
   lookup_table_all_years_2 = lookup_table_all_years_2[foo]
-  
+
   lookup_table_all_years_2 = lookup_table_all_years_2[HDAT ==
                                                         year_dt]
-  
+
   # setkey(lookup_table_all_years_2, WSTA, SOIL_ID, Well_capacity, quarter)
   # lookup_table_all_years_2[, quarter := 1:.N, by=c("WSTA", "SOIL_ID", "Well_capacity")]
-  
+
   # setkey(lookup_table_all_years_2, WSTA, SOIL_ID, Well_capacity)
   # setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
-  
+
   # lookup_table_all_years_2[, count := .N, by="Well_ID"]
-  
+
   # lookup_table_all_years_2 = lookup_table_all_years_2[well_capacity_data]
   # lookup_table_all_years_2 = unique(lookup_table_all_years_2, by=c("Well_ID", "quarter"))
-  
-  
+
+
   # lookup_table_all_years_2[, foo := ifelse(CR %like% "dry" | CR == "FA", 0, 32.5)]
   # lookup_table_all_years_2[, tot_acres:= sum(foo), by="Well_ID"]
-  
+
   econ_output = lookup_table_all_years_2[, .(Well_ID, well_capacity = well_capacity_org,
                                              tot_acres, quarter, CR, PAW, irrigation_ac_in = irrigation, irrigation_depth_mm = round(irrigation/32.5 * 25.4), profit, yield_kg_ac)]
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(tax, tax_amount)]
   write.csv(econ_output, well_capacity_file_year, row.names = FALSE)
-  
-  econ_output = econ_output[,.(Well_ID, year = year_dt, well_capacity, tot_acres, quarter, CR, PAW, irrigation = irrigation_ac_in, profit, yield_kg_ac, row, tax)]
+
+  econ_output = econ_output[,.(Well_ID, year = year_dt, well_capacity, tot_acres, IFREQ, quarter, CR, PAW, irrigation = irrigation_ac_in, profit, yield_kg_ac, row, tax)]
   econ_output_in = fread(econ_output_file)
   econ_output = rbind(econ_output_in, econ_output)
   write.csv(econ_output, econ_output_file, row.names = FALSE)
