@@ -187,8 +187,16 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT[, `:=`(irr_int, IRCM + (lead_irr_mm -
                                        IRCM)/IFREQ_seq * IFREQ_int)]
     KS_DSSAT = KS_DSSAT[, .(SOIL_ID, WSTA, CR, IFREQ, PAW,
-                            HDAT, irr_mm = irr_int, PRCP, PRCM, yield_kg_ac = yield_int)]
-    KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
+                            HDAT, irr_mm = irr_int, PRCP, PRCM, yield_kg_ha = yield_int)]
+    # KS_DSSAT[, `:=`(yield_kg_ac, yield_kg_ac * 0.4046)]
+    KS_DSSAT[CR %like% "MZ", `:=`(yield_bu_ac, yield_kg_ha * 0.01885)]
+    KS_DSSAT[CR %like% "SG", `:=`(yield_bu_ac, yield_kg_ha * 0.01831)]
+    KS_DSSAT[CR %like% "WH", `:=`(yield_bu_ac, yield_kg_ha * 0.01719)]
+
+    KS_DSSAT[, `:=`(irr_inch, irr_mm * 0.0393701)]
+    KS_DSSAT[, yield_kg_ha := NULL]
+    KS_DSSAT[, irr_mm := NULL]
+
     data.table::setkey(KS_DSSAT, SOIL_ID, WSTA, CR, IFREQ,
                        PAW, HDAT)
 
@@ -196,9 +204,9 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     KS_DSSAT = KS_DSSAT[IFREQ != 0 | PAW == soil_moisture_targets[1]]
     KS_DSSAT[IFREQ == 0, `:=`(CR, paste("dry",
                                         CR, sep = "-"))]
-    KS_DSSAT[CR %like% "MZ", yield_kg_ac := yield_kg_ac * 1.183]
-    KS_DSSAT[CR %like% "SG", yield_kg_ac := yield_kg_ac * 1.183]
-    KS_DSSAT[CR %like% "WH", yield_kg_ac := yield_kg_ac * 1.156]
+    # KS_DSSAT[CR %like% "MZ", yield_bu_ac := yield_bu_ac * 1.183]
+    # KS_DSSAT[CR %like% "SG", yield_bu_ac := yield_bu_ac * 1.183]
+    # KS_DSSAT[CR %like% "WH", yield_bu_ac := yield_bu_ac * 1.156]
 
 
 
@@ -254,8 +262,8 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     foo = data.table::data.table(SOIL_ID = KS_DSSAT_2[group ==
                                                         i, unique(SOIL_ID)], WSTA = KS_DSSAT_2[group == i,
                                                                                                unique(WSTA)], CR = "FA", IFREQ = 0, PAW = soil_moisture_targets[1],
-                                 HDAT = min(KS_DSSAT$HDAT), irr_mm = 0, PRCP = 200,
-                                 PRCM = 200, yield_kg_ac = 0)
+                                 HDAT = min(KS_DSSAT$HDAT), irr_inch = 0, PRCP = 200,
+                                 PRCM = 200, yield_bu_ac = 0)
     foo = foo[rep(seq_len(nrow(foo)), each = number_of_years)]
     baz = unique(KS_DSSAT, by = "HDAT")
     foo[, `:=`(HDAT, rep(baz$HDAT, nrow(foo)/nrow(baz)))]
@@ -277,7 +285,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
                              "IFREQ"), allow.cartesian = T)
     foo_irr = foo_irr[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                           Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
-                          PAW, HDAT, irr_mm, PRCP, PRCM, yield_kg_ac)]
+                          PAW, HDAT, irr_inch, PRCP, PRCM, yield_bu_ac)]
     data.table::setkey(foo_irr, CR)
 
 
@@ -294,8 +302,8 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     data.table::setkey(fixed_cost, Crop)
     foo_irr = foo_irr[fixed_cost]
     foo_irr = foo_irr[complete.cases(Well_ID)]
-    foo_irr[, `:=`(irrigation, 32.5 * irr_mm * 0.0393701)]
-    foo_irr[, `:=`(profit, 32.5 * (yield_kg_ac * price - f_cost) - irrigation * cost_per_acre_in)]
+    foo_irr[, `:=`(irrigation, 32.5 * irr_inch)]
+    foo_irr[, `:=`(profit, 32.5 * (yield_bu_ac * price - f_cost) - irrigation * cost_per_acre_in)]
 
     data.table::setkey(foo_irr, Well_ID, tot_acres, quarter,
                        HDAT)
@@ -361,7 +369,7 @@ gen_lookup_tax_CO_2 = function(tax_amount = 1,
     foo_irr = foo_irr_2[foo_irr]
     lookup_table_all_years = foo_irr[, .(Well_ID, Well_capacity,
                                      SOIL_ID, WSTA, tot_quarters, tot_acres, IFREQ, CR, quarter, PAW, HDAT,
-                                     PRCP, PRCM, yield_kg_ac, irrigation, profit)]
+                                     PRCP, PRCM, yield_bu_ac, irrigation, profit)]
     lookup_table_all_years_2 = rbind(lookup_table_all_years_2,
                                      lookup_table_all_years)
     # lookup_table_quarter_2 = rbind(lookup_table_quarter_2,
