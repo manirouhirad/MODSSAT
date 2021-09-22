@@ -5,7 +5,7 @@
 \title{This function is the parallelized version of the gen_lookup_subsidy function.}
 \usage{
 gen_lookup_subsidy_par_win_mac_cluster_2(
-  subsidy_amount = 1,
+  tax_amount = 1,
   subsidy_threshold = 1,
   DSSAT_files = "./input_files/DSSAT_files",
   soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
@@ -21,7 +21,7 @@ gen_lookup_subsidy_par_win_mac_cluster_2(
 )
 }
 \arguments{
-\item{subsidy_amount}{is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.}
+\item{tax_amount}{is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.}
 
 \item{subsidy_threshold}{is the threshold of subsidy, i.e., the amount of groundwater extraction above which subsidy is zero. Defaults to 400.}
 
@@ -55,6 +55,6 @@ This function is the parallelized version of the gen_lookup_subsidy function.
 }
 \examples{
 \dontrun{
-gen_lookup_tax(subsidy_amount = 2)
+gen_lookup_tax(tax_amount = 2)
 }
 }
