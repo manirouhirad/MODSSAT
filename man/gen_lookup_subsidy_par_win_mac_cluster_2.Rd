@@ -17,7 +17,7 @@ gen_lookup_subsidy_par_win_mac_cluster_2(
   soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
   IFREQ_seq = 2,
   IFREQ_interpolate = 0.1,
-  num_clusters = 12
+  num_clusters = parallel::detectCores() - 2
 )
 }
 \arguments{
