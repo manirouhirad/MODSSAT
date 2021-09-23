@@ -80,7 +80,7 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
     rm(foo_irr_3_N0, foo_irr_3_0)
 
     foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
-    foo_irr_3[, ifreq_cap := ifreq_cap + 2]
+    foo_irr_3[, ifreq_cap := ifreq_cap + 5]
     foo_irr_3 = foo_irr_3[ifreq <= ifreq_cap]
     # foo_irr_3[, id := .GRP, by=c("Soil_Type", "weather_station", "CR", "Well_ID", "Well_capacity", "tot_acres", "quarter", "PAW", "SDAT")]
     foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
