@@ -80,7 +80,7 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
     rm(foo_irr_3_N0, foo_irr_3_0)
 
     foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
-    foo_irr_3[, ifreq_cap := ifreq_cap + 5]
+    foo_irr_3[, ifreq_cap := ifreq_cap + 2]
     foo_irr_3 = foo_irr_3[ifreq <= ifreq_cap]
     # foo_irr_3[, id := .GRP, by=c("Soil_Type", "weather_station", "CR", "Well_ID", "Well_capacity", "tot_acres", "quarter", "PAW", "SDAT")]
     foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
@@ -102,8 +102,8 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
                         allow.cartesian = T)
     rm(foo_dt2_000, foo_dt3_000, foo_dt4_000)
     foo_dt1_000[, `:=`(irrigation_sum, irrigation_1 + irrigation_2 + irrigation_3 + irrigation_4)]
-    foo_dt1_000[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
-                                                0))]
+    # foo_dt1_000[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
+    #                                             0))]
     foo_dt1_000[, `:=`(profit_sum, profit_1 + profit_2 + profit_3 + profit_4)]
     # foo_dt1_000[, `:=`(subsidy_payment, irrigation_below * subsidy_amount)]
     # foo_dt1_000[, `:=`(profit_sum_sub, profit_sum + irrigation_below * subsidy_amount)]
@@ -148,8 +148,8 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
                         allow.cartesian = T)
     rm(foo_dt2_325, foo_dt3_325, foo_dt4_325)
     foo_dt1_325[, `:=`(irrigation_sum, irrigation_1 + irrigation_2 + irrigation_3 + irrigation_4)]
-    foo_dt1_325[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
-                                                0))]
+    # foo_dt1_325[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
+    #                                             0))]
     foo_dt1_325[, `:=`(profit_sum, profit_1 + profit_2 + profit_3 + profit_4)]
     # foo_dt1_325[, `:=`(subsidy_payment, irrigation_below * subsidy_amount)]
     # foo_dt1_325[, `:=`(profit_sum_sub, profit_sum + irrigation_below * subsidy_amount)]
@@ -194,8 +194,8 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
                         allow.cartesian = T)
     rm(foo_dt2_650, foo_dt3_650, foo_dt4_650)
     foo_dt1_650[, `:=`(irrigation_sum, irrigation_1 + irrigation_2 + irrigation_3 + irrigation_4)]
-    foo_dt1_650[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
-                                                0))]
+    # foo_dt1_650[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
+    #                                             0))]
     foo_dt1_650[, `:=`(profit_sum, profit_1 + profit_2 + profit_3 + profit_4)]
     # foo_dt1_650[, `:=`(subsidy_payment, irrigation_below * subsidy_amount)]
     # foo_dt1_650[, `:=`(profit_sum_sub, profit_sum + irrigation_below * subsidy_amount)]
@@ -239,8 +239,8 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
                         allow.cartesian = T)
     rm(foo_dt2_975, foo_dt3_975, foo_dt4_975)
     foo_dt1_975[, `:=`(irrigation_sum, irrigation_1 + irrigation_2 + irrigation_3 + irrigation_4)]
-    foo_dt1_975[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
-                                                0))]
+    # foo_dt1_975[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
+    #                                             0))]
     foo_dt1_975[, `:=`(profit_sum, profit_1 + profit_2 + profit_3 + profit_4)]
     # foo_dt1_975[, `:=`(subsidy_payment, irrigation_below * subsidy_amount)]
     # foo_dt1_975[, `:=`(profit_sum_sub, profit_sum + irrigation_below * subsidy_amount)]
@@ -284,8 +284,8 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
                         allow.cartesian = T)
     rm(foo_dt2_130, foo_dt3_130, foo_dt4_130)
     foo_dt1_130[, `:=`(irrigation_sum, irrigation_1 + irrigation_2 + irrigation_3 + irrigation_4)]
-    foo_dt1_130[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
-                                                0))]
+    # foo_dt1_130[, `:=`(irrigation_below, ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum,
+    #                                             0))]
     foo_dt1_130[, `:=`(profit_sum, profit_1 + profit_2 + profit_3 + profit_4)]
     # foo_dt1_130[, `:=`(subsidy_payment, irrigation_below * subsidy_amount)]
     # foo_dt1_130[, `:=`(profit_sum_sub, profit_sum + irrigation_below * subsidy_amount)]
