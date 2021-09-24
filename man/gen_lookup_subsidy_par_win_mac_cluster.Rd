@@ -5,8 +5,8 @@
 \title{This function is the parallelized version of the gen_lookup_subsidy function.}
 \usage{
 gen_lookup_subsidy_par_win_mac_cluster(
-  subsidy_amount = 21,
-  subsidy_threshold = 1500,
+  subsidy_amount = 1,
+  subsidy_threshold = 1,
   DSSAT_files = "./input_files/DSSAT_files",
   soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
   well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
@@ -17,7 +17,7 @@ gen_lookup_subsidy_par_win_mac_cluster(
   soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
   IFREQ_seq = 2,
   IFREQ_interpolate = 0.1,
-  num_clusters = 12
+  num_clusters = parallel::detectCores() - 2
 )
 }
 \arguments{

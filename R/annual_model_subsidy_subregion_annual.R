@@ -22,8 +22,8 @@
 #' gen_lookup_subsidy(subsidy_amount = 2)
 #' }
 #' @export
-annual_model_subsidy_subregion_annual = function(subsidy_amount = 21,
-                                                 subsidy_threshold = 1500,
+annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
+                                                 subsidy_threshold = 1,
                                                  soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
                                                  well_capacity_files = "./Well Capacity",
                                                  econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
@@ -40,6 +40,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 21,
                                                  last_year_of_GW = 2007,
                                                  irrigation_season_days = 70)
 {
+  library(data.table)
   subsidy_amount = (subsidy_amount - 1)/10
   soil_type = fread(soil_weather_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
