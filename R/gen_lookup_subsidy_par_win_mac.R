@@ -19,22 +19,18 @@
 #' }
 #' @export
 gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
-                                              subsidy_threshold = 1,
-                                              DSSAT_files = "./input_files/DSSAT_files",
-                                              # soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-                                              # well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
-
+                                          subsidy_threshold = 1,
+                                          DSSAT_files = "./input_files/DSSAT_files",
                                           maximum_well_capacity = 1000,
                                           well_capacity_intervals = 20,
-
-                                              price_file = "./input_files/crop_prices.csv",
-                                              fixed_cost_file = "./input_files/fixed_cost_input.csv",
-                                              pumping_cost = 3.21,
-                                              default_well_capacity_col_name = "Well_Capacity(gpm)",
-                                              soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
-                                              IFREQ_seq = 2,
-                                              IFREQ_interpolate = 0.1,
-                                              num_clusters = parallel::detectCores()-2
+                                          price_file = "./input_files/crop_prices.csv",
+                                          fixed_cost_file = "./input_files/fixed_cost_input.csv",
+                                          pumping_cost = 3.21,
+                                          default_well_capacity_col_name = "Well_Capacity(gpm)",
+                                          soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
+                                          IFREQ_seq = 2,
+                                          IFREQ_interpolate = 0.1,
+                                          num_clusters = parallel::detectCores()-2
 )
 {
   library(data.table)
