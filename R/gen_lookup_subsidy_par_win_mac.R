@@ -80,6 +80,8 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
                        new = col_new)
   KS_DSSAT[, `:=`(WSTA, substr(WSTA, 1, 4))]
   KS_DSSAT[, `:=`(group, .GRP), by = c("WSTA", "SOIL_ID")]
+  unique_soil = unique(KS_DSSAT[,.(SOIL_ID, WSTA)])
+
   KS_DSSAT_2 = data.table::copy(KS_DSSAT)
   lookup_table_all_years_2 = data.table::data.table()
   lookup_table_quarter_2 = data.table::data.table()
