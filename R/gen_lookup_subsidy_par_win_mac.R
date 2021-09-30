@@ -320,7 +320,7 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
     foo_irr_2 = foo_irr_2[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                               Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                               PAW, SDAT, irr_mm, PRCP, PRCM, irrigation, yield_kg_ac, profit)]
-
+    print(well_capacity_data)
 
     if (Sys.info()[1] == "Windows") {
       library(snow)
