@@ -21,8 +21,12 @@
 gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
                                               subsidy_threshold = 1,
                                               DSSAT_files = "./input_files/DSSAT_files",
-                                              soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-                                              well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
+                                              # soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
+                                              # well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
+
+                                          maximum_well_capacity = 1000,
+                                          well_capacity_intervals = 20,
+
                                               price_file = "./input_files/crop_prices.csv",
                                               fixed_cost_file = "./input_files/fixed_cost_input.csv",
                                               pumping_cost = 3.21,
@@ -86,24 +90,20 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
   lookup_table_well_2 = data.table::data.table()
 
   for (i in 1:max(KS_DSSAT_2$group)) {
-    soil_type = data.table::fread(soil_file)
-    soil_type[, `:=`(Soil_Type, KS_DSSAT_2[group == i, unique(SOIL_ID)])]
-    soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
-                                     Soil_Type))]
-    well_capacity = data.table::fread(well_capacity_file)
-    well_capacity = well_capacity[`Well_Capacity(gpm)` <= 801]
+
+    soil_type = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
+                           Soil_Type = unique_soil[i, SOIL_ID], weather_station = unique_soil[i, WSTA])
+    well_capacity = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
+                               `Well_Capacity(gpm)` = seq(1, (maximum_well_capacity), by=well_capacity_intervals))
+
     data.table::setkey(soil_type, Well_ID)
     data.table::setkey(well_capacity, Well_ID)
     well_capacity_data = soil_type[well_capacity]
-    data.table::setnames(well_capacity_data, old = default_well_capacity_col_name,
+    data.table::setnames(well_capacity_data, old= default_well_capacity_col_name,
                          "Well_capacity")
-    WSTAT = data.table(Well_ID = well_capacity_data$Well_ID,
-                       weather_station = KS_DSSAT_2[group == i, unique(WSTA)])
-    data.table::setkey(WSTAT, Well_ID)
-    data.table::setkey(well_capacity_data, Well_ID)
-    well_capacity_data = WSTAT[well_capacity_data]
     well_capacity_data = well_capacity_data[, .(Well_ID,
                                                 Soil_Type, weather_station, Well_capacity)]
+
     price_dt = data.table::fread(price_file)
     data.table::setkey(price_dt, CR)
     cost_dt = well_capacity_data[, .(Well_ID)]
@@ -320,7 +320,6 @@ gen_lookup_subsidy_par_win_mac = function(subsidy_amount = 1,
     foo_irr_2 = foo_irr_2[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                               Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                               PAW, SDAT, irr_mm, PRCP, PRCM, irrigation, yield_kg_ac, profit)]
-    print(well_capacity_data)
 
     if (Sys.info()[1] == "Windows") {
       library(snow)

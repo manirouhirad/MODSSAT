@@ -8,8 +8,8 @@ gen_lookup_subsidy_par_win_mac(
   subsidy_amount = 1,
   subsidy_threshold = 1,
   DSSAT_files = "./input_files/DSSAT_files",
-  soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-  well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
+  maximum_well_capacity = 1000,
+  well_capacity_intervals = 20,
   price_file = "./input_files/crop_prices.csv",
   fixed_cost_file = "./input_files/fixed_cost_input.csv",
   pumping_cost = 3.21,
@@ -27,10 +27,6 @@ gen_lookup_subsidy_par_win_mac(
 
 \item{DSSAT_files}{is the directory where DSSAT files are located. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/outputs_for_econ/revised".}
 
-\item{soil_file}{is the file that contains base soil file. Defaults to "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv".}
-
-\item{well_capacity_file}{is the file that contains base well capacity. Defaults to "C:/Users/manirad/Downloads/test/Well_Capacity_ganarator.csv".}
-
 \item{price_file}{is the file that includes crop prices. Defaults to "C:/Users/manirad/Dropbox/DSSAT subregions work pre-2018 annual meeting/subregion KS files/crop_prices.csv".}
 
 \item{fixed_cost_file}{is the file tha includes fixed costs (per acre) costs of production. Defaults to "C:/Users/manirad/Downloads/test/fixed_cost_input.csv".}
@@ -46,6 +42,10 @@ gen_lookup_subsidy_par_win_mac(
 \item{IFREQ_interpolate}{is the size of interpolation interval. Defaults to 0.1 so that IFREQ_seq of 2 adds 0, 0.1, 0.2, ..., 1.9.}
 
 \item{num_clusters}{is the number of cores for parallelization.}
+
+\item{soil_file}{is the file that contains base soil file. Defaults to "C:/Users/manirad/Downloads/test/Well_Soil Type_generator_07.csv".}
+
+\item{well_capacity_file}{is the file that contains base well capacity. Defaults to "C:/Users/manirad/Downloads/test/Well_Capacity_ganarator.csv".}
 }
 \value{
 returns the output table.
