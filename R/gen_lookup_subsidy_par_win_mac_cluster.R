@@ -607,7 +607,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
       foo_dt_all_3 <- parLapply(cl, (2*floor(aa/4)+1):(3*floor(aa/4)), FN_optim2)
-      foo_dt_all_4 <- parLapply(cl, (3*floor(aa/4)+1):(4*floor(aa/4)), FN_optim2)
+      foo_dt_all_4 <- parLapply(cl, (3*floor(aa/4)+1):aa,              FN_optim2)
       stopCluster(cl)
     }
     else {
