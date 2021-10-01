@@ -628,7 +628,7 @@ gen_lookup_tax_par_win_mac_cluster = function(tax_amount = 1,
       foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
 
-      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):(4*floor(aa/4)), FUN = FN_optim2,
+      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim2,
                                mc.cores = num_clusters)
 
     }

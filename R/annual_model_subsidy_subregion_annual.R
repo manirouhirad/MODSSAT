@@ -35,7 +35,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
                                                  default_well_capacity_col_name = "Well_Capacity(gpm)",
                                                  missing_soil_types = "KS00000007",
                                                  minimum_well_capacity = 0,
-                                                 maximum_well_capacity = 1000,
+                                                 maximum_well_capacity = 800,
                                                  first_year_of_GW = 1997,
                                                  last_year_of_GW = 2007,
                                                  irrigation_season_days = 70)
@@ -92,6 +92,9 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
 
   well_capacity_data[, Well_capacity := ifelse(Well_capacity <= minimum_well_capacity, minimum_well_capacity, Well_capacity)]
   well_capacity_data[, Well_capacity := ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity)]
+  well_capacity_data[, Well_capacity := floor(Well_capacity/well_capacity_intervals)*well_capacity_intervals]
+  well_capacity_data[Well_capacity !=0, Well_capacity := Well_capacity + 1]
+
   lookup_table_all_years_2   = readRDS(look_up_table_inside)
   lookup_table_all_years_2_0 = readRDS(look_up_table_outside)
 

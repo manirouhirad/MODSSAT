@@ -18,7 +18,7 @@ annual_model_subsidy_subregion_annual(
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
   minimum_well_capacity = 0,
-  maximum_well_capacity = 1000,
+  maximum_well_capacity = 800,
   first_year_of_GW = 1997,
   last_year_of_GW = 2007,
   irrigation_season_days = 70

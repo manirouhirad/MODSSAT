@@ -21,8 +21,8 @@
 gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
                                               subsidy_threshold = 1,
                                               DSSAT_files = "./input_files/DSSAT_files",
-                                              soil_file = "./input_files/Well_Soil Type_generator_07_1000.csv",
-                                              well_capacity_file = "./input_files/Well_Capacity_ganarator_1000.csv",
+                                              maximum_well_capacity = 1000,
+                                              well_capacity_intervals = 10,
                                               price_file = "./input_files/crop_prices.csv",
                                               fixed_cost_file = "./input_files/fixed_cost_input.csv",
                                               pumping_cost = 3.21,
@@ -358,30 +358,27 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
                        new = col_new)
   KS_DSSAT[, `:=`(WSTA, substr(WSTA, 1, 4))]
   KS_DSSAT[, `:=`(group, .GRP), by = c("WSTA", "SOIL_ID")]
+  unique_soil = unique(KS_DSSAT[,.(SOIL_ID, WSTA)])
+
   KS_DSSAT_2 = data.table::copy(KS_DSSAT)
   lookup_table_all_years_2 = data.table::data.table()
   lookup_table_quarter_2 = data.table::data.table()
   lookup_table_well_2 = data.table::data.table()
 
   for (i in 1:max(KS_DSSAT_2$group)) {
-    soil_type = data.table::fread(soil_file)
-    soil_type[, `:=`(Soil_Type, KS_DSSAT_2[group == i, unique(SOIL_ID)])]
-    soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
-                                     Soil_Type))]
-    well_capacity = data.table::fread(well_capacity_file)
-    well_capacity = well_capacity[`Well_Capacity(gpm)` <= 801]
+    soil_type = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
+                           Soil_Type = unique_soil[i, SOIL_ID], weather_station = unique_soil[i, WSTA])
+    well_capacity = data.table(Well_ID = seq(1001, (1000+maximum_well_capacity), by=well_capacity_intervals),
+                               `Well_Capacity(gpm)` = seq(1, (maximum_well_capacity), by=well_capacity_intervals))
+
     data.table::setkey(soil_type, Well_ID)
     data.table::setkey(well_capacity, Well_ID)
     well_capacity_data = soil_type[well_capacity]
-    data.table::setnames(well_capacity_data, old = default_well_capacity_col_name,
+    data.table::setnames(well_capacity_data, old= default_well_capacity_col_name,
                          "Well_capacity")
-    WSTAT = data.table(Well_ID = well_capacity_data$Well_ID,
-                       weather_station = KS_DSSAT_2[group == i, unique(WSTA)])
-    data.table::setkey(WSTAT, Well_ID)
-    data.table::setkey(well_capacity_data, Well_ID)
-    well_capacity_data = WSTAT[well_capacity_data]
     well_capacity_data = well_capacity_data[, .(Well_ID,
                                                 Soil_Type, weather_station, Well_capacity)]
+
     price_dt = data.table::fread(price_file)
     data.table::setkey(price_dt, CR)
     cost_dt = well_capacity_data[, .(Well_ID)]
@@ -624,7 +621,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
       foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
 
-      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):(4*floor(aa/4)), FUN = FN_optim2,
+      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim2,
                                mc.cores = num_clusters)
 
     }
