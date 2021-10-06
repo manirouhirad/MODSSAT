@@ -7,14 +7,16 @@
 annual_model_CREP(
   soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
   well_capacity_files = "./Well Capacity",
-  econ_output_folder = "./Econ_output/results with CREP/annual_results/",
+  econ_output_folder = "./Econ_output/results_with_CREP/annual_results",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
+  look_up_table = "lookup_table_all_years_2.rds",
   CREP_wells_data = "./CREP_wells.csv",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
   minimum_well_capacity = 0,
-  maximum_well_capacity = 1000,
+  maximum_well_capacity = 800,
+  well_capacity_intervals = 10,
   first_year_of_GW = 1997,
   last_year_of_GW = 2007,
   irrigation_season_days = 70
@@ -28,6 +30,8 @@ annual_model_CREP(
 \item{econ_output_folder}{is the name of the output folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",}
 
 \item{well_capacity_file_year}{is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",}
+
+\item{look_up_table}{is the lookup table for wells that are inside  the selected policy area.}
 
 \item{CREP_wells_data}{is the file that contains CREP well ID's. This can be set to the wells that you want retired.}
 

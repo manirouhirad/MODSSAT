@@ -8,7 +8,8 @@ gen_output_CREP(
   well_capacity_files = "./Well Capacity",
   well_capacity_for_econ = "./Econ_output/well_capacity.csv",
   first_year_of_simulation = 2000,
-  default_well_capacity_col_name = "Well_Capacity(gpm)"
+  default_well_capacity_col_name = "Well_Capacity(gpm)",
+  sim_id_or_well_num = 1
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ gen_output_CREP(
 \item{first_year_of_simulation}{is the first year that the hydro-economic simulation starts. Defaults to 2000.}
 
 \item{default_well_capacity_col_name}{is the name of the well capacity column generated from the MODFLOW model. Defaults to 'Well_Capacity(gpm)' as this is the original column name we started with.}
+
+\item{sim_id_or_well_num}{is the number id for the simulation or the number of retired wells.}
 }
 \value{
 returns the output table.
