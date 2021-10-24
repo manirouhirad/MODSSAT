@@ -10,7 +10,7 @@
 #' gen_lookup_subsidy(subsidy_amount = 2)
 #' }
 #' @export
-gen_output_subsidy = function (subsidy_amount = 2,
+gen_output_subsidy_nolookup = function (subsidy_amount = 2,
                                subsidy_threshold = 200,
                                well_capacity_files = "./Well Capacity",
                                well_capacity_for_econ = "./Econ_output/well_capacity.csv",
