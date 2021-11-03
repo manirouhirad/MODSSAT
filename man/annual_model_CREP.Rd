@@ -11,6 +11,8 @@ annual_model_CREP(
   well_capacity_file_year = "./KS_DSSAT_output.csv",
   look_up_table = "lookup_table_all_years_2.rds",
   CREP_wells_data = "./CREP_wells.csv",
+  base_year_well_capacity = "./Well_Capacity.csv",
+  which_year_well_capacity = "./Well Capacity/",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
@@ -34,6 +36,10 @@ annual_model_CREP(
 \item{look_up_table}{is the lookup table for wells that are inside  the selected policy area.}
 
 \item{CREP_wells_data}{is the file that contains CREP well ID's. This can be set to the wells that you want retired.}
+
+\item{base_year_well_capacity}{is the base year well capacity.}
+
+\item{which_year_well_capacity}{is the well capacity that determines which year the model is in.}
 
 \item{first_year_of_simulation}{is the first year that the hydro-economic simulation starts. Defaults to 2000.}
 

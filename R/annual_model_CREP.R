@@ -5,6 +5,8 @@
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
 #' @param look_up_table                  is the lookup table for wells that are inside  the selected policy area.
 #' @param CREP_wells_data                is the file that contains CREP well ID's. This can be set to the wells that you want retired.
+#' @param base_year_well_capacity        is the base year well capacity.
+#' @param which_year_well_capacity       is the well capacity that determines which year the model is in.
 #' @param first_year_of_simulation       is the first year that the hydro-economic simulation starts. Defaults to 2000.
 #' @param default_well_capacity_col_name is the name of the well capacity column generated from the MODFLOW model. Defaults to 'Well_Capacity(gpm)' as this is the original column name we started with.
 #' @param missing_soil_types             is the soil type that is assigned to missing soil types for wells. Defaults to "KS00000007".
@@ -22,6 +24,8 @@ annual_model_CREP = function(soil_weather_file = "./input_files/Well_SoilType_We
                              well_capacity_file_year = "./KS_DSSAT_output.csv",
                              look_up_table  = "lookup_table_all_years_2.rds",
                              CREP_wells_data = "./CREP_wells.csv",
+                             base_year_well_capacity = "./Well_Capacity.csv",
+                             which_year_well_capacity= "./Well Capacity/",
                              first_year_of_simulation = 2000,
                              default_well_capacity_col_name = "Well_Capacity(gpm)",
                              missing_soil_types = "KS00000007",
@@ -61,8 +65,9 @@ annual_model_CREP = function(soil_weather_file = "./input_files/Well_SoilType_We
   #                                                               "_Well_Capacity.csv")))), list(rbind(well_capacity,
   #                                                                                                    fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread("Well_Capacity.csv"))), list(rbind(well_capacity,
-                                                                                                     fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
+                         list(rbind(well_capacity, fread(base_year_well_capacity))),
+                         list(rbind(well_capacity, fread(paste0(which_year_well_capacity, year_dt, "_Capacity.csv")))))
+
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
   setkey(soil_type, Well_ID)
