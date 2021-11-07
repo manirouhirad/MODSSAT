@@ -30,7 +30,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
                                               soil_moisture_targets = c(25, 35, 45, 55, 65, 75),
                                               IFREQ_seq = 2,
                                               IFREQ_interpolate = 0.1,
-                                              num_clusters = parallel::detectCores()-2
+                                              num_clusters = 6
 )
 {
   library(data.table)
@@ -588,6 +588,9 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
     # well_capacity_data[, `:=`(group_1, .GRP), by = c("Well_ID", "tot_acres", "SDAT")]
     # well_capacity_data[, `:=`(group_2, 1:.N), by = c("Well_ID", "tot_acres", "SDAT", "quarter")]
     aa = max(well_capacity_data$Well_ID_grp)
+
+    well_capacity_data[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
+
 
     foo_irr_2 = merge(well_capacity_data, KS_DSSAT, by.x = c("Soil_Type",
                                                              "weather_station", "CR", "ifreq"), by.y = c("SOIL_ID",
