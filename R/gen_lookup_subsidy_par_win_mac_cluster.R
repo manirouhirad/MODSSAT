@@ -75,7 +75,7 @@ gen_lookup_subsidy_par_win_mac_cluster = function(subsidy_amount = 1,
     # foo_irr_3[, ifreq_denom := ifreq/.2]
     # foo_irr_3 = foo_irr_3[ifreq_denom %in% 0:200]
 
-    foo_irr_3[ifreq == KS_DSSAT[, max(IFREQ)], profit := profit/4]
+    foo_irr_3[ifreq == KS_DSSAT[, max(IFREQ)], profit := profit/10]
 
     rm(foo_irr_3_N0, foo_irr_3_0)
 
