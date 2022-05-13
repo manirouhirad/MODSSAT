@@ -89,7 +89,7 @@ annual_model_tax_CO_2 = function (tax_amount = 1,
   well_capacity_data = well_capacity_data[authorized_gpm_dt]
   well_capacity_data[, `:=`(authorized_rate, round(authorized_rate))]
   well_capacity_data[Well_capacity > authorized_rate,
-                     `:=`(authorized_rate, Well_capacity)]
+                     `:=`(Well_capacity, authorized_rate)]
   well_capacity_data[, `:=`(well_capacity_org, Well_capacity)]
   well_capacity_data[Well_capacity <= minimum_well_capacity,
                      `:=`(Well_capacity, minimum_well_capacity)]
