@@ -20,4 +20,4 @@ Imports:
 	scales (>= 1.1.0),
 	foreign (>= 0.8.72),
 	AER (>= 1.2.8)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
