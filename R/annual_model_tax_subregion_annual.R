@@ -27,24 +27,23 @@
 
 
 annual_model_tax_subregion_annual = function(tax_amount = 21,
-                                                 subsidy_threshold = 1500,
-                                                 soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
-                                                 well_capacity_files = "./Well Capacity",
-                                                 econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
-                                                 well_capacity_file_year = "./KS_DSSAT_output.csv",
-                                                 subregion_file = "./input_files/all_well_IDs_small.csv",
-                                                 look_up_table_inside  = "lookup_table_all_years_2.rds",
-                                                 look_up_table_outside = "lookup_table_all_years_2_0.rds",
-                                                 base_year_well_capacity = "./Well_Capacity.csv",
-                                                 which_year_well_capacity= "./Well Capacity/",
-                                                 first_year_of_simulation = 2000,
-                                                 default_well_capacity_col_name = "Well_Capacity(gpm)",
-                                                 missing_soil_types = "KS00000007",
-                                                 minimum_well_capacity = 0,
-                                                 maximum_well_capacity = 1000,
-                                                 first_year_of_GW = 1997,
-                                                 last_year_of_GW = 2007,
-                                                 irrigation_season_days = 70)
+                                             soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
+                                             well_capacity_files = "./Well Capacity",
+                                             econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
+                                             well_capacity_file_year = "./KS_DSSAT_output.csv",
+                                             subregion_file = "./input_files/all_well_IDs_small.csv",
+                                             look_up_table_inside  = "lookup_table_all_years_2.rds",
+                                             look_up_table_outside = "lookup_table_all_years_2_0.rds",
+                                             base_year_well_capacity = "./Well_Capacity.csv",
+                                             which_year_well_capacity= "./Well Capacity/",
+                                             first_year_of_simulation = 2000,
+                                             default_well_capacity_col_name = "Well_Capacity(gpm)",
+                                             missing_soil_types = "KS00000007",
+                                             minimum_well_capacity = 0,
+                                             maximum_well_capacity = 1000,
+                                             first_year_of_GW = 1997,
+                                             last_year_of_GW = 2007,
+                                             irrigation_season_days = 70)
 {
   library(data.table)
   tax_amount     = (tax_amount - 1)/10

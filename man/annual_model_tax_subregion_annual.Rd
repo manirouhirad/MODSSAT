@@ -6,7 +6,6 @@
 \usage{
 annual_model_tax_subregion_annual(
   tax_amount = 21,
-  subsidy_threshold = 1500,
   soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
   well_capacity_files = "./Well Capacity",
   econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
