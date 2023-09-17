@@ -94,8 +94,6 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   well_capacity_data[is.na(weather_station), `:=`(weather_station, well_capacity_data[1,weather_station])]
   well_capacity_data = well_capacity_data[!is.na(weather_station)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
-
-
   well_capacity_data[, Well_capacity := ifelse(Well_capacity <= minimum_well_capacity, minimum_well_capacity, Well_capacity)]
   well_capacity_data[, Well_capacity := ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity)]
   well_capacity_data[, Well_capacity := floor(Well_capacity/well_capacity_intervals)*well_capacity_intervals]

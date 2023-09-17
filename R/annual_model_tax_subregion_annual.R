@@ -1,6 +1,5 @@
 #' This function produces annual amounts of water use and profits.
-#' @param tax_amount                 is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.
-#' @param subsidy_threshold              is the threshold of subsidy, i.e., the amount of groundwater extraction above which subsidy is zero. Defaults to 400.
+#' @param tax_amount                     is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.
 #' @param soil_weather_file              is the file that contains the soil types and weather station for each well in the region. Defaults to "./input_files/Well_SoilType_WeatherStation.csv".
 #' @param well_capacity_files            is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".
 #' @param econ_output_folder             is the name of the folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
@@ -8,6 +7,8 @@
 #' @param subregion_file                 is the subset of wells that the subsidy is applied to. The rest of the wells adjust their water use only due to changes in aquifer levels.
 #' @param look_up_table_inside           is the lookup table for wells that are inside  the selected policy area or are   affected by the policy.
 #' @param look_up_table_outside          is the lookup table for wells that are outside the selected policy area or are unaffected by the policy.
+#' @param base_year_well_capacity        is the base year well capacity.
+#' @param which_year_well_capacity       is the well capacity that determines which year the model is in.
 #' @param first_year_of_simulation       is the first year that the hydro-economic simulation starts. Defaults to 2000.
 #' @param default_well_capacity_col_name is the name of the well capacity column generated from the MODFLOW model. Defaults to 'Well_Capacity(gpm)' as this is the original column name we started with.
 #' @param missing_soil_types             is the soil type that is assigned to missing soil types for wells. Defaults to "KS00000007".
@@ -22,6 +23,9 @@
 #' gen_lookup_subsidy(tax_amount = 2)
 #' }
 #' @export
+
+
+
 annual_model_tax_subregion_annual = function(tax_amount = 21,
                                                  subsidy_threshold = 1500,
                                                  soil_weather_file = "./input_files/Well_SoilType_WeatherStation.csv",
@@ -31,6 +35,8 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
                                                  subregion_file = "./input_files/all_well_IDs_small.csv",
                                                  look_up_table_inside  = "lookup_table_all_years_2.rds",
                                                  look_up_table_outside = "lookup_table_all_years_2_0.rds",
+                                                 base_year_well_capacity = "./Well_Capacity.csv",
+                                                 which_year_well_capacity= "./Well Capacity/",
                                                  first_year_of_simulation = 2000,
                                                  default_well_capacity_col_name = "Well_Capacity(gpm)",
                                                  missing_soil_types = "KS00000007",
@@ -40,7 +46,8 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
                                                  last_year_of_GW = 2007,
                                                  irrigation_season_days = 70)
 {
-  tax_amount = (tax_amount - 1)/10
+  library(data.table)
+  tax_amount     = (tax_amount - 1)/10
   soil_type = fread(soil_weather_file)
   soil_type[, `:=`(Soil_Type, gsub("KSFC00000", "KS0000000",
                                    Soil_Type))]
@@ -68,8 +75,8 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   #                                                               "_Well_Capacity.csv")))), list(rbind(well_capacity,
   #                                                                                                    fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
   well_capacity = ifelse(year_dt == first_year_of_simulation,
-                         list(rbind(well_capacity, fread("Well_Capacity.csv"))), list(rbind(well_capacity,
-                                                                                                     fread(paste0("./Well Capacity/", year_dt, "_Capacity.csv")))))
+                         list(rbind(well_capacity, fread(base_year_well_capacity))),
+                         list(rbind(well_capacity, fread(paste0(which_year_well_capacity, year_dt, "_Capacity.csv")))))
   well_capacity = data.table(well_capacity[[1]])
   well_capacity = well_capacity[complete.cases(Well_ID)]
   setkey(soil_type, Well_ID)
@@ -87,10 +94,11 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   well_capacity_data[is.na(weather_station), `:=`(weather_station, well_capacity_data[1,weather_station])]
   well_capacity_data = well_capacity_data[!is.na(weather_station)]
   well_capacity_data[, `:=`(Well_capacity, round(Well_capacity))]
-
-
   well_capacity_data[, Well_capacity := ifelse(Well_capacity <= minimum_well_capacity, minimum_well_capacity, Well_capacity)]
   well_capacity_data[, Well_capacity := ifelse(Well_capacity >= maximum_well_capacity, maximum_well_capacity, Well_capacity)]
+  well_capacity_data[, Well_capacity := floor(Well_capacity/well_capacity_intervals)*well_capacity_intervals]
+  well_capacity_data[Well_capacity !=0, Well_capacity := Well_capacity + 1]
+
   lookup_table_all_years_2   = readRDS(look_up_table_inside)
   lookup_table_all_years_2_0 = readRDS(look_up_table_outside)
 
@@ -144,7 +152,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
 
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(tax_amnt, tax_amount)]
-  econ_output[, `:=`(subsidy_thshld, subsidy_threshold)]
+
   econ_output[, year := year_2]
   # econ_output_in = fread("./Econ_output/KS_DSSAT_output_tax.csv")
   # econ_output = rbind(econ_output_in, econ_output)
@@ -152,7 +160,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
                                                 0)]
   well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
                                                     output_rate_acin_day)]
-  write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", tax_amount, "_", subsidy_threshold, "_", year_2, ".csv"), row.names = FALSE)
+  write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", tax_amount, "_", year_2, ".csv"), row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
 

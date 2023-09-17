@@ -14,6 +14,8 @@ annual_model_tax_subregion_annual(
   subregion_file = "./input_files/all_well_IDs_small.csv",
   look_up_table_inside = "lookup_table_all_years_2.rds",
   look_up_table_outside = "lookup_table_all_years_2_0.rds",
+  base_year_well_capacity = "./Well_Capacity.csv",
+  which_year_well_capacity = "./Well Capacity/",
   first_year_of_simulation = 2000,
   default_well_capacity_col_name = "Well_Capacity(gpm)",
   missing_soil_types = "KS00000007",
@@ -26,8 +28,6 @@ annual_model_tax_subregion_annual(
 }
 \arguments{
 \item{tax_amount}{is the amount of subsidy per acre-inch of groundwater extracted. Defaults to 1.}
-
-\item{subsidy_threshold}{is the threshold of subsidy, i.e., the amount of groundwater extraction above which subsidy is zero. Defaults to 400.}
 
 \item{soil_weather_file}{is the file that contains the soil types and weather station for each well in the region. Defaults to "./input_files/Well_SoilType_WeatherStation.csv".}
 
@@ -42,6 +42,10 @@ annual_model_tax_subregion_annual(
 \item{look_up_table_inside}{is the lookup table for wells that are inside  the selected policy area or are   affected by the policy.}
 
 \item{look_up_table_outside}{is the lookup table for wells that are outside the selected policy area or are unaffected by the policy.}
+
+\item{base_year_well_capacity}{is the base year well capacity.}
+
+\item{which_year_well_capacity}{is the well capacity that determines which year the model is in.}
 
 \item{first_year_of_simulation}{is the first year that the hydro-economic simulation starts. Defaults to 2000.}
 
