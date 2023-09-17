@@ -22,6 +22,7 @@ annual_model_tax_subregion_annual(
   maximum_well_capacity = 1000,
   first_year_of_GW = 1997,
   last_year_of_GW = 2007,
+  well_capacity_intervals = 10,
   irrigation_season_days = 70
 )
 }
@@ -59,6 +60,8 @@ annual_model_tax_subregion_annual(
 \item{first_year_of_GW}{is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.}
 
 \item{last_year_of_GW}{is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.}
+
+\item{well_capacity_intervals}{is the intervals in well capacities. Defaults to 20.}
 
 \item{irrigation_season_days}{Number of days in an irrigation season. Defaults to 70.}
 }
