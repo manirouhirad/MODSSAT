@@ -141,13 +141,12 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
 
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)],
-                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)])
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[,   .(Well_ID,      Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_sub)],
+                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_sub)])
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
 
   setkey(lookup_table_all_years_2, Well_ID)
-  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,
-                                             tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, output_rate_acin_day)]
+  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_sub, output_rate_acin_day)]
 
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(tax_amnt, tax_amount)]
@@ -157,8 +156,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   # econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
-  well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
-                                                    output_rate_acin_day)]
+  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day)]
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", tax_amount, "_", year_2, ".csv"), row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
