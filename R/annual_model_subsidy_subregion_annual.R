@@ -18,6 +18,7 @@
 #' @param first_year_of_GW               is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.
 #' @param last_year_of_GW                is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
+#' @param capital_cost                   The cost of capital.
 #' @param well_capacity_intervals        is the intervals in well capacities. Defaults to 20.
 #' @return                               returns the output table.
 #' @examples
@@ -44,6 +45,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
                                                  first_year_of_GW = 1997,
                                                  last_year_of_GW = 2007,
                                                  well_capacity_intervals = 10,
+                                                 capital_cost = (64 + 42-48) * 130,
                                                  irrigation_season_days = 70)
 {
   library(data.table)
@@ -122,10 +124,23 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
                                                                                                        (-1 + 2*(last_year_of_GW - first_year_of_GW+1)), ifelse(file_name > (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)) & file_name <= (last_year_of_GW-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name -
                                                                                                                                                                  (-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name - (-1 + 4*(last_year_of_GW - first_year_of_GW+1)))))))]
   year_dt = year_dt$file_name
-  lookup_table_all_years_2   = lookup_table_all_years_2[SDAT ==
-                                                          year_dt]
-  lookup_table_all_years_2_0 = lookup_table_all_years_2_0[SDAT ==
-                                                            year_dt]
+
+  setkey(lookup_table_all_years_2,      WSTA,   SOIL_ID, Well_capacity)
+  setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
+  lookup_table_all_years_2_exp  = lookup_table_all_years_2[well_capacity_data, allow.cartesian=T]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub := profit_Well_ID_sub - capital_cost]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub := mean(profit_Well_ID_sub), by="Well_ID"]
+  lookup_table_all_years_2_exp = unique(lookup_table_all_years_2_exp,            by="Well_ID")
+  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_sub < 0 | tot_acres == 0, 1, 0)]
+  lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
+
+  lookup_table_all_years_2   = lookup_table_all_years_2[  SDAT == year_dt]
+  lookup_table_all_years_2_0 = lookup_table_all_years_2_0[SDAT == year_dt]
+
+  setkey(well_capacity_data,           Well_ID)
+  setkey(lookup_table_all_years_2_exp, Well_ID)
+  well_capacity_data = well_capacity_data[lookup_table_all_years_2_exp]
+  well_capacity_data[exit == 1, Well_capacity := 0]
 
   setkey(lookup_table_all_years_2,   WSTA, SOIL_ID, Well_capacity)
   setkey(lookup_table_all_years_2_0, WSTA, SOIL_ID, Well_capacity)
@@ -135,31 +150,30 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
 
   wells_subregion = fread(subregion_file)
   wells_subregion[, id := 1]
-  setkey(lookup_table_all_years_2, Well_ID)
+  setkey(lookup_table_all_years_2,   Well_ID)
   setkey(lookup_table_all_years_2_0, Well_ID)
   setkey(wells_subregion, V1)
   lookup_table_all_years_2 = lookup_table_all_years_2[wells_subregion]
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
 
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)],
-                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub)])
-  lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
 
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
+                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit = 0)])
+  lookup_table_all_years_2 = lookup_table_all_years_2[complete.cases(Well_ID)]
+  lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
   setkey(lookup_table_all_years_2, Well_ID)
-  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,
-                                             tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, output_rate_acin_day)]
+  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit, output_rate_acin_day)]
 
   econ_output[, `:=`(row, 1:.N)]
-  econ_output[, `:=`(subsidy_amnt, subsidy_amount)]
+  econ_output[, `:=`(subsidy_amnt,   subsidy_amount)]
   econ_output[, `:=`(subsidy_thshld, subsidy_threshold)]
   econ_output[, year := year_2]
   # econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
   # econ_output = rbind(econ_output_in, econ_output)
   econ_output[is.na(output_rate_acin_day), `:=`(output_rate_acin_day,
                                                 0)]
-  well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
-                                                    output_rate_acin_day)]
+  well_capacity_data = lookup_table_all_years_2[, .(Well_ID, output_rate_acin_day)]
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", subsidy_amount, "_", subsidy_threshold, "_", year_2, ".csv"), row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
