@@ -140,6 +140,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   setkey(well_capacity_data,           Well_ID)
   setkey(lookup_table_all_years_2_exp, Well_ID)
   well_capacity_data = well_capacity_data[lookup_table_all_years_2_exp]
+  well_capacity_data[, Well_capacity_2 := Well_capacity]
   well_capacity_data[exit == 1, Well_capacity := 0]
 
   setkey(lookup_table_all_years_2,   WSTA, SOIL_ID, Well_capacity)
@@ -158,7 +159,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
 
 
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity= Well_capacity_2, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
                                      lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit = 0)])
   lookup_table_all_years_2 = lookup_table_all_years_2[complete.cases(Well_ID)]
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
