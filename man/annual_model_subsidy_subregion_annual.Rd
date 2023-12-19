@@ -12,6 +12,7 @@ annual_model_subsidy_subregion_annual(
   econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
   subregion_file = "./input_files/all_well_IDs_small.csv",
+  dryland_profit_file = "./input_files/dryland_profits.rds",
   look_up_table_inside = "lookup_table_all_years_2.rds",
   look_up_table_outside = "lookup_table_all_years_2_0.rds",
   base_year_well_capacity = "./Well_Capacity.csv",
@@ -42,6 +43,8 @@ annual_model_subsidy_subregion_annual(
 \item{well_capacity_file_year}{is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",}
 
 \item{subregion_file}{is the subset of wells that the subsidy is applied to. The rest of the wells adjust their water use only due to changes in aquifer levels.}
+
+\item{dryland_profit_file}{is the profit of dryland wells.}
 
 \item{look_up_table_inside}{is the lookup table for wells that are inside  the selected policy area or are   affected by the policy.}
 

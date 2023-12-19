@@ -6,6 +6,7 @@
 #' @param econ_output_folder             is the name of the folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
 #' @param subregion_file                 is the subset of wells that the subsidy is applied to. The rest of the wells adjust their water use only due to changes in aquifer levels.
+#' @param dryland_profit_file            is the profit of dryland wells.
 #' @param look_up_table_inside           is the lookup table for wells that are inside  the selected policy area or are   affected by the policy.
 #' @param look_up_table_outside          is the lookup table for wells that are outside the selected policy area or are unaffected by the policy.
 #' @param base_year_well_capacity        is the base year well capacity.
@@ -17,9 +18,9 @@
 #' @param maximum_well_capacity          is the maximum well capacity in the model. If well capacity falls above this capacity, it is set to this maximum. Defaults to 3000 gallons per minute.
 #' @param first_year_of_GW               is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.
 #' @param last_year_of_GW                is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.
-#' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
-#' @param capital_cost                   The cost of capital.
 #' @param well_capacity_intervals        is the intervals in well capacities. Defaults to 20.
+#' @param capital_cost                   The cost of capital.
+#' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @examples
 #' \dontrun{
@@ -33,6 +34,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
                                                  econ_output_folder = "./Econ_output/results_with_subsidy/annual_results/",
                                                  well_capacity_file_year = "./KS_DSSAT_output.csv",
                                                  subregion_file = "./input_files/all_well_IDs_small.csv",
+                                                 dryland_profit_file = "./input_files/dryland_profits.rds",
                                                  look_up_table_inside    = "lookup_table_all_years_2.rds",
                                                  look_up_table_outside   = "lookup_table_all_years_2_0.rds",
                                                  base_year_well_capacity = "./Well_Capacity.csv",
@@ -128,26 +130,47 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   setkey(lookup_table_all_years_2,      WSTA,   SOIL_ID, Well_capacity)
   setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
   lookup_table_all_years_2_exp  = lookup_table_all_years_2[well_capacity_data, allow.cartesian=T]
-  lookup_table_all_years_2_exp[, profit_Well_ID_sub := profit_Well_ID_sub - capital_cost]
-  lookup_table_all_years_2_exp[, profit_Well_ID_sub := mean(profit_Well_ID_sub), by="Well_ID"]
-  lookup_table_all_years_2_exp = unique(lookup_table_all_years_2_exp,            by="Well_ID")
-  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_sub < 0 | tot_acres == 0, 1, 0)]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := profit_Well_ID_sub - capital_cost]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := mean(profit_Well_ID_sub), by="Well_ID"]
+  lookup_table_all_years_2_exp[, profit_Well_ID       := mean(profit_Well_ID),     by="Well_ID"]
+  lookup_table_all_years_2_exp = unique(lookup_table_all_years_2_exp,              by="Well_ID")
+
+  dryland_profits = readRDS(dryland_profit_file)
+  dryland_profits[, mean_profit_dryland  := sum(mean_profit_dryland), by=c("SOIL_ID", "SDAT")]
+  dryland_profits = unique(dryland_profits,                           by=c("SOIL_ID"))
+  dryland_profits = dryland_profits[,.(SOIL_ID, mean_profit_dryland)]
+
+  setkey(lookup_table_all_years_2_exp, SOIL_ID)
+  setkey(dryland_profits,              SOIL_ID)
+  lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[dryland_profits]
+
+  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_sub < mean_profit_dryland | tot_acres == 0, 1, 0)]
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
+
+  dryland_profits = readRDS(dryland_profit_file)
+  dryland_profits[, profit_dryland  := sum(profit), by=c("SOIL_ID", "SDAT")]
+  dryland_profits = unique(dryland_profits,         by=c("SOIL_ID", "SDAT"))
+  dryland_profits = dryland_profits[,.(SOIL_ID, SDAT, profit_dryland)]
 
   lookup_table_all_years_2   = lookup_table_all_years_2[  SDAT == year_dt]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[SDAT == year_dt]
+  dryland_profits            = dryland_profits[           SDAT == year_dt]
 
   setkey(well_capacity_data,           Well_ID)
   setkey(lookup_table_all_years_2_exp, Well_ID)
   well_capacity_data = well_capacity_data[lookup_table_all_years_2_exp]
-  well_capacity_data[, Well_capacity_2 := Well_capacity]
-  well_capacity_data[exit == 1, Well_capacity := 0]
 
   setkey(lookup_table_all_years_2,   WSTA, SOIL_ID, Well_capacity)
   setkey(lookup_table_all_years_2_0, WSTA, SOIL_ID, Well_capacity)
   setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
   lookup_table_all_years_2   = lookup_table_all_years_2[well_capacity_data]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[well_capacity_data]
+
+  setkey(lookup_table_all_years_2,   SOIL_ID, SDAT)
+  setkey(lookup_table_all_years_2_0, SOIL_ID, SDAT)
+  setkey(dryland_profits,            SOIL_ID, SDAT)
+  lookup_table_all_years_2   = lookup_table_all_years_2[dryland_profits]
+  lookup_table_all_years_2_0 = lookup_table_all_years_2_0[dryland_profits]
 
   wells_subregion = fread(subregion_file)
   wells_subregion[, id := 1]
@@ -157,9 +180,9 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   lookup_table_all_years_2 = lookup_table_all_years_2[wells_subregion]
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
+  lookup_table_all_years_2[exit == 1, profit_Well_ID_sub := profit_dryland]
 
-
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity= Well_capacity_2, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
                                      lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit = 0)])
   lookup_table_all_years_2 = lookup_table_all_years_2[complete.cases(Well_ID)]
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
