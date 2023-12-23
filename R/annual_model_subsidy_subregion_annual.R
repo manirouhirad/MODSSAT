@@ -46,7 +46,7 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
                                                  maximum_well_capacity = 800,
                                                  first_year_of_GW = 1997,
                                                  last_year_of_GW = 2007,
-                                                 well_capacity_intervals = 10,
+                                                 well_capacity_intervals = 20,
                                                  capital_cost = (64 + 42-48) * 130,
                                                  irrigation_season_days = 70)
 {
@@ -181,6 +181,8 @@ annual_model_subsidy_subregion_annual = function(subsidy_amount = 1,
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
   lookup_table_all_years_2[exit == 1, profit_Well_ID_sub := profit_dryland]
+  lookup_table_all_years_2[exit == 1, irr_tot_acres      := 0]
+  lookup_table_all_years_2[exit == 1, tot_acres          := 0]
 
   lookup_table_all_years_2   = rbind(lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit)],
                                      lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, irr_below, profit_Well_ID, profit_Well_ID_sub, exit = 0)])

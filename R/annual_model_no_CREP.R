@@ -3,6 +3,7 @@
 #' @param well_capacity_files            is the directory where well capacity files are located. Defaults to "C:/Users/manirad/Downloads/test/Well Capacity".
 #' @param econ_output_folder             is the name of the output folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",
 #' @param well_capacity_file_year        is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",
+#' @param dryland_profit_file            is the profit of dryland wells.
 #' @param look_up_table                  is the lookup table for wells that are inside  the selected policy area.
 #' @param CREP_wells_data                is the file that contains CREP well ID's. This can be set to the wells that you want retired.
 #' @param base_year_well_capacity        is the base year well capacity.
@@ -15,6 +16,7 @@
 #' @param irrigation_season_days         is the number of days in an irrigation season. Defaults to 70.
 #' @param first_year_of_GW               is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.
 #' @param last_year_of_GW                is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.
+#' @param capital_cost                   The cost of capital.
 #' @param irrigation_season_days         Number of days in an irrigation season. Defaults to 70.
 #' @return                               returns the output table.
 #' @export
@@ -22,6 +24,7 @@ annual_model_no_CREP = function(soil_weather_file = "./input_files/Well_SoilType
                                well_capacity_files = "./Well Capacity",
                                econ_output_folder = "./Econ_output/results_with_CREP/annual_results",
                                well_capacity_file_year = "./KS_DSSAT_output.csv",
+                               dryland_profit_file = "./input_files/dryland_profits.rds",
                                look_up_table  = "lookup_table_all_years_2.rds",
                                CREP_wells_data = "./CREP_wells.csv",
                                base_year_well_capacity = "./Well_Capacity.csv",
@@ -34,6 +37,7 @@ annual_model_no_CREP = function(soil_weather_file = "./input_files/Well_SoilType
                                well_capacity_intervals = 10,
                                first_year_of_GW = 1997,
                                last_year_of_GW = 2007,
+                               capital_cost = (64 + 42-48) * 130,
                                irrigation_season_days = 70
 )
 {
@@ -128,15 +132,56 @@ annual_model_no_CREP = function(soil_weather_file = "./input_files/Well_SoilType
                                                                                                        (-1 + 2*(last_year_of_GW - first_year_of_GW+1)), ifelse(file_name > (last_year_of_GW-1 + 2*(last_year_of_GW - first_year_of_GW+1)) & file_name <= (last_year_of_GW-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name -
                                                                                                                                                                  (-1 + 3*(last_year_of_GW - first_year_of_GW+1)), file_name - (-1 + 4*(last_year_of_GW - first_year_of_GW+1)))))))]
   year_dt = year_dt$file_name
-  lookup_table_all_years_2 = lookup_table_all_years_2[SDAT ==
-                                                        year_dt]
-  setkey(lookup_table_all_years_2, SOIL_ID, Well_capacity)
-  setkey(well_capacity_data, Soil_Type, Well_capacity)
-  lookup_table_all_years_2 = lookup_table_all_years_2[well_capacity_data]
+
+  setkey(lookup_table_all_years_2,      WSTA,   SOIL_ID, Well_capacity)
+  setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
+  lookup_table_all_years_2_exp  = lookup_table_all_years_2[well_capacity_data, allow.cartesian=T]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := profit_Well_ID_sub - capital_cost]
+  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := mean(profit_Well_ID_sub), by="Well_ID"]
+  lookup_table_all_years_2_exp[, profit_Well_ID       := mean(profit_Well_ID),     by="Well_ID"]
+  lookup_table_all_years_2_exp = unique(lookup_table_all_years_2_exp,              by="Well_ID")
+
+  dryland_profits = readRDS(dryland_profit_file)
+  dryland_profits[, mean_profit_dryland  := sum(mean_profit_dryland), by=c("SOIL_ID", "SDAT")]
+  dryland_profits = unique(dryland_profits,                           by=c("SOIL_ID"))
+  dryland_profits = dryland_profits[,.(SOIL_ID, mean_profit_dryland)]
+
+  setkey(lookup_table_all_years_2_exp, SOIL_ID)
+  setkey(dryland_profits,              SOIL_ID)
+  lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[dryland_profits]
+
+  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_sub < mean_profit_dryland | tot_acres == 0, 1, 0)]
+  lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
+
+  dryland_profits = readRDS(dryland_profit_file)
+  dryland_profits[, profit_dryland  := sum(profit), by=c("SOIL_ID", "SDAT")]
+  dryland_profits = unique(dryland_profits,         by=c("SOIL_ID", "SDAT"))
+  dryland_profits = dryland_profits[,.(SOIL_ID, SDAT, profit_dryland)]
+
+
+
+  lookup_table_all_years_2 = lookup_table_all_years_2[SDAT == year_dt]
+  dryland_profits          = dryland_profits[         SDAT == year_dt]
+
+  setkey(well_capacity_data,           Well_ID)
+  setkey(lookup_table_all_years_2_exp, Well_ID)
+  well_capacity_data = well_capacity_data[lookup_table_all_years_2_exp]
+
+  setkey(lookup_table_all_years_2,   WSTA, SOIL_ID, Well_capacity)
+  setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
+  lookup_table_all_years_2   = lookup_table_all_years_2[well_capacity_data]
+
+  setkey(lookup_table_all_years_2,   SOIL_ID, SDAT)
+  setkey(dryland_profits,            SOIL_ID, SDAT)
+  lookup_table_all_years_2   = lookup_table_all_years_2[dryland_profits]
+  lookup_table_all_years_2[exit == 1, profit_Well_ID_sub := profit_dryland]
+  lookup_table_all_years_2[exit == 1, irr_tot_acres      := 0]
+  lookup_table_all_years_2[exit == 1, tot_acres          := 0]
+
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
   econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,
                                              tot_acres, irr_tot_acres, profit_Well_ID,
-                                             output_rate_acin_day)]
+                                             output_rate_acin_day, exit)]
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, year := year_2]
   # econ_output_in = fread("./Econ_output/KS_DSSAT_output.csv")
@@ -146,10 +191,7 @@ annual_model_no_CREP = function(soil_weather_file = "./input_files/Well_SoilType
                                                 0)]
   well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
                                                     output_rate_acin_day)]
-
+  well_capacity_data = rbind(well_capacity_data, well_capacity_data_NA_wells[,.(Well_ID = V1, output_rate_acin_day = 0)])
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", year_2, ".csv"), row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
-
-
-

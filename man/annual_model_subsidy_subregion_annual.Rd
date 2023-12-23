@@ -24,7 +24,7 @@ annual_model_subsidy_subregion_annual(
   maximum_well_capacity = 800,
   first_year_of_GW = 1997,
   last_year_of_GW = 2007,
-  well_capacity_intervals = 10,
+  well_capacity_intervals = 20,
   capital_cost = (64 + 42 - 48) * 130,
   irrigation_season_days = 70
 )

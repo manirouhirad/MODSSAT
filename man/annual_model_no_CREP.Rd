@@ -9,6 +9,7 @@ annual_model_no_CREP(
   well_capacity_files = "./Well Capacity",
   econ_output_folder = "./Econ_output/results_with_CREP/annual_results",
   well_capacity_file_year = "./KS_DSSAT_output.csv",
+  dryland_profit_file = "./input_files/dryland_profits.rds",
   look_up_table = "lookup_table_all_years_2.rds",
   CREP_wells_data = "./CREP_wells.csv",
   base_year_well_capacity = "./Well_Capacity.csv",
@@ -21,6 +22,7 @@ annual_model_no_CREP(
   well_capacity_intervals = 10,
   first_year_of_GW = 1997,
   last_year_of_GW = 2007,
+  capital_cost = (64 + 42 - 48) * 130,
   irrigation_season_days = 70
 )
 }
@@ -32,6 +34,8 @@ annual_model_no_CREP(
 \item{econ_output_folder}{is the name of the output folder that contains irrigated acres, irrigation, and profits for each well. Defaults to "C:/Users/manirad/Downloads/test/Econ_output/KS_DSSAT_output.csv",}
 
 \item{well_capacity_file_year}{is the name of the output file that contains irrigation for each well which will be used by MODFLOW. Defaults to "C:/Users/manirad/Downloads/test/KS_DSSAT_output.csv",}
+
+\item{dryland_profit_file}{is the profit of dryland wells.}
 
 \item{look_up_table}{is the lookup table for wells that are inside  the selected policy area.}
 
@@ -54,6 +58,8 @@ annual_model_no_CREP(
 \item{first_year_of_GW}{is the first year that the GW model exists. This may be different than the first year of simulation. Defaults to 1997.}
 
 \item{last_year_of_GW}{is the last  year that the GW model exists. This may be different than the last  year of simulation. Defaults to 2007.}
+
+\item{capital_cost}{The cost of capital.}
 
 \item{irrigation_season_days}{Number of days in an irrigation season. Defaults to 70.}
 }
