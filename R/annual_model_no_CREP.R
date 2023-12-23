@@ -191,7 +191,7 @@ annual_model_no_CREP = function(soil_weather_file = "./input_files/Well_SoilType
                                                 0)]
   well_capacity_data = lookup_table_all_years_2[, .(Well_ID,
                                                     output_rate_acin_day)]
-  well_capacity_data = rbind(well_capacity_data, well_capacity_data_NA_wells[,.(Well_ID = V1, output_rate_acin_day = 0)])
+  # well_capacity_data = rbind(well_capacity_data, well_capacity_data_NA_wells[,.(Well_ID = V1, output_rate_acin_day = 0)])
   write.csv(econ_output, paste0(econ_output_folder, "Econ_output_", year_2, ".csv"), row.names = FALSE)
   write.csv(well_capacity_data, well_capacity_file_year, row.names = FALSE)
 }
