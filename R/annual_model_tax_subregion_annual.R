@@ -131,8 +131,8 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   setkey(lookup_table_all_years_2,      WSTA,   SOIL_ID, Well_capacity)
   setkey(well_capacity_data, weather_station, Soil_Type, Well_capacity)
   lookup_table_all_years_2_exp  = lookup_table_all_years_2[well_capacity_data, allow.cartesian=T]
-  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := profit_Well_ID_sub - capital_cost]
-  lookup_table_all_years_2_exp[, profit_Well_ID_sub   := mean(profit_Well_ID_sub), by="Well_ID"]
+  lookup_table_all_years_2_exp[, profit_Well_ID_tax   := profit_Well_ID_tax - capital_cost]
+  lookup_table_all_years_2_exp[, profit_Well_ID_tax   := mean(profit_Well_ID_tax), by="Well_ID"]
   lookup_table_all_years_2_exp[, profit_Well_ID       := mean(profit_Well_ID),     by="Well_ID"]
   lookup_table_all_years_2_exp = unique(lookup_table_all_years_2_exp,              by="Well_ID")
 
@@ -145,7 +145,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   setkey(dryland_profits,              SOIL_ID)
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[dryland_profits]
 
-  # lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_sub < mean_profit_dryland | tot_acres == 0, 1, 0)]
+  # lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_tax < mean_profit_dryland | tot_acres == 0, 1, 0)]
   lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID < mean_profit_dryland | tot_acres == 0, 1, 0)]
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
 
@@ -183,17 +183,18 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
 
-  lookup_table_all_years_2[exit == 1, profit_Well_ID_sub := profit_Well_ID - tax_amt * irr_tot_acres]
+  lookup_table_all_years_2[exit == 1, profit_Well_ID_tax := profit_Well_ID - tax_amt * irr_tot_acres]
   lookup_table_all_years_2[exit == 1, irr_tot_acres      := 0]
   lookup_table_all_years_2[exit == 1, tot_acres          := 0]
 
-  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[,   .(Well_ID,      Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID)],
-                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID)])
+  lookup_table_all_years_2   = rbind(lookup_table_all_years_2[,   .(Well_ID,      Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_tax, exit)],
+                                     lookup_table_all_years_2_0[, .(Well_ID = V1, Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_tax, exit)])
   lookup_table_all_years_2 = lookup_table_all_years_2[complete.cases(Well_ID)]
   lookup_table_all_years_2[, `:=`(output_rate_acin_day, irr_tot_acres/irrigation_season_days)]
 
   setkey(lookup_table_all_years_2, Well_ID)
-  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity,tot_acres, irr_tot_acres, profit_Well_ID, output_rate_acin_day)]
+  econ_output = lookup_table_all_years_2[, .(Well_ID, Well_capacity, tot_acres, irr_tot_acres, profit_Well_ID, profit_Well_ID_tax, exit, output_rate_acin_day)]
+
   econ_output[, `:=`(row, 1:.N)]
   econ_output[, `:=`(tax_amnt, tax_amount)]
   econ_output[, year := year_2]
