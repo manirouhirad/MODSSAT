@@ -106,6 +106,8 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
 
   lookup_table_all_years_2   = readRDS(look_up_table_inside)
   lookup_table_all_years_2_0 = readRDS(look_up_table_outside)
+  try(setnames(lookup_table_all_years_2,   old = "profit_Well_ID_sub", new = "profit_Well_ID_tax"))
+  try(setnames(lookup_table_all_years_2_0, old = "profit_Well_ID_sub", new = "profit_Well_ID_tax"))
 
   filenames = list.files(path = well_capacity_files, pattern = "*.csv",
                          full.names = TRUE)
@@ -147,6 +149,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
 
   # lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_tax < mean_profit_dryland | tot_acres == 0, 1, 0)]
   lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID < mean_profit_dryland | tot_acres == 0, 1, 0)]
+  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_tax < mean_profit_dryland & year_2 >= 2016, 1, exit)]
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
 
   dryland_profits = readRDS(dryland_profit_file)
@@ -183,7 +186,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   lookup_table_all_years_2_0 = wells_subregion[lookup_table_all_years_2_0]
   lookup_table_all_years_2_0 = lookup_table_all_years_2_0[is.na(id)]
 
-  lookup_table_all_years_2[exit == 1, profit_Well_ID_tax := profit_Well_ID - tax_amt * irr_tot_acres]
+  lookup_table_all_years_2[exit == 1, profit_Well_ID_tax := profit_Well_ID]
   lookup_table_all_years_2[exit == 1, irr_tot_acres      := 0]
   lookup_table_all_years_2[exit == 1, tot_acres          := 0]
 
