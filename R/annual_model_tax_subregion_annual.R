@@ -148,7 +148,7 @@ annual_model_tax_subregion_annual = function(tax_amount = 21,
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[dryland_profits]
 
   # lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_tax < mean_profit_dryland | tot_acres == 0, 1, 0)]
-  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID < mean_profit_dryland | tot_acres == 0, 1, 0)]
+  lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID - capital_cost < mean_profit_dryland | tot_acres == 0, 1, 0)]
   lookup_table_all_years_2_exp[, exit := ifelse(profit_Well_ID_tax < mean_profit_dryland & year_2 >= 2016, 1, exit)]
   lookup_table_all_years_2_exp = lookup_table_all_years_2_exp[,.(Well_ID, exit)]
 
