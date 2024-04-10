@@ -634,9 +634,10 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       print(environment())
       print(environmentName(environment()))
       ls()
-      parallel::clusterExport(cl, varlist = c("well_capacity_data", "data.table", #".",
+      parallel::clusterExport(cl, varlist = c("Well_ID_grp", "setnames", "setkey",
+                                              "well_capacity_data", "data.table", #".",
                                               "aa", "FN_optim2", "KS_DSSAT",
-                                              "IFREQ_interpolate", "setnames", "setkey", "subsidy_amount", "Well_ID_grp",
+                                              "IFREQ_interpolate", "subsidy_amount",
                                               "subsidy_threshold")#, envir = environment()
                               )
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
