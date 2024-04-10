@@ -631,6 +631,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       library(snow)
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
+      print(environment())
       parallel::clusterExport(cl, varlist = c("well_capacity_data", "data.table", #".",
                                               "aa", "FN_optim2", "KS_DSSAT",
                                               "IFREQ_interpolate", "setnames", "setkey", "subsidy_amount", "Well_ID_grp",
