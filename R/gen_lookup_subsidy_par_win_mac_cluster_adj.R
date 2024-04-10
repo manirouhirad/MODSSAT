@@ -637,7 +637,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       print(Sys.info()[1])
       parallel::clusterExport(cl, varlist = c(#"Well_ID_grp",
                                               "setnames", "setkey",
-                                              "well_capacity_data", "data.table", #".",
+                                              "well_capacity_data", "data.table", ".SD",
                                               "aa", "FN_optim2", "KS_DSSAT",
                                               "IFREQ_interpolate", "subsidy_amount",
                                               "subsidy_threshold"), envir = environment()
