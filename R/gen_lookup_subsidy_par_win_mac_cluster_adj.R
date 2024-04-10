@@ -628,7 +628,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     print(Sys.info()[1])
     print(environment())
     print(environmentName(environment()))
-    ls()
+    ls(ls(envir = environment()))
 
 
     if (Sys.info()[1] == "Windows") {
@@ -637,7 +637,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       print(Sys.info()[1])
       print(environment())
       print(environmentName(environment()))
-      ls()
+      ls(ls(envir = environment()))
       parallel::clusterExport(cl, varlist = c("Well_ID_grp", "setnames", "setkey",
                                               "well_capacity_data", "data.table", #".",
                                               "aa", "FN_optim2", "KS_DSSAT",
