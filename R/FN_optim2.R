@@ -5,9 +5,10 @@
 
 
 FN_optim2 = function(jj = 1) {
-  
+  print(well_capacity_data)
   # foo_irr_3 = well_capacity_data[Well_ID_grp == jj]
   foo_irr_3 <- well_capacity_data[, .SD[.SD[[9]] == jj]]
+  print(foo_irr_3)
   
   foo_irr_3[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
   foo_irr_3_0  = foo_irr_3[ifreq == 0]

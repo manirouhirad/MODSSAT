@@ -643,10 +643,10 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
                                               "subsidy_threshold"), envir = environment()
                               )
 
-      print(environment())
-      print(environmentName(environment()))
-      ls(envir = environment())
-      print(well_capacity_data[,9])
+      # print(environment())
+      # print(environmentName(environment()))
+      # ls(envir = environment())
+      # print(well_capacity_data[,9])
 
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
