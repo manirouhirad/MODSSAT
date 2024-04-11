@@ -4,7 +4,7 @@
 #' @export
 
 
-FN_optim2 <- function(jj = 1, well_capacity_data) {
+FN_optim2 <- function(jj = 1) {
   foo_irr_3 <- well_capacity_data[well_capacity_data[[9]] == jj, ]
   max_IFREQ <- max(KS_DSSAT[["IFREQ"]], na.rm = TRUE)
   foo_irr_3[foo_irr_3$ifreq > max_IFREQ, "ifreq"] <- max_IFREQ
