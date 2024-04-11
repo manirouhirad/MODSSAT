@@ -101,10 +101,15 @@ FN_optim2 = function(jj = 1) {
 
   foo_dt1_000 <- merge(foo_dt1_000, foo, by = "row")
   
-  quarter_1 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 1, ifreq = ifreq_1, CR = CR_1, PAW = PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  quarter_2 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 2, ifreq = ifreq_2, CR = CR_2, PAW = PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  quarter_3 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 3, ifreq = ifreq_3, CR = CR_3, PAW = PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  quarter_4 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 4, ifreq = ifreq_4, CR = CR_4, PAW = PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  quarter_1 <- subset(foo_dt1_000, SDAT == min(SDAT),  select = c("Well_capacity", "tot_acres", "quarter" = 1,  "ifreq" = ifreq_1, "CR" = CR_1, "PAW" = PAW_1,  "mean_irrigation_combination", "mean_profit_combination",  "mean_profit_combination_sub"))
+  quarter_2 <- subset(foo_dt1_000, SDAT == min(SDAT),  select = c("Well_capacity", "tot_acres", "quarter" = 2,  "ifreq" = ifreq_2, "CR" = CR_2, "PAW" = PAW_2,  "mean_irrigation_combination", "mean_profit_combination",  "mean_profit_combination_sub"))
+  quarter_3 <- subset(foo_dt1_000, SDAT == min(SDAT),  select = c("Well_capacity", "tot_acres", "quarter" = 3,  "ifreq" = ifreq_3, "CR" = CR_3, "PAW" = PAW_3,  "mean_irrigation_combination", "mean_profit_combination",  "mean_profit_combination_sub"))
+  quarter_4 <- subset(foo_dt1_000, SDAT == min(SDAT),  select = c("Well_capacity", "tot_acres", "quarter" = 4,  "ifreq" = ifreq_4, "CR" = CR_4, "PAW" = PAW_4,  "mean_irrigation_combination", "mean_profit_combination",  "mean_profit_combination_sub"))
+  
+  # quarter_1 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 1, ifreq = ifreq_1, CR = CR_1, PAW = PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  # quarter_2 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 2, ifreq = ifreq_2, CR = CR_2, PAW = PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  # quarter_3 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 3, ifreq = ifreq_3, CR = CR_3, PAW = PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  # quarter_4 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 4, ifreq = ifreq_4, CR = CR_4, PAW = PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   
   # quarter_1 = colnames(quarter_1)
   # quarter_2 = colnames(quarter_2)
