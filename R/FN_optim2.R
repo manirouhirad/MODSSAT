@@ -22,12 +22,8 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3_N0$id <- seq_len(nrow(foo_irr_3_N0))
   
   foo = data.table(foo_irr_3_N0)
-  foo[rep(1:.N, (diff+1))]
   selected_rows <- foo[rep(seq_len(nrow(foo)), foo$diff + 1), ]
-  
-  
-  
-  
+
   tryCatch({
     foo_irr_3_N0 = foo_irr_3_N0[rep(seq_len(nrow(foo_irr_3_N0)), foo_irr_3_N0$diff+1),]
     foo_irr_3_N0$foo <- ave(rep(1, nrow(foo)), foo$id, FUN = seq_along)
