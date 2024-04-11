@@ -47,7 +47,7 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] <- foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] / 10
   rm(foo_irr_3_N0, foo_irr_3_0)
   
-  return(foo_irr_3_N0)
+  return(foo_irr_3)
   # 
   # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
   # foo_irr_3[, ifreq_cap := ifreq_cap + 2]
