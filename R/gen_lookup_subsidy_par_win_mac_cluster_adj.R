@@ -653,6 +653,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
 
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
       print("Hello 1")
+      print(foo_dt_all_1)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
       print("Hello 2")
       foo_dt_all_3 <- parLapply(cl, (2*floor(aa/4)+1):(3*floor(aa/4)), FN_optim2)
@@ -677,7 +678,6 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     }
 
     print("Hello 5")
-    print(foo_dt1_000)
 
 
     foo_dt_all_1 <- do.call(rbind, foo_dt_all_1)
