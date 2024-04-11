@@ -5,40 +5,44 @@
 
 
 FN_optim2 = function(jj = 1) {
+  library(dplyr)
   foo_irr_3 <- well_capacity_data[well_capacity_data[[9]] == jj, ]
   max_IFREQ <- max(KS_DSSAT[["IFREQ"]], na.rm = TRUE)
   foo_irr_3[foo_irr_3$ifreq > max_IFREQ, "ifreq"] <- max_IFREQ
   foo_irr_3_0  = foo_irr_3[foo_irr_3$ifreq == 0,]
   foo_irr_3_N0 = foo_irr_3[foo_irr_3$ifreq != 0,]
   foo_irr_3_N0$ifreq = as.numeric(as.character(foo_irr_3_N0$ifreq))
-  
+
   tryCatch({
     foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
                         by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
                         by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
   }, error=function(e){})
-  
+
   foo_irr_3_N0$diff <- (max_IFREQ - foo_irr_3_N0$ifreq) * (1/IFREQ_interpolate)
   foo_irr_3_N0$id <- seq_len(nrow(foo_irr_3_N0))
-  
-  foo = data.table(foo_irr_3_N0)
-  selected_rows <- foo[rep(seq_len(nrow(foo)), foo$diff + 1), ]
 
   tryCatch({
+    # selected_rows <- foo[rep(seq_len(nrow(foo)), foo$diff + 1), ]
     foo_irr_3_N0 = foo_irr_3_N0[rep(seq_len(nrow(foo_irr_3_N0)), foo_irr_3_N0$diff+1),]
-    foo_irr_3_N0$foo <- ave(rep(1, nrow(foo)), foo$id, FUN = seq_along)
-    
-    # library(dplyr)
-    # foo_irr_3_N0 <- foo_irr_3_N0 %>% 
-    #   group_by(id) %>% 
+    foo_irr_3_N0 <- foo_irr_3_N0 %>%
+      group_by(id) %>%
+      mutate(foo = row_number())
+
+    foo_irr_3_N0 <- foo_irr_3_N0 %>%
+      group_by(id) %>%
+      group_modify(~ .x %>% mutate(foo = row_number()))
+    foo_irr_3_N0 = data.frame(foo_irr_3_N0)
+    # foo_irr_3_N0 <- foo_irr_3_N0 %>%
+    #   group_by(id) %>%
     #   mutate(foo = row_number())
-    
+
     foo_irr_3_N0$foo   = foo_irr_3_N0$foo - 1
     foo_irr_3_N0$ifreq = foo_irr_3_N0$ifreq + (foo_irr_3_N0$foo * IFREQ_interpolate)
     foo_irr_3_N0$ifreq = as.numeric(as.character(foo_irr_3_N0$ifreq))
   }, error=function(e){})
-  
-  
+
+
   foo_irr_3_N0 = merge(foo_irr_3_N0, KS_DSSAT,
                        by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
                        by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
@@ -46,15 +50,13 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3 = rbind(foo_irr_3_N0, foo_irr_3_0)
   foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] <- foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] / 10
   rm(foo_irr_3_N0, foo_irr_3_0)
-  
-  library(dplyr)
-  
+
   # Calculate 'col1' by group using dplyr
   foo_irr_3 <- foo_irr_3 %>%
     group_by(Well_capacity, SDAT, tot_acres, CR, PAW) %>%
     mutate(ifreq_cap = min(ifreq)) %>%
     ungroup()
-  
+
   foo_irr_3$ifreq_cap <- foo_irr_3$ifreq_cap + 2
   foo_irr_3 = foo_irr_3[foo_irr_3$ifreq <= foo_irr_3$ifreq_cap,]
   foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
@@ -63,64 +65,70 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3 <- foo_irr_3 %>%
     group_by(Well_capacity, tot_acres, ifreq) %>%
     mutate(id = group_indices())
-  
+
   # #----
   foo_dt1_000 <- foo_irr_3 %>% filter(quarter == 1 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit)
   foo_dt2_000 <- foo_irr_3 %>% filter(quarter == 2 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit)
   foo_dt3_000 <- foo_irr_3 %>% filter(quarter == 3 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq, CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation, profit_3 = profit)
   foo_dt4_000 <- foo_irr_3 %>% filter(quarter == 4 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_4 = ifreq, CR_4 = CR, PAW_4 = PAW, irrigation_4 = irrigation, profit_4 = profit)
-  
+
   foo_dt3_000 = merge(foo_dt3_000, foo_dt4_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   foo_dt2_000 = merge(foo_dt2_000, foo_dt3_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   foo_dt1_000 = merge(foo_dt1_000, foo_dt2_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   rm(foo_dt2_000, foo_dt3_000, foo_dt4_000)
 
   foo_dt1_000$irrigation_sum   <- foo_dt1_000$irrigation_1 + foo_dt1_000$irrigation_2 + foo_dt1_000$irrigation_3 + foo_dt1_000$irrigation_4
-  
+
   foo_dt1_000 <- foo_dt1_000 %>% mutate(irrigation_below = ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum, 0))
 
   foo_dt1_000$profit_sum <- foo_dt1_000$profit_1 + foo_dt1_000$profit_2 + foo_dt1_000$profit_3 + foo_dt1_000$profit_4
   # foo_dt1_000$subsidy_payment <- foo_dt1_000$irrigation_below * subsidy_amount
   foo_dt1_000$profit_sum_sub <- foo_dt1_000$profit_sum + (foo_dt1_000$irrigation_below * subsidy_amount)
 
-  foo_dt1_000$row <- ave(seq_len(nrow(foo_dt1_000)),
-                         foo_dt1_000$CR_1, foo_dt1_000$PAW_1,
-                         foo_dt1_000$CR_2, foo_dt1_000$PAW_2,
-                         foo_dt1_000$CR_3, foo_dt1_000$PAW_3,
-                         foo_dt1_000$CR_4, foo_dt1_000$PAW_4,
-                         FUN = function(x) seq_along(x))
+  # foo_dt1_000 <- foo_dt1_000 %>%
+  #   group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4) %>%
+  #   mutate(row = group_indices())
 
+  foo_dt1_000 <- foo_dt1_000 %>%
+    group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+    mutate(row = cur_group_id())
+
+  # foo_dt1_000 = data.table(foo_dt1_000)
+  # foo_dt1_000[,.N, by="row"]
 
   foo <- foo_dt1_000[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
+
   foo$mean_profit_combination     <- ave(foo$profit_sum,     foo$row, FUN = mean)
   foo$mean_profit_combination_sub <- ave(foo$profit_sum_sub, foo$row, FUN = mean)
   foo$mean_irrigation_combination <- ave(foo$irrigation_sum, foo$row, FUN = mean)
   foo <- foo[!duplicated(foo$row), ]
+
+
+
   max_p <- max(foo$mean_profit_combination_sub)
   foo <- foo[foo$mean_profit_combination_sub == max_p, c("row", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
 
   foo_dt1_000 <- merge(foo_dt1_000, foo, by = "row")
   foo_dt1_000 = foo_dt1_000[foo_dt1_000$SDAT == min(foo_dt1_000$SDAT), ]
-  
+
   # Select columns
   quarter_1 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_2 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_2, CR_2, PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_3 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_3, CR_3, PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_4 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_4, CR_4, PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  
+
   quarter_1$quarter = 1
   quarter_2$quarter = 2
   quarter_3$quarter = 3
   quarter_4$quarter = 4
-  
+
   colnames(quarter_1) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_2) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_3) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_4) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
 
   foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
-  
-  
+
   # #----------
   foo_dt1_325 <- foo_irr_3 %>% filter(quarter == 1 & tot_acres == 32.5) %>% select(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit)
   foo_dt2_325 <- foo_irr_3 %>% filter(quarter == 2 & tot_acres == 32.5) %>% select(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit)
@@ -131,22 +139,23 @@ FN_optim2 = function(jj = 1) {
   foo_dt2_325 = merge(foo_dt2_325, foo_dt3_325, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   foo_dt1_325 = merge(foo_dt1_325, foo_dt2_325, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   rm(foo_dt2_325, foo_dt3_325, foo_dt4_325)
-  
+
   foo_dt1_325$irrigation_sum   <- foo_dt1_325$irrigation_1 + foo_dt1_325$irrigation_2 + foo_dt1_325$irrigation_3 + foo_dt1_325$irrigation_4
   foo_dt1_325 <- foo_dt1_325 %>% mutate(irrigation_below = ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum, 0))
-  
+
   foo_dt1_325$profit_sum <- foo_dt1_325$profit_1 + foo_dt1_325$profit_2 + foo_dt1_325$profit_3 + foo_dt1_325$profit_4
   foo_dt1_325$profit_sum_sub <- foo_dt1_325$profit_sum + (foo_dt1_325$irrigation_below * subsidy_amount)
-  
-  foo_dt1_325$row <- ave(seq_len(nrow(foo_dt1_325)),
-                         foo_dt1_325$CR_1, foo_dt1_325$PAW_1,
-                         foo_dt1_325$CR_2, foo_dt1_325$PAW_2,
-                         foo_dt1_325$CR_3, foo_dt1_325$PAW_3,
-                         foo_dt1_325$CR_4, foo_dt1_325$PAW_4,
-                         foo_dt1_325$ifreq_1,
-                         FUN = function(x) seq_along(x))
-  
-  foo <- foo_dt1_325[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
+
+  # foo_dt1_325 <- foo_dt1_325 %>%
+  #   group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+  #   mutate(row = group_indices())
+
+
+  foo_dt1_325 <- foo_dt1_325 %>%
+    group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+    mutate(row = cur_group_id())
+
+    foo <- foo_dt1_325[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
   foo$mean_profit_combination     <- ave(foo$profit_sum,     foo$row, FUN = mean)
   foo$mean_profit_combination_sub <- ave(foo$profit_sum_sub, foo$row, FUN = mean)
   foo$mean_irrigation_combination <- ave(foo$irrigation_sum, foo$row, FUN = mean)
@@ -154,51 +163,48 @@ FN_optim2 = function(jj = 1) {
   max_p <- max(foo$mean_profit_combination_sub)
   foo <- foo[foo$mean_profit_combination_sub == max_p, c("row", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
   foo_dt1_325 <- merge(foo_dt1_325, foo, by = "row")
-  
-  
+
+
   foo_dt1_325 = foo_dt1_325[foo_dt1_325$SDAT == min(foo_dt1_325$SDAT), ]
   quarter_1 <- foo_dt1_325 %>% select(Well_capacity, tot_acres, ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_2 <- foo_dt1_325 %>% select(Well_capacity, tot_acres, ifreq_2, CR_2, PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_3 <- foo_dt1_325 %>% select(Well_capacity, tot_acres, ifreq_3, CR_3, PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_4 <- foo_dt1_325 %>% select(Well_capacity, tot_acres, ifreq_4, CR_4, PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  
+
   quarter_1$quarter = 1
   quarter_2$quarter = 2
   quarter_3$quarter = 3
   quarter_4$quarter = 4
-  
+
   colnames(quarter_1) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_2) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_3) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_4) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
-  
+
   foo_dt1_325 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
-  
+
   # #----------
   foo_dt1_650 <- foo_irr_3 %>% filter(quarter == 1 & tot_acres == 65) %>% select(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit, id)
   foo_dt2_650 <- foo_irr_3 %>% filter(quarter == 2 & tot_acres == 65) %>% select(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit, id)
   foo_dt3_650 <- foo_irr_3 %>% filter(quarter == 3 & tot_acres == 65) %>% select(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq, CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation, profit_3 = profit)
   foo_dt4_650 <- foo_irr_3 %>% filter(quarter == 4 & tot_acres == 65) %>% select(Well_capacity, SDAT, tot_acres, ifreq_4 = ifreq, CR_4 = CR, PAW_4 = PAW, irrigation_4 = irrigation, profit_4 = profit)
-  
+
   foo_dt3_650 = merge(foo_dt3_650, foo_dt4_650, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   foo_dt2_650 = merge(foo_dt2_650, foo_dt3_650, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   foo_dt1_650 = merge(foo_dt1_650, foo_dt2_650, by = c("Well_capacity", "SDAT", "tot_acres", "id"), allow.cartesian = T)
   rm(foo_dt2_650, foo_dt3_650, foo_dt4_650)
-  
+
   foo_dt1_650$irrigation_sum   <- foo_dt1_650$irrigation_1 + foo_dt1_650$irrigation_2 + foo_dt1_650$irrigation_3 + foo_dt1_650$irrigation_4
   foo_dt1_650 <- foo_dt1_650 %>% mutate(irrigation_below = ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum, 0))
-  
+
   foo_dt1_650$profit_sum <- foo_dt1_650$profit_1 + foo_dt1_650$profit_2 + foo_dt1_650$profit_3 + foo_dt1_650$profit_4
   foo_dt1_650$profit_sum_sub <- foo_dt1_650$profit_sum + (foo_dt1_650$irrigation_below * subsidy_amount)
-  
-  foo_dt1_650$row <- ave(seq_len(nrow(foo_dt1_650)),
-                         foo_dt1_650$CR_1, foo_dt1_650$PAW_1,
-                         foo_dt1_650$CR_2, foo_dt1_650$PAW_2,
-                         foo_dt1_650$CR_3, foo_dt1_650$PAW_3,
-                         foo_dt1_650$CR_4, foo_dt1_650$PAW_4,
-                         foo_dt1_650$id,
-                         FUN = function(x) seq_along(x))
-  
+
+  foo_dt1_650 <- foo_dt1_650 %>%
+    group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+    mutate(row = cur_group_id())
+
+
   foo <- foo_dt1_650[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
   foo$mean_profit_combination     <- ave(foo$profit_sum,     foo$row, FUN = mean)
   foo$mean_profit_combination_sub <- ave(foo$profit_sum_sub, foo$row, FUN = mean)
@@ -207,27 +213,27 @@ FN_optim2 = function(jj = 1) {
   max_p <- max(foo$mean_profit_combination_sub)
   foo <- foo[foo$mean_profit_combination_sub == max_p, c("row", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
   foo_dt1_650 <- merge(foo_dt1_650, foo, by = "row")
-  
+
   foo_dt1_650 = foo_dt1_650[foo_dt1_650$SDAT == min(foo_dt1_650$SDAT), ]
   quarter_1 <- foo_dt1_650 %>% select(Well_capacity, tot_acres, ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_2 <- foo_dt1_650 %>% select(Well_capacity, tot_acres, ifreq_2, CR_2, PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_3 <- foo_dt1_650 %>% select(Well_capacity, tot_acres, ifreq_3, CR_3, PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   quarter_4 <- foo_dt1_650 %>% select(Well_capacity, tot_acres, ifreq_4, CR_4, PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
-  
+
   quarter_1$quarter = 1
   quarter_2$quarter = 2
   quarter_3$quarter = 3
   quarter_4$quarter = 4
-  
+
   colnames(quarter_1) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_2) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_3) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
   colnames(quarter_4) <- c("Well_capacity", "tot_acres", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub", "quarter")
-  
+
   foo_dt1_650 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
   # return(foo_dt1_650)
-  
-  
+
+
   #----------
   foo_dt1_975 <- foo_irr_3 %>% filter(quarter == 1 & tot_acres == 97.5) %>% select(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit, id)
   foo_dt2_975 <- foo_irr_3 %>% filter(quarter == 2 & tot_acres == 97.5) %>% select(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit, id)
@@ -245,13 +251,11 @@ FN_optim2 = function(jj = 1) {
   foo_dt1_975$profit_sum <- foo_dt1_975$profit_1 + foo_dt1_975$profit_2 + foo_dt1_975$profit_3 + foo_dt1_975$profit_4
   foo_dt1_975$profit_sum_sub <- foo_dt1_975$profit_sum + (foo_dt1_975$irrigation_below * subsidy_amount)
 
-  foo_dt1_975$row <- ave(seq_len(nrow(foo_dt1_975)),
-                         foo_dt1_975$CR_1, foo_dt1_975$PAW_1,
-                         foo_dt1_975$CR_2, foo_dt1_975$PAW_2,
-                         foo_dt1_975$CR_3, foo_dt1_975$PAW_3,
-                         foo_dt1_975$CR_4, foo_dt1_975$PAW_4,
-                         foo_dt1_975$id,
-                         FUN = function(x) seq_along(x))
+
+  foo_dt1_975 <- foo_dt1_975 %>%
+    group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+    mutate(row = cur_group_id())
+
 
   foo <- foo_dt1_975[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
   foo$mean_profit_combination     <- ave(foo$profit_sum,     foo$row, FUN = mean)
@@ -297,13 +301,9 @@ FN_optim2 = function(jj = 1) {
   foo_dt1_130$profit_sum <- foo_dt1_130$profit_1 + foo_dt1_130$profit_2 + foo_dt1_130$profit_3 + foo_dt1_130$profit_4
   foo_dt1_130$profit_sum_sub <- foo_dt1_130$profit_sum + (foo_dt1_130$irrigation_below * subsidy_amount)
 
-  foo_dt1_130$row <- ave(seq_len(nrow(foo_dt1_130)),
-                         foo_dt1_130$CR_1, foo_dt1_130$PAW_1,
-                         foo_dt1_130$CR_2, foo_dt1_130$PAW_2,
-                         foo_dt1_130$CR_3, foo_dt1_130$PAW_3,
-                         foo_dt1_130$CR_4, foo_dt1_130$PAW_4,
-                         foo_dt1_130$id,
-                         FUN = function(x) seq_along(x))
+  foo_dt1_130 <- foo_dt1_130 %>%
+    group_by(CR_1, PAW_1, CR_2, PAW_2, CR_3, PAW_3, CR_4, PAW_4, ifreq_1) %>%
+    mutate(row = cur_group_id())
 
   foo <- foo_dt1_130[, c("row", "profit_sum", "profit_sum_sub", "irrigation_sum")]
   foo$mean_profit_combination     <- ave(foo$profit_sum,     foo$row, FUN = mean)
@@ -339,8 +339,6 @@ FN_optim2 = function(jj = 1) {
   foo_dt1 <- foo_dt1 %>% mutate(max_mean_p = max(mean_profit_combination_sub, na.rm = TRUE))
   foo_dt1 <- foo_dt1 %>% filter(max_mean_p == mean_profit_combination_sub)
 
-  # foo_dt1[, max_mean_p := max(mean_profit_combination_sub, na.rm = T)]
-  # foo_dt1 = foo_dt1[max_mean_p == mean_profit_combination_sub]
   return(foo_dt1)
 
 }

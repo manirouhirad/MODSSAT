@@ -652,33 +652,22 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       # print(well_capacity_data[,9])
 
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
-      print("Hello 1")
-      print(foo_dt_all_1)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
-      print("Hello 2")
       foo_dt_all_3 <- parLapply(cl, (2*floor(aa/4)+1):(3*floor(aa/4)), FN_optim2)
-      print("Hello 3")
       foo_dt_all_4 <- parLapply(cl, (3*floor(aa/4)+1):aa,              FN_optim2)
-      print("Hello 4")
       stopCluster(cl)
     } else {
       print(Sys.info()[1])
       foo_dt_all_1 <- mclapply(X = 1:floor(aa/4), FUN = FN_optim2,
                                mc.cores = num_clusters)
-
       foo_dt_all_2 <- mclapply(X = (floor(aa/4)+1):(2*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
-
       foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
-
       foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim2,
                                mc.cores = num_clusters)
 
     }
-
-    print("Hello 5")
-
 
     foo_dt_all_1 <- do.call(rbind, foo_dt_all_1)
     foo_dt_all_1 =      data.table(foo_dt_all_1)
