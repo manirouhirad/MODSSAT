@@ -647,13 +647,13 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       stopCluster(cl)
     } else {
       print(Sys.info()[1])
-      foo_dt_all_1 <- mclapply(X = 1:floor(aa/4), FUN = FN_optim2,
+      foo_dt_all_1 <- mclapply(X = 1:floor(aa/4), FUN = FN_optim3,
                                mc.cores = num_clusters)
-      foo_dt_all_2 <- mclapply(X = (floor(aa/4)+1):(2*floor(aa/4)), FUN = FN_optim2,
+      foo_dt_all_2 <- mclapply(X = (floor(aa/4)+1):(2*floor(aa/4)), FUN = FN_optim3,
                                mc.cores = num_clusters)
-      foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim2,
+      foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim3,
                                mc.cores = num_clusters)
-      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim2,
+      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim3,
                                mc.cores = num_clusters)
 
     }
