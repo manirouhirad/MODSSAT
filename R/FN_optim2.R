@@ -75,7 +75,7 @@ FN_optim2 = function(jj = 1) {
   foo_dt1_000 = merge(foo_dt1_000, foo_dt2_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
   rm(foo_dt2_000, foo_dt3_000, foo_dt4_000)
   
-  foo_dt1_000$irrigation_sum   <- foo_dt1_000$irrigation_1 + foo_dt1_000$irrigation_2 + foo_dt1_000$irrigation_3 + foo_dt1_000$irrigation_4
+  # foo_dt1_000$irrigation_sum   <- foo_dt1_000$irrigation_1 + foo_dt1_000$irrigation_2 + foo_dt1_000$irrigation_3 + foo_dt1_000$irrigation_4
   
   # foo_dt1_000 <- foo_dt1_000 %>%
   #   mutate(irrigation_below = ifelse(irrigation_sum < subsidy_threshold, subsidy_threshold - irrigation_sum, 0))
