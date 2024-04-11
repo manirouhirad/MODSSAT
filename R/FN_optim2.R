@@ -60,9 +60,9 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
   foo_irr_3 <- foo_irr_3[order(foo_irr_3$Well_capacity, foo_irr_3$tot_acres, foo_irr_3$CR, foo_irr_3$PAW, foo_irr_3$SDAT, foo_irr_3$ifreq, foo_irr_3$quarter), ]
 
-  foo_irr_3 <- foo_irr_3 %>%
-    group_by(Well_capacity, tot_acres, ifreq) %>%
-    mutate(id = group_indices())
+  # foo_irr_3 <- foo_irr_3 %>%
+  #   group_by(Well_capacity, tot_acres, ifreq) %>%
+  #   mutate(id = group_indices())
   
   return(foo_irr_3)
   # #----
