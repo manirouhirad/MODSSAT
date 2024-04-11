@@ -47,6 +47,20 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] <- foo_irr_3$profit[foo_irr_3$ifreq == max_IFREQ] / 10
   rm(foo_irr_3_N0, foo_irr_3_0)
   
+  library(dplyr)
+  
+  # Calculate 'col1' by group using dplyr
+  foo_irr_3 <- foo_irr_3 %>%
+    group_by(Well_capacity, SDAT, tot_acres, CR, PAW) %>%
+    mutate(ifreq_cap = min(ifreq)) %>%
+    ungroup()
+  
+  # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
+  # agg_data <- aggregate(ifreq_cap ~ Well_capacity + SDAT + tot_acres + CR + PAW, data = foo, FUN = min)
+  # names(agg_data)[2] <- "col1"  # Rename the aggregated column
+  # foo <- merge(foo, agg_data, by = c("col3", "col4"), all.x = TRUE)
+  
+  
   return(foo_irr_3)
   # 
   # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
