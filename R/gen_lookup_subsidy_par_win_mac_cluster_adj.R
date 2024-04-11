@@ -631,7 +631,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     ls(envir = environment())
     print("hello")
 
-    # well_capacity_data = data.frame(well_capacity_data)
+    well_capacity_data = data.frame(well_capacity_data)
 
     if (Sys.info()[1] == "Windows") {
       library(snow)
