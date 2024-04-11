@@ -11,8 +11,12 @@ FN_optim2 = function(jj = 1) {
   library(data.table)
   foo_irr_3 <- well_capacity_data[well_capacity_data[[9]] == jj, ]
   foo_irr_3 = as.data.table(foo_irr_3)
-  foo_irr_3[, ifreq := 15.9]
-  # foo_irr_3[ifreq > 15.9, ifreq := 15.9]
+  max_IFREQ <- max(KS_DSSAT[["IFREQ"]], na.rm = TRUE)
+  foo_irr_3[foo_irr_3$ifreq > max_IFREQ, "ifreq"] <- max_IFREQ
+  foo_irr_3_0  = foo_irr_3[foo_irr_3$ifreq == 0,]
+  foo_irr_3_N0 = foo_irr_3[foo_irr_3$ifreq != 0,]
+  foo_irr_3_N0$ifreq = as.numeric(as.character(foo_irr_3_N0$ifreq))
+  
   # foo_irr_3[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
   # foo_irr_3_0  = foo_irr_3[ifreq == 0]
   # foo_irr_3_N0 = foo_irr_3[ifreq != 0]
@@ -48,7 +52,7 @@ FN_optim2 = function(jj = 1) {
   # foo_irr_3[ifreq == KS_DSSAT[, max(IFREQ)], profit := profit/10]
   # 
   # rm(foo_irr_3_N0, foo_irr_3_0)
-  return(foo_irr_3)
+  return(foo_irr_3_N0)
   # 
   # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
   # foo_irr_3[, ifreq_cap := ifreq_cap + 2]
