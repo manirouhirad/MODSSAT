@@ -13,9 +13,9 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3 = data.table(foo_irr_3)
   
   foo_irr_3[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
-  foo_irr_3_0  = foo_irr_3[ifreq == 0]
-  foo_irr_3_N0 = foo_irr_3[ifreq != 0]
-  foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
+  # foo_irr_3_0  = foo_irr_3[ifreq == 0]
+  # foo_irr_3_N0 = foo_irr_3[ifreq != 0]
+  # foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
 
   # tryCatch({
   #   foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
