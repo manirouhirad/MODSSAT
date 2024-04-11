@@ -17,37 +17,37 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3_N0 = foo_irr_3[ifreq != 0]
   foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
 
-  tryCatch({
-    foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
-                        by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
-                        by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
-  }, error=function(e){})
-
-  foo_irr_3_N0[, diff := (KS_DSSAT[, max(IFREQ)] - ifreq) * (1/IFREQ_interpolate)]
-  foo_irr_3_N0[, id := 1:.N]
-
-  tryCatch({
-    foo_irr_3_N0 = foo_irr_3_N0[rep(1:.N, (diff+1))]
-    foo_irr_3_N0[, foo := 1:.N, by=c("id")]
-    foo_irr_3_N0[, foo := foo - 1]
-    foo_irr_3_N0[, ifreq := ifreq + foo * IFREQ_interpolate]
-    foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
-  }, error=function(e){})
-
-  foo_irr_3_N0 = merge(foo_irr_3_N0, KS_DSSAT,
-                       by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
-                       by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
-  foo_irr_3_N0[, c("id", "diff", "foo") := NULL]
-
-
-  foo_irr_3 = rbind(foo_irr_3_N0, foo_irr_3_0)
-  # foo_irr_3[, ifreq_denom := ifreq/.2]
-  # foo_irr_3 = foo_irr_3[ifreq_denom %in% 0:200]
-
-  foo_irr_3[ifreq == KS_DSSAT[, max(IFREQ)], profit := profit/10]
-
-  rm(foo_irr_3_N0, foo_irr_3_0)
-  return(foo_irr_3)
+  # tryCatch({
+  #   foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
+  #                       by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
+  #                       by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
+  # }, error=function(e){})
+  # 
+  # foo_irr_3_N0[, diff := (KS_DSSAT[, max(IFREQ)] - ifreq) * (1/IFREQ_interpolate)]
+  # foo_irr_3_N0[, id := 1:.N]
+  # 
+  # tryCatch({
+  #   foo_irr_3_N0 = foo_irr_3_N0[rep(1:.N, (diff+1))]
+  #   foo_irr_3_N0[, foo := 1:.N, by=c("id")]
+  #   foo_irr_3_N0[, foo := foo - 1]
+  #   foo_irr_3_N0[, ifreq := ifreq + foo * IFREQ_interpolate]
+  #   foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
+  # }, error=function(e){})
+  # 
+  # foo_irr_3_N0 = merge(foo_irr_3_N0, KS_DSSAT,
+  #                      by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
+  #                      by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
+  # foo_irr_3_N0[, c("id", "diff", "foo") := NULL]
+  # 
+  # 
+  # foo_irr_3 = rbind(foo_irr_3_N0, foo_irr_3_0)
+  # # foo_irr_3[, ifreq_denom := ifreq/.2]
+  # # foo_irr_3 = foo_irr_3[ifreq_denom %in% 0:200]
+  # 
+  # foo_irr_3[ifreq == KS_DSSAT[, max(IFREQ)], profit := profit/10]
+  # 
+  # rm(foo_irr_3_N0, foo_irr_3_0)
+  return(foo_irr_3_N0)
   # 
   # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
   # foo_irr_3[, ifreq_cap := ifreq_cap + 2]
