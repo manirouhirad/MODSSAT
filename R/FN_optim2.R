@@ -107,11 +107,17 @@ FN_optim2 = function(jj = 1) {
   quarter_4 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 4, ifreq = ifreq_4, CR = CR_4, PAW = PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   
   # Combine the subsets
-  foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
-  return(foo_dt1_000)
+  # foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
+  return(quarter_1)
   
   # #----------
-  # 
+
+  # foo_dt1_325 <- foo_irr_3 %>% filter(quarter == 1 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit)
+  # foo_dt2_325 <- foo_irr_3 %>% filter(quarter == 2 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit)
+  # foo_dt3_325 <- foo_irr_3 %>% filter(quarter == 3 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq, CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation, profit_3 = profit)
+  # foo_dt4_325 <- foo_irr_3 %>% filter(quarter == 4 & tot_acres == 0) %>% select(Well_capacity, SDAT, tot_acres, ifreq_4 = ifreq, CR_4 = CR, PAW_4 = PAW, irrigation_4 = irrigation, profit_4 = profit)
+  
+  
   # foo_dt1_325 = foo_irr_3[quarter == 1 & tot_acres == 32.5, .(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit)]
   # foo_dt2_325 = foo_irr_3[quarter == 2 & tot_acres == 32.5, .(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit)]
   # foo_dt3_325 = foo_irr_3[quarter == 3 & tot_acres == 32.5, .(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq, CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation, profit_3 = profit)]
