@@ -65,7 +65,7 @@ FN_optim2 = function(jj = 1) {
     mutate(id = group_indices())
   
   # #----
-  foo_dt1_000 <- subset(foo_irr_3, quarter == 1 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq,  CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation,  profit_1 = profit))
+  foo_dt1_000 <- subset(foo_irr_3, quarter == 1 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, "ifreq_1" = ifreq,  "CR_1" = CR, "PAW_1" = PAW, "irrigation_1" = irrigation,  "profit_1" = profit))
   foo_dt2_000 <- subset(foo_irr_3, quarter == 2 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq,  CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation,  profit_2 = profit))
   foo_dt3_000 <- subset(foo_irr_3, quarter == 3 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq,  CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation,  profit_3 = profit))
   foo_dt4_000 <- subset(foo_irr_3, quarter == 4 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_4 = ifreq,  CR_4 = CR, PAW_4 = PAW, irrigation_4 = irrigation,  profit_4 = profit))
