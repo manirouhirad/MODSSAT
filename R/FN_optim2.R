@@ -55,22 +55,16 @@ FN_optim2 = function(jj = 1) {
     mutate(ifreq_cap = min(ifreq)) %>%
     ungroup()
   
-  # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
-  # agg_data <- aggregate(ifreq_cap ~ Well_capacity + SDAT + tot_acres + CR + PAW, data = foo, FUN = min)
-  # names(agg_data)[2] <- "col1"  # Rename the aggregated column
-  # foo <- merge(foo, agg_data, by = c("col3", "col4"), all.x = TRUE)
-  
+  foo_irr_3$ifreq_cap <- foo_irr_3$ifreq_cap + 2
+  foo_irr_3 = foo_irr_3[ifreq <= ifreq_cap,]
+  foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
+  foo_irr_3 <- foo_irr_3[order(foo_irr_3$Well_capacity, foo_irr_3$tot_acres, foo_irr_3$CR, foo_irr_3$PAW, foo_irr_3$SDAT, foo_irr_3$ifreq, foo_irr_3$quarter), ]
+
+  foo_irr_3 <- foo_irr_3 %>%
+    group_by(Well_capacity, tot_acres, ifreq) %>%
+    mutate(id = group_indices())
   
   return(foo_irr_3)
-  # 
-  # foo_irr_3[, ifreq_cap := min(ifreq), by=c("Well_capacity", "SDAT", "tot_acres", "CR", "PAW")]
-  # foo_irr_3[, ifreq_cap := ifreq_cap + 2]
-  # foo_irr_3 = foo_irr_3[ifreq <= ifreq_cap]
-  # # foo_irr_3[, id := .GRP, by=c("Soil_Type", "weather_station", "CR", "Well_ID", "Well_capacity", "tot_acres", "quarter", "PAW", "SDAT")]
-  # foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
-  # setkey(foo_irr_3, Well_capacity, tot_acres, CR, PAW, SDAT, ifreq, quarter)
-  # foo_irr_3[, id := .GRP, by=c("Well_capacity", "tot_acres", "ifreq")]
-  # 
   # #----
   # foo_dt1_000 = foo_irr_3[quarter == 1 & tot_acres == 0, .(Well_capacity, SDAT, tot_acres, ifreq_1 = ifreq, CR_1 = CR, PAW_1 = PAW, irrigation_1 = irrigation, profit_1 = profit)]
   # foo_dt2_000 = foo_irr_3[quarter == 2 & tot_acres == 0, .(Well_capacity, SDAT, tot_acres, ifreq_2 = ifreq, CR_2 = CR, PAW_2 = PAW, irrigation_2 = irrigation, profit_2 = profit)]
