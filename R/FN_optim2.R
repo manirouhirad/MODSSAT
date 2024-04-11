@@ -56,7 +56,7 @@ FN_optim2 = function(jj = 1) {
     ungroup()
   
   foo_irr_3$ifreq_cap <- foo_irr_3$ifreq_cap + 2
-  foo_irr_3 = foo_irr_3[foo_irr_3$ifreq <= ifreq_cap,]
+  foo_irr_3 = foo_irr_3[foo_irr_3$ifreq <= foo_irr_3$ifreq_cap,]
   foo_irr_3 = unique(foo_irr_3, by=colnames(foo_irr_3))
   foo_irr_3 <- foo_irr_3[order(foo_irr_3$Well_capacity, foo_irr_3$tot_acres, foo_irr_3$CR, foo_irr_3$PAW, foo_irr_3$SDAT, foo_irr_3$ifreq, foo_irr_3$quarter), ]
 
