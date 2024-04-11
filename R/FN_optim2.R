@@ -103,27 +103,27 @@ FN_optim2 = function(jj = 1) {
   
   foo_dt1_000 = foo_dt1_000[foo_dt1_000$SDAT == min(foo_dt1_000$SDAT), ]
   
-  quarter_1 <- foo_dt1_000 %>%
-    rename(Well_capacity = Well_capacity,
-           tot_acres = tot_acres,
-           quarter = "1",
-           ifreq = ifreq_1,
-           CR = CR_1,
-           PAW = PAW_1,
-           mean_irrigation_combination = mean_irrigation_combination,
-           mean_profit_combination = mean_profit_combination,
-           mean_profit_combination_sub = mean_profit_combination_sub)
-  
-  quarter_2 <- foo_dt1_000 %>%
-    rename(Well_capacity = Well_capacity,
-           tot_acres = tot_acres,
-           quarter = "2",
-           ifreq = ifreq_1,
-           CR = CR_1,
-           PAW = PAW_1,
-           mean_irrigation_combination = mean_irrigation_combination,
-           mean_profit_combination = mean_profit_combination,
-           mean_profit_combination_sub = mean_profit_combination_sub)
+  # quarter_1 <- foo_dt1_000 %>%
+  #   rename(Well_capacity = Well_capacity,
+  #          tot_acres = tot_acres,
+  #          quarter = "1",
+  #          ifreq = ifreq_1,
+  #          CR = CR_1,
+  #          PAW = PAW_1,
+  #          mean_irrigation_combination = mean_irrigation_combination,
+  #          mean_profit_combination = mean_profit_combination,
+  #          mean_profit_combination_sub = mean_profit_combination_sub)
+  # 
+  # quarter_2 <- foo_dt1_000 %>%
+  #   rename(Well_capacity = Well_capacity,
+  #          tot_acres = tot_acres,
+  #          quarter = "2",
+  #          ifreq = ifreq_1,
+  #          CR = CR_1,
+  #          PAW = PAW_1,
+  #          mean_irrigation_combination = mean_irrigation_combination,
+  #          mean_profit_combination = mean_profit_combination,
+  #          mean_profit_combination_sub = mean_profit_combination_sub)
   
   # quarter_1 <- foo_dt1_000[, c("Well_capacity", "tot_acres", "quarter" = "1", "ifreq_1", "CR_1", "PAW_1", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
   # colnames(quarter_1) <- c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
@@ -149,7 +149,7 @@ FN_optim2 = function(jj = 1) {
   # foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
   # foo_dt1_000 <- list(quarter_1, quarter_2, quarter_3, quarter_4)
   
-  return(quarter_2)
+  return(foo_dt1_000)
   
   # #----------
 
