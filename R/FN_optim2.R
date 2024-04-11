@@ -70,10 +70,10 @@ FN_optim2 = function(jj = 1) {
   foo_dt3_000 <- subset(foo_irr_3, quarter == 3 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_3 = ifreq,  CR_3 = CR, PAW_3 = PAW, irrigation_3 = irrigation,  profit_3 = profit))
   foo_dt4_000 <- subset(foo_irr_3, quarter == 4 & tot_acres == 0,  select = c(Well_capacity, SDAT, tot_acres, ifreq_4 = ifreq,  CR_4 = CR, PAW_4 = PAW, irrigation_4 = irrigation,  profit_4 = profit))
   
-  foo_dt3_000 = merge(foo_dt3_000, foo_dt4_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
-  foo_dt2_000 = merge(foo_dt2_000, foo_dt3_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
-  foo_dt1_000 = merge(foo_dt1_000, foo_dt2_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
-  rm(foo_dt2_000, foo_dt3_000, foo_dt4_000)
+  # foo_dt3_000 = merge(foo_dt3_000, foo_dt4_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
+  # foo_dt2_000 = merge(foo_dt2_000, foo_dt3_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
+  # foo_dt1_000 = merge(foo_dt1_000, foo_dt2_000, by = c("Well_capacity", "SDAT", "tot_acres"), allow.cartesian = T)
+  # rm(foo_dt2_000, foo_dt3_000, foo_dt4_000)
   
   # foo_dt1_000$irrigation_sum   <- foo_dt1_000$irrigation_1 + foo_dt1_000$irrigation_2 + foo_dt1_000$irrigation_3 + foo_dt1_000$irrigation_4
   
