@@ -106,8 +106,10 @@ FN_optim2 = function(jj = 1) {
   library(dplyr)
   
   # Select columns
-  quarter_1 <- foo_dt1_000 %>%
-    select(Well_capacity, tot_acres, ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  quarter_1 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  quarter_2 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_2, CR_2, PAW_2, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  quarter_3 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_3, CR_3, PAW_3, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
+  quarter_4 <- foo_dt1_000 %>% select(Well_capacity, tot_acres, ifreq_4, CR_4, PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   
   # quarter_1 <- foo_dt1_000 %>%
   #   rename(Well_capacity = Well_capacity,
@@ -155,7 +157,7 @@ FN_optim2 = function(jj = 1) {
   # foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
   # foo_dt1_000 <- list(quarter_1, quarter_2, quarter_3, quarter_4)
   
-  return(quarter_1)
+  return(quarter_2)
   
   # #----------
 
