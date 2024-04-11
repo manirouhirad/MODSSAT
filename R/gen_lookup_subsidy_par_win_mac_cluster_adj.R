@@ -625,11 +625,6 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     foo_irr_2 = foo_irr_2[, .(Well_ID, SOIL_ID = Soil_Type, WSTA = weather_station,
                               Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                               PAW, SDAT, irr_mm, PRCP, PRCM, irrigation, yield_bu_ac, profit)]
-    print(Sys.info()[1])
-    print(environment())
-    print(environmentName(environment()))
-    ls(envir = environment())
-    print("hello")
 
     # well_capacity_data = data.frame(well_capacity_data)
 
@@ -644,12 +639,6 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
                                               "IFREQ_interpolate", "subsidy_amount",
                                               "subsidy_threshold"), envir = environment()
                               )
-
-      print("hello helloww")
-      # print(environment())
-      # print(environmentName(environment()))
-      # ls(envir = environment())
-      # print(well_capacity_data[,9])
 
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
@@ -679,7 +668,6 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     foo_dt_all_4 =      data.table(foo_dt_all_4)
 
     foo_dt_all = rbind(foo_dt_all_1, foo_dt_all_2, foo_dt_all_3, foo_dt_all_4)
-    print(foo_dt_all)
     foo_dt_all = unique(foo_dt_all, by=c("Well_capacity", "quarter"))
 
     foo_dt_all = foo_dt_all[, .(Well_capacity, tot_acres, quarter, ifreq,
