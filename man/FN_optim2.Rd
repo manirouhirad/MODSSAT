@@ -4,7 +4,7 @@
 \alias{FN_optim2}
 \title{This function maximizes the expected profit.}
 \usage{
-FN_optim2(jj = 1)
+FN_optim2(jj = 1, well_capacity_data)
 }
 \arguments{
 \item{jj}{is the loop number. Defaults to 1.}

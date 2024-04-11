@@ -631,6 +631,8 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     ls(envir = environment())
     print("hello")
 
+    well_capacity_data = data.frame(well_capacity_data)
+
     if (Sys.info()[1] == "Windows") {
       library(snow)
       cl <- makeCluster(num_clusters)
@@ -649,9 +651,13 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       # print(well_capacity_data[,9])
 
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
+      print("Hello 1")
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
+      print("Hello 2")
       foo_dt_all_3 <- parLapply(cl, (2*floor(aa/4)+1):(3*floor(aa/4)), FN_optim2)
+      print("Hello 3")
       foo_dt_all_4 <- parLapply(cl, (3*floor(aa/4)+1):aa,              FN_optim2)
+      print("Hello 4")
       stopCluster(cl)
     } else {
       print(Sys.info()[1])
@@ -669,6 +675,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
 
     }
 
+    print("Hello 5")
 
     foo_dt_all_1 <- do.call(rbind, foo_dt_all_1)
     foo_dt_all_1 =      data.table(foo_dt_all_1)
