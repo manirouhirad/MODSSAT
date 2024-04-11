@@ -17,19 +17,14 @@ FN_optim2 = function(jj = 1) {
   foo_irr_3_N0 = foo_irr_3[foo_irr_3$ifreq != 0,]
   foo_irr_3_N0$ifreq = as.numeric(as.character(foo_irr_3_N0$ifreq))
   
-  # foo_irr_3[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
-  # foo_irr_3_0  = foo_irr_3[ifreq == 0]
-  # foo_irr_3_N0 = foo_irr_3[ifreq != 0]
-  # foo_irr_3_N0[, ifreq := as.numeric(as.character(ifreq))]
-
-  # tryCatch({
-  #   foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
-  #                       by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
-  #                       by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
-  # }, error=function(e){})
+  tryCatch({
+    foo_irr_3_0 = merge(foo_irr_3_0, KS_DSSAT,
+                        by.x = c("Soil_Type", "weather_station", "CR", "ifreq"),
+                        by.y = c("SOIL_ID", "WSTA", "CR", "IFREQ"), allow.cartesian = T)
+  }, error=function(e){})
   # 
-  # foo_irr_3_N0[, diff := (KS_DSSAT[, max(IFREQ)] - ifreq) * (1/IFREQ_interpolate)]
-  # foo_irr_3_N0[, id := 1:.N]
+  foo_irr_3_N0[, diff := (KS_DSSAT[, max(IFREQ)] - ifreq) * (1/IFREQ_interpolate)]
+  foo_irr_3_N0[, id := 1:.N]
   # 
   # tryCatch({
   #   foo_irr_3_N0 = foo_irr_3_N0[rep(1:.N, (diff+1))]
