@@ -677,6 +677,8 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     }
 
     print("Hello 5")
+    print(foo_dt1_000)
+
 
     foo_dt_all_1 <- do.call(rbind, foo_dt_all_1)
     foo_dt_all_1 =      data.table(foo_dt_all_1)

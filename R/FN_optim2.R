@@ -107,13 +107,10 @@ FN_optim2 = function(jj = 1) {
   quarter_4 <- foo_dt1_000 %>% filter(SDAT == min(SDAT)) %>% select(Well_capacity, tot_acres, quarter = 4, ifreq = ifreq_4, CR = CR_4, PAW = PAW_4, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)
   
   # Combine the subsets
-  foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
+  # foo_dt1_000 <- rbind(quarter_1, quarter_2, quarter_3, quarter_4)
+  foo_dt1_000 <- list(quarter_1, quarter_2, quarter_3, quarter_4)
   
-  print(quarter_1)
-  print(quarter_2)
-  print(quarter_3)
-  print(quarter_4)
-  return(quarter_1)
+  return(foo_dt1_000)
   
   # #----------
 
