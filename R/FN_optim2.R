@@ -102,11 +102,34 @@ FN_optim2 = function(jj = 1) {
   foo_dt1_000 <- merge(foo_dt1_000, foo, by = "row")
   
   foo_dt1_000 = foo_dt1_000[foo_dt1_000$SDAT == min(foo_dt1_000$SDAT), ]
-  quarter_1 <- foo_dt1_000[, c("Well_capacity", "tot_acres", "quarter" = "1", "ifreq_1", "CR_1", "PAW_1", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
-  colnames(quarter_1) <- c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
   
-  quarter_2 <- foo_dt1_000[, c("Well_capacity", "tot_acres", "quarter" = "2", "ifreq_1", "CR_1", "PAW_1", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
-  colnames(quarter_2) <- c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
+  quarter_1 <- foo_dt1_000 %>%
+    rename(Well_capacity = Well_capacity,
+           tot_acres = tot_acres,
+           quarter = "1",
+           ifreq = ifreq_1,
+           CR = CR_1,
+           PAW = PAW_1,
+           mean_irrigation_combination = mean_irrigation_combination,
+           mean_profit_combination = mean_profit_combination,
+           mean_profit_combination_sub = mean_profit_combination_sub)
+  
+  quarter_2 <- foo_dt1_000 %>%
+    rename(Well_capacity = Well_capacity,
+           tot_acres = tot_acres,
+           quarter = "2",
+           ifreq = ifreq_1,
+           CR = CR_1,
+           PAW = PAW_1,
+           mean_irrigation_combination = mean_irrigation_combination,
+           mean_profit_combination = mean_profit_combination,
+           mean_profit_combination_sub = mean_profit_combination_sub)
+  
+  # quarter_1 <- foo_dt1_000[, c("Well_capacity", "tot_acres", "quarter" = "1", "ifreq_1", "CR_1", "PAW_1", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
+  # colnames(quarter_1) <- c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
+  # 
+  # quarter_2 <- foo_dt1_000[, c("Well_capacity", "tot_acres", "quarter" = "2", "ifreq_1", "CR_1", "PAW_1", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")]
+  # colnames(quarter_2) <- c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
   
   # quarter_1 = quarter_1[,.(Well_capacity, tot_acres, quarter = "1", ifreq_1, CR_1, PAW_1, mean_irrigation_combination, mean_profit_combination, mean_profit_combination_sub)]
   # colnames(quarter_1) = c("Well_capacity", "tot_acres", "quarter", "ifreq", "CR", "PAW", "mean_irrigation_combination", "mean_profit_combination", "mean_profit_combination_sub")
