@@ -688,6 +688,7 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
     foo_dt_all_4 =      data.table(foo_dt_all_4)
 
     foo_dt_all = rbind(foo_dt_all_1, foo_dt_all_2, foo_dt_all_3, foo_dt_all_4)
+    print(foo_dt_all)
     foo_dt_all = unique(foo_dt_all, by=c("Well_capacity", "quarter"))
 
     foo_dt_all = foo_dt_all[, .(Well_capacity, tot_acres, quarter, ifreq,
