@@ -10,7 +10,7 @@ FN_optim2 = function(jj = 1) {
   # foo_irr_3 <- well_capacity_data[, .SD[.SD[[9]] == jj]]
   library(data.table)
   foo_irr_3 <- well_capacity_data[well_capacity_data[[9]] == jj, ]
-  foo_irr_3 = data.table(foo_irr_3)
+  foo_irr_3 = as.data.table(foo_irr_3)
   foo_irr_3 = class(foo_irr_3)
   # foo_irr_3[ifreq > 15.9, ifreq := 15.9]
   # foo_irr_3[ifreq > KS_DSSAT[, max(IFREQ)], ifreq := KS_DSSAT[, max(IFREQ)]]
