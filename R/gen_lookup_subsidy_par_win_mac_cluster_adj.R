@@ -626,20 +626,15 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
                               Well_capacity, tot_acres, IFREQ = ifreq, CR, quarter,
                               PAW, SDAT, irr_mm, PRCP, PRCM, irrigation, yield_bu_ac, profit)]
 
-    # well_capacity_data = data.frame(well_capacity_data)
 
     if (Sys.info()[1] == "Windows") {
       library(snow)
       cl <- makeCluster(num_clusters)
       print(Sys.info()[1])
-      parallel::clusterExport(cl, varlist = c(#"Well_ID_grp",
-                                              "setnames", "setkey",
-                                              "well_capacity_data", "data.table", ".SD", ":=",
+      parallel::clusterExport(cl, varlist = c("well_capacity_data", "data.table", #".",
                                               "aa", "FN_optim2", "KS_DSSAT",
-                                              "IFREQ_interpolate", "subsidy_amount",
-                                              "subsidy_threshold"), envir = environment()
-                              )
-
+                                              "IFREQ_interpolate", "setnames", "setkey", "subsidy_amount", "Well_ID_grp",
+                                              "subsidy_threshold"), envir = environment())
       foo_dt_all_1 <- parLapply(cl, 1:floor(aa/4),                     FN_optim2)
       foo_dt_all_2 <- parLapply(cl, (floor(aa/4)+1):(2*floor(aa/4)),   FN_optim2)
       foo_dt_all_3 <- parLapply(cl, (2*floor(aa/4)+1):(3*floor(aa/4)), FN_optim2)
@@ -647,16 +642,20 @@ gen_lookup_subsidy_par_win_mac_cluster_adj = function(subsidy_amount = 1,
       stopCluster(cl)
     } else {
       print(Sys.info()[1])
-      foo_dt_all_1 <- mclapply(X = 1:floor(aa/4), FUN = FN_optim3,
+      foo_dt_all_1 <- mclapply(X = 1:floor(aa/4), FUN = FN_optim2,
                                mc.cores = num_clusters)
-      foo_dt_all_2 <- mclapply(X = (floor(aa/4)+1):(2*floor(aa/4)), FUN = FN_optim3,
+
+      foo_dt_all_2 <- mclapply(X = (floor(aa/4)+1):(2*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
-      foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim3,
+
+      foo_dt_all_3 <- mclapply(X = (2*floor(aa/4)+1):(3*floor(aa/4)), FUN = FN_optim2,
                                mc.cores = num_clusters)
-      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim3,
+
+      foo_dt_all_4 <- mclapply(X = (3*floor(aa/4)+1):aa, FUN = FN_optim2,
                                mc.cores = num_clusters)
 
     }
+
 
     foo_dt_all_1 <- do.call(rbind, foo_dt_all_1)
     foo_dt_all_1 =      data.table(foo_dt_all_1)

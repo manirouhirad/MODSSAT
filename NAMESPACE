@@ -2,7 +2,6 @@
 
 export(FN_optim)
 export(FN_optim2)
-export(FN_optim3)
 export(annual_model_CREP)
 export(annual_model_CREP_0)
 export(annual_model_base)
